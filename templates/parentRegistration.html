@@ -1,0 +1,48 @@
+{% include 'publicHeader.html' %}  
+<body>
+<h1>Parent Registration</h1>
+<form  method="post">
+    <table>
+        <tr>
+            <th>Name</th>
+            <td><input type="text" name="name" id=""></td>
+        </tr>
+    <tr>
+        <th>Phone No</th>
+        <td><input type="text" name="phone" id=""></td>
+    </tr>
+    <tr>
+        <th>Address</th>
+        <td>
+            <textarea name="address" id=""></textarea>
+        </td>
+    </tr>
+    <tr>
+        <th>Gender</th>
+        <td><input type="radio" value="male" name="gender">Male<input type="radio" value="female" name="gender">Female</td>
+    </tr>
+    <tr>
+        <th>Date of Birth</th>
+        <td><input type="text" name="dob" id=""></td>
+    </tr>
+    <tr>
+        <th>E-mail</th>
+        <td><input type="email" name="email" id=""></td>
+    </tr>
+    <tr>
+        <th>Username</th>
+        <td><input type="text" name="username" id=""></td>
+    </tr>
+    <tr>
+        <th>Paswword</th>
+        <td><input type="password" name="password" id=""></td>
+    </tr>  
+    <tr>
+        <td> <input type="submit" name="register" value="submit"></td>
+    </tr>  
+    </table>
+</form>
+</center>
+</body>
+
+{% include 'footer.html' %}
