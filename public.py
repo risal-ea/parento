@@ -48,6 +48,22 @@ def dayCareReg():
 
 @public.route("/parentReg",methods=['post','get'])
 def parentReg():
+    if 'register' in request.form:
+        name = request.form['name']
+        phone_no = request.form['phone']
+        adress = request.form['adress']
+        gender = request.form['gender']
+        dob = request.form['dob']
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
+
+        z="insert into login values(null,'%s','%s','parent')"%(username,password)
+        id=insert(z)
+
+        x="insert into parent values(null,'%s','%s','%s','%s','%s','%s','%s')"%(id, name, email,phone_no,adress,dob,gender)
+        insert(x)
+
     return render_template("parentRegistration.html")
 
     
