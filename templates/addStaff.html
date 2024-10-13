@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Staff</title>
+</head>
+<body>
+
+<h2>Add Staff Information</h2>
+
+<form action="/add_staff" method="POST, get">
+    <label for="staff_name">Staff Name:</label><br>
+    <input type="text" id="staff_name" name="staff_name" required><br><br>
+
+    <label for="staff_email">Staff Email:</label><br>
+    <input type="email" id="staff_email" name="staff_email" required><br><br>
+
+    <label for="staff_phone">Staff Phone:</label><br>
+    <input type="tel" id="staff_phone" name="staff_phone" required><br><br>
+
+    <label for="staff_dob">Staff Date of Birth:</label><br>
+    <input type="date" id="staff_dob" name="staff_dob" required><br><br>
+
+    <label for="gender">Gender:</label><br>
+    <select id="gender" name="gender" required>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+    </select><br><br>
+
+    <label for="staff_adress">Staff Address:</label><br>
+    <input type="text" id="staff_adress" name="staff_adress" required><br><br>
+
+    <label for="position">Position:</label><br>
+    <input type="text" id="position" name="position" required><br><br>
+
+    <label for="qualification">Qualification:</label><br>
+    <input type="text" id="qualification" name="qualification" required><br><br>
+
+    <label for="staff_name">Username</label><br>
+    <input type="text"  name="username" required><br><br>
+
+    <label for="staff_email">Password</label><br>
+    <input type="password" name="password" required><br><br>
+
+    <input type="submit" value="Add Staff" name="add_staff">
+</form>
+
+</body>
+</html>

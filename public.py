@@ -19,6 +19,9 @@ def log():
         if res:
             if res[0]['usertype']=='admin':
                 return redirect(url_for('admin.adm'))
+            elif res[0]['usertype']=='dayCare':
+                return redirect(url_for('dayCare.dayCare_home'))
+
         
     return render_template("login.html")
 
@@ -37,7 +40,7 @@ def dayCareReg():
         username = request.form['username']       
         password = request.form['password']
 
-        z="insert into login values(null,'%s','%s','dayCare')"%(username,password)
+        z="insert into login values(null,'%s','%s','pending')"%(username,password)
         id=insert(z)
 
         x="insert into day_care values(null,'%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(id, name, owner_name,phone_no,adress,license_number,capacity,opTime,dcDescription)

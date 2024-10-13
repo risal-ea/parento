@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>view feedback</title>
+</head>
+<body>
+    <center>
+        <h1>FeedBack</h1>
+        <table border="2">
+            <tr>
+                <th>Feedback ID</th>
+                <th>Day Care ID</th>
+                <th>Login ID</th>
+                <th>Feedback</th>
+                <th>Date and Time</th>
+            </tr>
+            {% for feedback in data['view'] %}
+            <tr>
+                <td>{{ feedback['feedback_id'] }}</td>
+                <td>{{ feedback['day_care_id'] }}</td>
+                <td>{{ feedback['login_id'] }}</td>
+                <td>{{ feedback['feedback'] }}</td>
+                <td>{{ feedback['date_time'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </center>
+</body>
+</html>
