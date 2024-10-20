@@ -15,11 +15,16 @@ def log():
 
         getData="SELECT * FROM login WHERE username='%s' AND PASSWORD='%s'"%(uname,password)
         res = select(getData)
+        session['log']= res[0]['login_id']
+        print(session['log'])
 
         if res:
             if res[0]['usertype']=='admin':
                 return redirect(url_for('admin.adm'))
             elif res[0]['usertype']=='dayCare':
+                qry="select * from day_care where login_id='%s'"%(session['log'])
+                res1=select(qry)
+                session['day_care']=res1[0]['day_care_id']
                 return redirect(url_for('dayCare.dayCare_home'))
 
         

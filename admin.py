@@ -53,8 +53,9 @@ def viewParent():
 @admin.route('/view-feedback')
 def viewFeedBack():
     data={}
-    a = 'select * from feedback'
+    a = 'select * from feedback inner join day_care  using ( day_care_id) inner join parent on feedback.login_id = parent.login_id '
     b=select(a)
+    print(b)
     if b:
         data['view']=b
 

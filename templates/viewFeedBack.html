@@ -11,16 +11,16 @@
         <table border="2">
             <tr>
                 <th>Feedback ID</th>
-                <th>Day Care ID</th>
-                <th>Login ID</th>
+                <th>Day Care</th>
+                <th>Parent</th>
                 <th>Feedback</th>
                 <th>Date and Time</th>
             </tr>
             {% for feedback in data['view'] %}
             <tr>
                 <td>{{ feedback['feedback_id'] }}</td>
-                <td>{{ feedback['day_care_id'] }}</td>
-                <td>{{ feedback['login_id'] }}</td>
+                <td>{{ feedback['day_care_name'] }}</td>
+                <td>{{ feedback['parent_name'] }}</td>
                 <td>{{ feedback['feedback'] }}</td>
                 <td>{{ feedback['date_time'] }}</td>
             </tr>

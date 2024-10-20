@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Facilities</title>
+</head>
+<body>
+    <center>
+    {% if data['up'] %}
+        <form method="POST">
+            <label for="facility_name">Facility Name:</label><br>
+            <input type="text" id="facility_name" name="facility_name" value="{{data['up'][0]['facility_name']}}" required><br><br>
+        
+            <label for="facility_type">Facility Type:</label><br>
+            <input type="text" id="facility_type" name="facility_type" value="{{data['up'][0]['facility_type']}}" required><br><br>
+        
+            <label for="facility_des">Facility Description:</label><br>
+            <input type="text" id="facility_des" name="facility_des" value="{{data['up'][0]['facility_des']}}" required><br><br>
+        
+            <label for="facility_capacity">Facility Capacity:</label><br>
+            <input type="text" id="facility_capacity" name="facility_capacity" value="{{data['up'][0]['facility_capacity']}}" required><br><br>
+        
+            <label for="facility_image">Facility Image:</label><br>
+            <input type="text" id="facility_image" name="facility_image" value="{{data['up'][0]['facility_image']}}" required><br><br>
+        
+            <label for="operating_hrs">Operating Hours:</label><br>
+            <input type="text" id="operating_hrs" name="operating_hrs" value="{{data['up'][0]['operating_hrs']}}" required><br><br>
+        
+            <label for="safety_measures">Safety Measures:</label><br>
+            <input type="text" id="safety_measures" name="safety_measures" value="{{data['up'][0]['safety_measures']}}" required><br><br>
+        
+            <input type="submit" value="Update Facility" name="update_facility">
+        </form>
+    {% else %}
+        <h1>Manage Facilities</h1>
+        <a href="/addFacility">Add Facility</a>
+        <br><br>
+        <table border="2">
+            <tr>
+                <th>Facility ID</th>
+                <th>Daycare ID</th>
+                <th>Facility Name</th>
+                <th>Facility Type</th>
+                <th>Facility Description</th>
+                <th>Facility Capacity</th>
+                <th>Facility Image</th>
+                <th>Operating Hours</th>
+                <th>Safety Measures</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+            {% for facility in data['view'] %}
+            <tr>
+                <td>{{facility['facility_id']}}</td>
+                <td>{{facility['day_care_id']}}</td>
+                <td>{{facility['facility_name']}}</td>
+                <td>{{facility['facility_type']}}</td>
+                <td>{{facility['facility_des']}}</td>
+                <td>{{facility['facility_capacity']}}</td>
+                <td>{{facility['facility_image']}}</td>
+                <td>{{facility['operating_hrs']}}</td>
+                <td>{{facility['safety_measures']}}</td>
+                <td><a href="?action=update&id={{facility['facility_id']}}">Update</a></td>
+                <td><a href="?action=delete&id={{facility['facility_id']}}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    </center>
+</body>
+</html>

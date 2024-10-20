@@ -7,8 +7,81 @@
 </head>
 <body>
     <center>
+        
+    {% if data['up'] %}
+
+        <form  method="POST">
+            <label for="staff_name">Staff Name:</label><br>
+            <input type="text" id="staff_name" name="staff_name" value="{{data['up'][0]['staff_name']}}" required><br><br>
+        
+            <label for="staff_email">Staff Email:</label><br>
+            <input type="email" id="staff_email" name="staff_email" value="{{data['up'][0]['staff_email']}}" required><br><br>
+        
+            <label for="staff_phone">Staff Phone:</label><br>
+            <input type="tel" id="staff_phone" name="staff_phone" value="{{data['up'][0]['staff_phone']}}"required><br><br>
+        
+            <label for="staff_dob">Staff Date of Birth:</label><br>
+            <input type="date" id="staff_dob" name="staff_dob" required><br><br>
+        
+            <label for="gender">Gender:</label><br>
+            <select id="gender" name="gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br><br>
+        
+            <label for="staff_adress">Staff Address:</label><br>
+            <input type="text" id="staff_adress" name="staff_adress" value="{{data['up'][0]['staff_adress']}}"required><br><br>
+        
+            <label for="position">Position:</label><br>
+            <input type="text" id="position" name="position" value="{{data['up'][0]['position']}}"required><br><br>
+        
+            <label for="qualification">Qualification:</label><br>
+            <input type="text" id="qualification" name="qualification" value="{{data['up'][0]['qualification']}}"required><br><br>
+        
+        
+            <input type="submit" value="update Staff" name="update_staff">
+        </form>
+{% else %}
         <h1>Manage Staff</h1>
         <a href="/addStaff">Add Staff</a>
+        <br>
+        <br>
+        <table border="2">
+            <tr>
+                <th>Staff Id</th>
+                <th>Login Id</th>
+                <th>Daycare Id</th>
+                <th>Staff name</th>
+                <th>Staff email</th>
+                <th>Staff phone</th>
+                <th>Staff dob</th>
+                <th>Gender</th>
+                <th>Staff adress</th>
+                <th>Position</th>
+                <th>Qualification</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+            {% for staff in data['view'] %}
+            <tr>
+                <td>{{staff['staff_id']}}</td>
+                <td>{{staff['login_id']}}</td>
+                <td>{{staff['day_care_id']}}</td>
+                <td>{{staff['staff_name']}}</td>
+                <td>{{staff['staff_email']}}</td>
+                <td>{{staff['staff_phone']}}</td>
+                <td>{{staff['staff_dob']}}</td>
+                <td>{{staff['gender']}}</td>
+                <td>{{staff['staff_adress']}}</td>
+                <td>{{staff['position']}}</td>
+                <td>{{staff['qualification']}}</td>
+                <td><a href="?action=update&id={{staff['login_id']}}">Update</a></td>
+                <td><a href="?action=delete&id={{staff['login_id']}}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    {% endif %}
     </center>
 </body>
 </html>
