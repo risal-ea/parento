@@ -1,6 +1,6 @@
 import mysql.connector
 user="root"
-password=""
+password="12345678"
 database="parento"
 
 def select(q):
