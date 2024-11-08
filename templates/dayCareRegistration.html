@@ -1,56 +1,67 @@
-{% include 'publicHeader.html' %}  
+{% include 'public/header.html' %}
 <body>
-<h1>DayCare Registration</h1>
-<form  method="post">
-    <table>
-        <tr>
-            <th>Name</th>
-            <td><input type="text" name="name" id=""></td>
-        </tr>
-        <tr>
-            <th>Owner's Name</th>
-            <td><input type="text" name="ownerName" id=""></td>
-        </tr>
-    <tr>
-        <th>Phone No</th>
-        <td><input type="text" name="phoneNo" id=""></td>
-    </tr>
-    <tr>
-        <th>Address</th>
-        <td>
-            <textarea name="address" id=""></textarea>
-        </td>
-    </tr>
-    <tr>
-        <th>License Number</th>
-         <td><input type="text" name="licenseNumber" id=""></td>
-    </tr>
-    <tr>
-        <th>Capacity</th>
-        <td><input type="text" name="capacity" id=""></td>
-    </tr>
-    <tr>
-        <th>Operating Time</th>
-        <td><input type="text" name="opTime" id=""></td>
-    </tr>
-    <tr>
-        <th>Daycare Description</th>
-        <td><input type="text" name="dcDescription" id=""></td>
-    </tr>
-    <tr>
-        <th>Username</th>
-        <td><input type="text" name="username" id=""></td>
-    </tr>
-    <tr>
-        <th>Paswword</th>
-        <td><input type="password" name="password" id=""></td>
-    </tr>  
-    <tr>
-        <td> <input type="submit" name="register" value="submit"></td>
-    </tr>  
-    </table>
-</form>
-</center>
+    <section>
+        <img src="/static/img/home1.jpg" alt="" class="home__img">
+
+        <div class="form__container">
+            <form method="post" class="form-container">
+                <h2 align="center">Daycare Registration</h2>
+                <div class="form-group">
+                    <label for="name">Daycare Name</label>
+                    <input type="text" name="name" id="name" class="form-input" placeholder="Enter Daycare Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ownerName">Owner's Name</label>
+                    <input type="text" name="ownerName" id="ownerName" class="form-input" placeholder="Enter Owner's Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNo">Phone No</label>
+                    <input type="text" name="phoneNo" id="phoneNo" class="form-input" placeholder="Enter Phone Number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea name="address" id="address" class="form-textarea" placeholder="Enter Address" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="licenseNumber">License Number</label>
+                    <input type="text" name="licenseNumber" id="licenseNumber" class="form-input" placeholder="Enter License Number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="capacity">Capacity</label>
+                    <input type="text" name="capacity" id="capacity" class="form-input" placeholder="Enter Capacity" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="opTime">Operating Time</label>
+                    <input type="text" name="opTime" id="opTime" class="form-input" placeholder="Enter Operating Time" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dcDescription">Daycare Description</label>
+                    <input type="text" name="dcDescription" id="dcDescription" class="form-input" placeholder="Enter Description" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" name="username" id="username" class="form-input" placeholder="Enter Username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-input" placeholder="Enter Password" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" name="register" value="Submit" class="form-button">
+                </div>
+            </form>
+        </div>
+    </section>
 </body>
 
-{% include 'footer.html' %}
+{% include 'public/footer.html' %}
