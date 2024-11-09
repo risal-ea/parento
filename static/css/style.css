@@ -82,14 +82,16 @@
   }
   /*=============== FORM STYLING ===============*/
   .form__container {
-    margin-top: 5rem;
     position: relative;
     display: flex;
     flex-direction: column; /* Ensure form is stacked vertically */
     justify-content: center; /* Center the form vertically */
     align-items: center; /* Center the form horizontally */
     min-height: calc(100vh - var(--header-height)); /* Make the container take up the remaining viewport height */
-    padding: 2rem; /* Optional: Adds some space around the form */
+}
+
+.margin{
+  margin-top: 12rem;
 }
 
 .form-container {
