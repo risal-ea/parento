@@ -926,6 +926,7 @@ h1 {
   
   .footer__description {
     margin-bottom: var(--mb-2);
+    color: var(--text-color-light);
   }
   
   .footer__social {
@@ -943,7 +944,7 @@ h1 {
   }
   
   .footer__link {
-    color: var(--text-color);
+    color: var(--text-color-light);
   }
   
   .footer__link:hover {
