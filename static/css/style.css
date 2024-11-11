@@ -170,24 +170,24 @@ h1 {
   border-collapse: collapse;
 }
 
-.daycare-table th,
-.daycare-table td {
+.data-table th,
+.data-table td {
   padding: 12px 20px;
   border: 1px solid #ddd;
 }
 
-.daycare-table th {
+.data-table th {
   background-color: #133E87;
   color: white;
-  text-align: left;
+  text-align: center;
 }
 
-.daycare-table td {
+.data-table td {
   text-align: left;
   font-size: 14px;
 }
 
-.daycare-table a {
+.data-table a {
   text-decoration: none;
   color: white;
   font-weight: bold;
@@ -212,7 +212,7 @@ h1 {
   background-color: #e53935;
 }
 
-.daycare-table td:last-child {
+.data-table td:last-child {
   text-align: center;
 }
 

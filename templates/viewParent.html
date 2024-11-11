@@ -1,35 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>view parent</title>
-</head>
-<body>
-    <center>
-        <h1>Parent</h1>
-        <table border="2">
-            <tr>
-                <th>Parent Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Address</th>
-                <th>Date of Birth</th>
-                <th>Gender</th>
-            </tr>
-            {% for i in data['view'] %}
-            <tr>
-                <td>{{ i['parent_name'] }}</td>
-                <td>{{ i['parent_email'] }}</td>
-                <td>{{ i['parent_phone'] }}</td>
-                <td>{{ i['parent_adress'] }}</td>
-                <td>{{ i['parent_dob'] }}</td>
-                <td>{{ i['parent_gender'] }}</td>
-                <td><a href="/view-babies?id={{i['parent_id']}}">view babies</a></td>
-            </tr>
-            {% endfor %}
-        </table>
-        
-    </center>
+{% include 'public/header.html' %}
+<body style="background-color: #C5D3E8;">
+        <div class="data-container">
+            <h1>Parent</h1>
+            <table class="data-table">
+                <tr>
+                    <th>Parent Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Date of Birth</th>
+                    <th>Gender</th>
+                    <th>View Babies</th>
+                </tr>
+                {% for i in data['view'] %}
+                <tr>
+                    <td>{{ i['parent_name'] }}</td>
+                    <td>{{ i['parent_email'] }}</td>
+                    <td>{{ i['parent_phone'] }}</td>
+                    <td>{{ i['parent_adress'] }}</td>
+                    <td>{{ i['parent_dob'] }}</td>
+                    <td>{{ i['parent_gender'] }}</td>
+                    <td><a href="/view-babies?id={{i['parent_id']}}" class="accept-btn">view babies</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
 </body>
-</html>
+{% include 'public/footer.html' %}
