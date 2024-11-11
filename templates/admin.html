@@ -1,13 +1,22 @@
-{%include 'public/header.html'%}
-<body>
-    <h1>Welcome Admin</h1>
-    <br>
-    <a href="/view-dayCare">view Day Care</a>
-    <br>
-    <a href="/view-staff">view staff</a>
-    <br>
-    <a href="/view-parent">view parent</a>
-    <br>
-    <a href="/view-feedback">view feedback</a>
+{% include 'public/header.html' %}
+<body style="background-color: #C5D3E8;">
+    <div class="admin_table">
+        <h1>Welcome Admin</h1>
+        <br>
+        <table class="admin-links-table">
+            <tr>
+                <td><a href="/view-dayCare">View Day Care</a></td>
+            </tr>
+            <tr>
+                <td><a href="/view-staff">View Staff</a></td>
+            </tr>
+            <tr>
+                <td><a href="/view-parent">View Parent</a></td>
+            </tr>
+            <tr>
+                <td><a href="/view-feedback">View Feedback</a></td>
+            </tr>
+        </table>
+    </div>
 </body>
-{%include 'public/footer.html'%}
+{% include 'public/footer.html' %}
