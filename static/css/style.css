@@ -146,6 +146,79 @@
 .form-button:hover {
     background-color: #45a049; /* Darker green on hover */
 }
+/*========== VIEW DAYCARE==========*/
+.daycare-container {
+  text-align: center;
+  padding: 2rem;
+  margin: 10rem auto 0;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  width: 100%;
+}
+
+h1 {
+  color: #133E87;
+  margin-bottom: 20px;
+  font-size: 36px;
+}
+
+.daycare-table {
+  width: 100%;
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+
+.daycare-table th,
+.daycare-table td {
+  padding: 12px 20px;
+  border: 1px solid #ddd;
+}
+
+.daycare-table th {
+  background-color: #133E87;
+  color: white;
+  text-align: left;
+}
+
+.daycare-table td {
+  text-align: left;
+  font-size: 14px;
+}
+
+.daycare-table a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.accept-btn {
+  background-color: #4CAF50;
+}
+
+.reject-btn {
+  background-color: #F44336;
+}
+
+.accept-btn:hover {
+  background-color: #45a049;
+}
+
+.reject-btn:hover {
+  background-color: #e53935;
+}
+
+.daycare-table td:last-child {
+  text-align: center;
+}
+
+.daycare-actions td a {
+  margin: 5px;
+}
 /*========== ADMIN TABLE==========*/
 .admin_table {
   text-align: center;

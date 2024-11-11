@@ -1,47 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>view_data_care</title>
-</head>
-<body>
-    <center>
-        <h1>DAY CARE</h1>
-        <table border="2">
-            <tr>
-                <th>Day Care Name</th>
-                <th>Owner Name</th>
-                <th>Phone</th>
-                <th>Adress</th>
-                <th>license No</th>
-                <th>capacity</th>
-                <th>Operating Time</th>
-                <th>Day Care Discription</th>
-            </tr>
-            {% for i in data['view'] %}
-            <tr>
-                <td>{{i['day_care_name']}}</td>
-                <td>{{i['owner_name']}}</td>
-                <td>{{i['phone']}}</td>
-                <td>{{i['adress']}}</td>
-                <td>{{i['license_number']}}</td>
-                <td>{{i['capacity']}}</td>
-                <td>{{i['operating_time']}}</td>
-                <td>{{i['daycare_discription']}}</td>
-                {% if i['usertype'] == 'pending'%}
-                <td><a href="?action=accept&id={{i['login_id']}}">accept</a></td>
-                <td><a href="?action=reject&id={{i['login_id']}}">reject</a></td>
-                {% elif i['usertype'] == 'dayCare' %}
-                <td>accepted</td>
-                <td><a href="?action=reject&id={{i['login_id']}}">reject</a></td>
-                {% else %}
-                <td><a href="?action=accept&id={{i['login_id']}}">accept</a></td>
-                <td>rejected</td>
-                {% endif %}
-            </tr>
-            {% endfor %}
+{% include 'public/header.html' %}
+<body style="background-color: #C5D3E8;">
+    <div class="daycare-container">
+        <h1>DAY CARE DETAILS</h1>
+        <table class="daycare-table">
+            <thead>
+                <tr>
+                    <th>Day Care Name</th>
+                    <th>Owner Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>License No</th>
+                    <th>Capacity</th>
+                    <th>Operating Time</th>
+                    <th>Day Care Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in data['view'] %}
+                <tr>
+                    <td>{{i['day_care_name']}}</td>
+                    <td>{{i['owner_name']}}</td>
+                    <td>{{i['phone']}}</td>
+                    <td>{{i['adress']}}</td>
+                    <td>{{i['license_number']}}</td>
+                    <td>{{i['capacity']}}</td>
+                    <td>{{i['operating_time']}}</td>
+                    <td>{{i['daycare_discription']}}</td>
+                    {% if i['usertype'] == 'pending' %}
+                    <td>Pending</td>
+                    <td class="daycare-actions">
+                        <a href="?action=accept&id={{i['login_id']}}" class="accept-btn">Accept</a> | 
+                        <a href="?action=reject&id={{i['login_id']}}" class="reject-btn">Reject</a>
+                    </td>
+                    {% elif i['usertype'] == 'dayCare' %}
+                    <td>Accepted</td>
+                    <td>
+                        <a href="?action=reject&id={{i['login_id']}}" class="reject-btn">Reject</a>
+                    </td>
+                    {% else %}
+                    <td>Rejected</td>
+                    <td>
+                        <a href="?action=accept&id={{i['login_id']}}" class="accept-btn">Accept</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
-    </center>
+    </div>
 </body>
-</html>
+{% include 'public/footer.html' %}
