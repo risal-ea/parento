@@ -1,8 +1,8 @@
 {% include 'public/header.html' %}
 <body style="background-color: #C5D3E8;">
-    <div class="daycare-container">
+    <div class="data-container">
         <h1>DAY CARE DETAILS</h1>
-        <table class="daycare-table">
+        <table class="data-table">
             <thead>
                 <tr>
                     <th>Day Care Name</th>
@@ -30,7 +30,7 @@
                     <td>{{i['daycare_discription']}}</td>
                     {% if i['usertype'] == 'pending' %}
                     <td>Pending</td>
-                    <td class="daycare-actions">
+                    <td class="data-actions">
                         <a href="?action=accept&id={{i['login_id']}}" class="accept-btn">Accept</a> | 
                         <a href="?action=reject&id={{i['login_id']}}" class="reject-btn">Reject</a>
                     </td>

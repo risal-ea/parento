@@ -147,7 +147,7 @@
     background-color: #45a049; /* Darker green on hover */
 }
 /*========== VIEW DAYCARE==========*/
-.daycare-container {
+.data-container {
   text-align: center;
   padding: 2rem;
   margin: 10rem auto 0;
@@ -164,7 +164,7 @@ h1 {
   font-size: 36px;
 }
 
-.daycare-table {
+.data-table {
   width: 100%;
   margin: 20px auto;
   border-collapse: collapse;
@@ -216,7 +216,7 @@ h1 {
   text-align: center;
 }
 
-.daycare-actions td a {
+.data-actions td a {
   margin: 5px;
 }
 /*========== ADMIN TABLE==========*/

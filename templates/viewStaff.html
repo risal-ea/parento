@@ -1,38 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>view satff</title>
-</head>
+{% include 'public/header.html' %}
 <body>
-    <center>
-        <h1>Staff</h1>
+    <div class="data-container">
+    <h1>Staff</h1>
 
-<table border="2">
-    <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone No</th>
-        <th>Date of birth</th>
-        <th>Gender</th>
-        <th>Adress</th>
-        <th>Position</th>
-        <th>Qualification</th>
-    </tr>
-    {% for i in data['view'] %}
-    <tr>
-        <td>{{i['staff_name']}}</td>
-        <td>{{i['staff_email']}}</td>
-        <td>{{i['staff_phone']}}</td>
-        <td>{{i['staff_dob']}}</td>
-        <td>{{i['gender']}}</td>
-        <td>{{i['staff_adress']}}</td>
-        <td>{{i['position']}}</td>
-        <td>{{i['qualification']}}</td>
-    </tr>
-    {% endfor %}
-</table>
-    </center>
+    <table border="2" class="data-table">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone No</th>
+            <th>Date of birth</th>
+            <th>Gender</th>
+            <th>Adress</th>
+            <th>Position</th>
+            <th>Qualification</th>
+        </tr>
+        {% for i in data['view'] %}
+        <tr>
+            <td>{{i['staff_name']}}</td>
+            <td>{{i['staff_email']}}</td>
+            <td>{{i['staff_phone']}}</td>
+            <td>{{i['staff_dob']}}</td>
+            <td>{{i['gender']}}</td>
+            <td>{{i['staff_adress']}}</td>
+            <td>{{i['position']}}</td>
+            <td>{{i['qualification']}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
 </body>
-</html>
+{% include 'public/footer.html' %}
