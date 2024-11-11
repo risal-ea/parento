@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>view feedback</title>
-</head>
-<body>
-    <center>
+{% include 'public/header.html' %}
+<body style="background-color: #E2DFD0;">
+    <div class="data-container">
         <h1>FeedBack</h1>
-        <table border="2">
+        <table class="data-table">
             <tr>
                 <th>Feedback ID</th>
                 <th>Day Care</th>
@@ -26,6 +20,6 @@
             </tr>
             {% endfor %}
         </table>
-    </center>
+    </div>
 </body>
-</html>
+{% include 'public/footer.html' %}
