@@ -134,7 +134,7 @@
 .form-button {
     width: 100%;
     padding: 1rem;
-    background-color: #4CAF50; /* Green background for submit button */
+    background-color: #4F6C7D; /* Green background for submit button */
     color: white;
     border: none;
     border-radius: 4px;
@@ -144,7 +144,7 @@
 }
 
 .form-button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #8bb5ce; /* Darker green on hover */
 }
 /*========== VIEW DAYCARE==========*/
 .data-container {
