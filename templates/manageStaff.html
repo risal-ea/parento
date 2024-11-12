@@ -48,9 +48,6 @@
         <br>
         <table border="2">
             <tr>
-                <th>Staff Id</th>
-                <th>Login Id</th>
-                <th>Daycare Id</th>
                 <th>Staff name</th>
                 <th>Staff email</th>
                 <th>Staff phone</th>
@@ -64,9 +61,6 @@
             </tr>
             {% for staff in data['view'] %}
             <tr>
-                <td>{{staff['staff_id']}}</td>
-                <td>{{staff['login_id']}}</td>
-                <td>{{staff['day_care_id']}}</td>
                 <td>{{staff['staff_name']}}</td>
                 <td>{{staff['staff_email']}}</td>
                 <td>{{staff['staff_phone']}}</td>

@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Facilities</title>
-</head>
-<body>
-    <center>
+{% include 'public/header.html' %}
+<body style="background-color: #4F6C7D;">
+    <div class="data-container">
     {% if data['up'] %}
         <form method="POST">
             <label for="facility_name">Facility Name:</label><br>
@@ -36,10 +30,8 @@
         <h1>Manage Facilities</h1>
         <a href="/addFacility">Add Facility</a>
         <br><br>
-        <table border="2">
+        <table class="data-table">
             <tr>
-                <th>Facility ID</th>
-                <th>Daycare ID</th>
                 <th>Facility Name</th>
                 <th>Facility Type</th>
                 <th>Facility Description</th>
@@ -52,8 +44,6 @@
             </tr>
             {% for facility in data['view'] %}
             <tr>
-                <td>{{facility['facility_id']}}</td>
-                <td>{{facility['day_care_id']}}</td>
                 <td>{{facility['facility_name']}}</td>
                 <td>{{facility['facility_type']}}</td>
                 <td>{{facility['facility_des']}}</td>
@@ -61,12 +51,13 @@
                 <td>{{facility['facility_image']}}</td>
                 <td>{{facility['operating_hrs']}}</td>
                 <td>{{facility['safety_measures']}}</td>
-                <td><a href="?action=update&id={{facility['facility_id']}}">Update</a></td>
-                <td><a href="?action=delete&id={{facility['facility_id']}}">Delete</a></td>
+                <td><a href="?action=update&id={{facility['facility_id']}}" class="accept-btn">Update</a></td>
+                <td><a href="?action=delete&id={{facility['facility_id']}}" class="reject-btn">Delete</a></td>
             </tr>
             {% endfor %}
         </table>
     {% endif %}
-    </center>
+    </div>
 </body>
-</html>
+{% include 'public/footer.html' %}
+
