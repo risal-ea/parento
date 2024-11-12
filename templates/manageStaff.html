@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>manage staff</title>
-</head>
-<body>
-    <center>
+{% include 'public/header.html' %}
+<body style="background-color: #4F6C7D;">
+    <div class="data-container">
         
     {% if data['up'] %}
 
@@ -46,7 +40,7 @@
         <a href="/addStaff">Add Staff</a>
         <br>
         <br>
-        <table border="2">
+        <table class="data-table">
             <tr>
                 <th>Staff name</th>
                 <th>Staff email</th>
@@ -69,13 +63,13 @@
                 <td>{{staff['staff_adress']}}</td>
                 <td>{{staff['position']}}</td>
                 <td>{{staff['qualification']}}</td>
-                <td><a href="?action=update&id={{staff['login_id']}}">Update</a></td>
-                <td><a href="?action=delete&id={{staff['login_id']}}">Delete</a></td>
+                <td><a href="?action=update&id={{staff['login_id']}}" class="accept-btn">Update</a></td>
+                <td><a href="?action=delete&id={{staff['login_id']}}" class="reject-btn">Delete</a></td>
             </tr>
             {% endfor %}
         </table>
 
     {% endif %}
-    </center>
+    </div>
 </body>
-</html>
+{% include 'public/footer.html' %}
