@@ -1,39 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Facility</title>
-</head>
-<body>
-    <center>
-        <h1>Add Facility</h1>
-        <form method="POST">
-            <label for="facility_name">Facility Name:</label><br>
-            <input type="text" id="facility_name" name="facility_name" required><br><br>
+{% include 'public/header.html' %}
+<body style="background-color: #4F6C7D;">
+    <div class="form__container">
+        <form method="POST" class="form-container margin">
+            <h2 align="center">Add Facility</h2>
+            <div class="form-group">
+                <label for="facility_name">Facility Name:</label><br>
+                <input type="text" id="facility_name" name="facility_name" class="form-input" required><br><br>
+            </div>
 
-            <label for="facility_type">Facility Type:</label><br>
-            <input type="text" id="facility_type" name="facility_type" required><br><br>
+            <div class="form-group">
+                <label for="facility_type">Facility Type:</label><br>
+                <input type="text" id="facility_type" name="facility_type" class="form-input" required><br><br>
+            </div>
 
-            <label for="facility_des">Facility Description:</label><br>
-            <input type="text" id="facility_des" name="facility_des" required><br><br>
+            <div class="form-group">
+                <label for="facility_des">Facility Description:</label><br>
+                <input type="text" id="facility_des" name="facility_des" class="form-input" required><br><br>
+            </div>
 
-            <label for="facility_capacity">Facility Capacity:</label><br>
-            <input type="text" id="facility_capacity" name="facility_capacity" required><br><br>
+            <div class="form-group">
+                <label for="facility_capacity">Facility Capacity:</label><br>
+                <input type="text" id="facility_capacity" name="facility_capacity" class="form-input" required><br><br>
+            </div>
 
-            <label for="facility_image">Facility Image:</label><br>
-            <input type="text" id="facility_image" name="facility_image" required><br><br>
+            <div class="form-group">
+                <label for="facility_image">Facility Image:</label><br>
+                <input type="text" id="facility_image" name="facility_image" class="form-input" required><br><br>
+            </div>
 
-            <label for="operating_hrs">Operating Hours:</label><br>
-            <input type="text" id="operating_hrs" name="operating_hrs" required><br><br>
+            <div class="form-group">
+                <label for="operating_hrs">Operating Hours:</label><br>
+                <input type="text" id="operating_hrs" name="operating_hrs" class="form-input" required><br><br>
+            </div>
 
-            <label for="safety_measures">Safety Measures:</label><br>
-            <input type="text" id="safety_measures" name="safety_measures" required><br><br>
-
-            <input type="submit" value="Add Facility" name="add_facility">
+            <div class="form-group">
+                <label for="safety_measures">Safety Measures:</label><br>
+                <input type="text" id="safety_measures" name="safety_measures" class="form-input" required><br><br>
+            </div>
+            <input type="submit" value="Add Facility" name="add_facility" class="form-button">
+            <br><br>
+            <a href="/manageFacilities">Back to Manage Facilities</a>
         </form>
-        <br>
-        <a href="/manageFacilities">Back to Manage Facilities</a>
-    </center>
+
+    </div>
 </body>
-</html>
+{% include 'public/footer.html' %}
+
