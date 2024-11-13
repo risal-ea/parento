@@ -151,6 +151,13 @@ def addFacility():
 
     return render_template('addFacility.html')
 
-
+@dayCare.route("/view-babies-daycare", methods=['get', 'post'])
+def viewBabies():
+    data={}
+    a = 'select * from babies'
+    b=select(a)
+    if b:
+        data['view']=b
+    return render_template('viewBabies_daycare.html', data=data)
 
 
