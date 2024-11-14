@@ -59,7 +59,7 @@ def parentReg():
     if 'register' in request.form:
         name = request.form['name']
         phone_no = request.form['phone']
-        adress = request.form['adress']
+        adress = request.form['address']
         gender = request.form['gender']
         dob = request.form['dob']
         email = request.form['email']

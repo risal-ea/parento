@@ -161,3 +161,13 @@ def viewBabies():
     return render_template('viewBabies_daycare.html', data=data)
 
 
+@dayCare.route('/view-parent-daycare')
+def viewParent():
+    data={}
+    id=request.args['id']
+    a = "SELECT * FROM babies INNER JOIN parent USING(parent_id) where parent_id = '%s'"%(id)
+    b=select(a)
+    if b:
+        data['view']=b
+
+    return render_template('viewParent_daycare.html', data=data)

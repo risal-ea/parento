@@ -1,26 +1,36 @@
 {% include 'public/header.html' %}
 <body style="background-color: #4F6C7D;">
     <div class="data-container">
-        <h1>Babies</h1>
+        <h1>Parent</h1>
         <table class="data-table">
             <tr>
-                <th>Name</th>
+                <th>Parent Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
                 <th>Date of Birth</th>
                 <th>Gender</th>
-                <th>Photo</th>
+                <th>Baby Name</th>
+                <th>Baby Date of Birth</th>
+                <th>Baby Gender</th>
+                <th>Baby Photo</th>
                 <th>Allergies/Dietary Restrictions</th>
                 <th>Medical Condition</th>
-                <th>View Parent</th>
             </tr>
             {% for i in data['view'] %}
             <tr>
+                <td>{{ i['parent_name'] }}</td>
+                <td>{{ i['parent_email'] }}</td>
+                <td>{{ i['parent_phone'] }}</td>
+                <td>{{ i['parent_adress'] }}</td>
+                <td>{{ i['parent_dob'] }}</td>
+                <td>{{ i['parent_gender'] }}</td>
                 <td>{{ i['baby_name'] }}</td>
                 <td>{{ i['baby_dob'] }}</td>
                 <td>{{ i['baby_gender'] }}</td>
                 <td><img src="{{ i['baby_photo'] }}" alt="{{ i['baby_name'] }}" width="50" /></td>
                 <td>{{ i['allergies_or_dietry_restriction'] }}</td>
                 <td>{{ i['medical_condition'] }}</td>
-                <td><a href="/view-parent-daycare?id={{i['parent_id']}}" class="accept-btn">View</a></td>
             </tr>
             {% endfor %}
         </table>
