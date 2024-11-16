@@ -1,0 +1,25 @@
+{% include 'public/header.html' %}
+<body style="background-color: #4F6C7D;">
+    <div class="data-container">
+        <h1>FeedBack</h1>
+        <table class="data-table">
+            <tr>
+                <th>Feedback ID</th>
+                <th>Day Care</th>
+                <th>Parent</th>
+                <th>Feedback</th>
+                <th>Date and Time</th>
+            </tr>
+            {% for feedback in data['view'] %}
+            <tr>
+                <td>{{ feedback['feedback_id'] }}</td>
+                <td>{{ feedback['day_care_name'] }}</td>
+                <td>{{ feedback['parent_name'] }}</td>
+                <td>{{ feedback['feedback'] }}</td>
+                <td>{{ feedback['date_time'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+{% include 'public/footer.html' %}

@@ -5,7 +5,16 @@ dayCare = Blueprint('dayCare', __name__)
 
 @dayCare.route('/dayCare')
 def dayCare_home():
-    return render_template('dayCare.html')
+    data={}
+    a="select * from day_care"
+    getData = select(a)
+    
+    if getData:
+        data['view']= getData
+
+    print("data_care_data: ",data)
+
+    return render_template('dayCare.html', data=data)
 
 @dayCare.route('/manageStaff',methods=['post','get'])
 def manageStaff():
@@ -171,3 +180,31 @@ def viewParent():
         data['view']=b
 
     return render_template('viewParent_daycare.html', data=data)
+
+@dayCare.route('/view-feedback-daycare')
+def viewFeedback():
+    data = {}
+    
+    # Get the logged-in daycare ID from the session
+    day_care_id = session.get('day_care')
+    
+    if not day_care_id:
+        return "You are not logged in as a daycare."
+    
+    # Define the SQL query to get feedback for the logged-in daycare
+    a = '''
+        SELECT feedback.feedback_id, day_care.day_care_name, parent.parent_name, feedback.feedback, feedback.date_time
+        FROM feedback
+        INNER JOIN day_care USING (day_care_id)
+        INNER JOIN parent ON feedback.login_id = parent.login_id
+        WHERE feedback.day_care_id = %s
+    '''
+    
+    # Execute the query using the modified select() function
+    b = select(a, (day_care_id,))
+    
+    if b:
+        data['view'] = b
+
+    # Return the rendered template with the feedback data
+    return render_template('/viewFeedback_daycare.html', data=data)

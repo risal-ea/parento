@@ -3,14 +3,27 @@ user="root"
 password="12345678"
 database="parento"
 
-def select(q):
-	con=mysql.connector.connect(user=user,password=password,host="localhost",database=database,port=3306)
-	cur=con.cursor(dictionary=True)
-	cur.execute(q)
-	result=cur.fetchall()
-	cur.close()
-	con.close()
-	return result
+# def select(q):
+# 	con=mysql.connector.connect(user=user,password=password,host="localhost",database=database,port=3306)
+# 	cur=con.cursor(dictionary=True)
+# 	cur.execute(q)
+# 	result=cur.fetchall()
+# 	cur.close()
+# 	con.close()
+# 	return result
+
+def select(q, params=None):
+    try:
+        con = mysql.connector.connect(user=user, password=password, host="localhost", database=database, port=3306)
+        cur = con.cursor(dictionary=True)
+        cur.execute(q, params or ())
+        result = cur.fetchall()
+        cur.close()
+        con.close()
+        return result
+    except Error as e:
+        print(f"Error: {e}")
+        return None
 
 def insert(q):
 	con=mysql.connector.connect(user=user,password=password,host="localhost",database=database,port=3306)
