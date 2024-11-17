@@ -18,8 +18,6 @@ def dayCare_home():
 
 @dayCare.route('/manageStaff',methods=['post','get'])
 def manageStaff():
-
-    print("//////////////////////")
     data={}
     a='select * from staff'
     getData=select(a)
@@ -208,3 +206,28 @@ def viewFeedback():
 
     # Return the rendered template with the feedback data
     return render_template('/viewFeedback_daycare.html', data=data)
+
+@dayCare.route('/view-complaint')
+def viewComplaint():
+    data={}
+    a="select * from complaint inner join parent where complaint.login_id = parent.login_id"
+    b = select(a)
+
+    if b:
+        data['view']=b
+
+    print("view complaint: ", data)
+
+    return render_template('viewComplaint.html', data=data)
+
+@dayCare.route('/send-reply', methods=['get', 'post'])
+def sendReply():
+    id=request.args['id']
+    if 'submit' in request.form:
+        reply = request.form['reply'] 
+
+        q="update complaint set reply='%s' where complaint_id='%s'"%(reply,id)
+        r=update(q)
+        return "<script>alert('replied');window.location='/view-complaint'</script>"
+
+    return render_template('sendReply.html')
