@@ -1,0 +1,29 @@
+{% include 'public/header.html' %}
+<body style="background-color: #4F6C7D;">
+    <div class="data-container">
+        <h1>Complaint</h1>
+        <table class="data-table">
+            <tr>
+                <th>Parent ID</th>
+                <th>Complaint</th>
+                <th>Reply</th>
+                <th>date</th>
+                <th>Status</th>
+                <th>Send Reply</th>
+                <th>Forward Message</th>
+            </tr>
+            {% for i in data['view'] %}
+            <tr>
+                <td>{{ i['parent_name'] }}</td>
+                <td>{{ i['complaint'] }}</td>
+                <td>{{ i['reply'] }}</td>
+                <td>{{ i['date_time'] }}</td>
+                <td>{{ i['status'] }}</td>
+                <td><a href="/send-reply?id={{i['complaint_id']}}" class="accept-btn">reply</a></td>
+                <td><a href="?action=update&id={{i['complaint_id']}}" class="accept-btn">forward</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+{% include 'public/footer.html' %}

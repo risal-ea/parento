@@ -26,6 +26,11 @@ def log():
                 res1=select(qry)
                 session['day_care']=res1[0]['day_care_id']
                 return redirect(url_for('dayCare.dayCare_home'))
+            elif res[0]['usertype']=='staff':
+                qry="select * from staff where login_id='%s'"%(session['log'])
+                res1=select(qry)
+                session['staff']=res1[0]['staff_id']
+                return redirect(url_for('staff.staffHome'))
 
         
     return render_template("login.html")
