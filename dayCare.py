@@ -207,10 +207,10 @@ def viewFeedback():
     # Return the rendered template with the feedback data
     return render_template('/viewFeedback_daycare.html', data=data)
 
-@dayCare.route('/view-complaint')
+@dayCare.route('/view-complaint-daycare')
 def viewComplaint():
     data={}
-    a="select * from complaint inner join parent where complaint.login_id = parent.login_id"
+    a="select * from complaint inner join parent where complaint.login_id = parent.login_id and complaint.status = 'forwarded'"
     b = select(a)
 
     if b:
@@ -218,7 +218,7 @@ def viewComplaint():
 
     print("view complaint: ", data)
 
-    return render_template('viewComplaint.html', data=data)
+    return render_template('viewComplaint_daycare.html', data=data)
 
 @dayCare.route('/send-reply', methods=['get', 'post'])
 def sendReply():
