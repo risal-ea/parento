@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1>Profile</h1>
+        </div>
+        {% if data.view %}
+        <div class="profile-info">
+            <div class="profile-image">
+                <img src="https://via.placeholder.com/150" alt="Profile Image">
+            </div>
+            <div class="profile-details">
+                <h2>{{ data.view.staff_name }}</h2>
+                <p><strong>Position:</strong> {{ data.view.position }}</p>
+                <p><strong>Email:</strong> {{ data.view.staff_email }}</p>
+                <p><strong>Phone:</strong> {{ data.view.staff_phone }}</p>
+                <p><strong>Date of Birth:</strong> {{ data.view.staff_dob }}</p>
+                <p><strong>Gender:</strong> {{ data.view.gender }}</p>
+                <p><strong>Address:</strong> {{ data.view.staff_adress }}</p>
+                <p><strong>Qualification:</strong> {{ data.view.qualification }}</p>
+            </div>
+        </div>
+        {% else %}
+        <p>No profile data available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

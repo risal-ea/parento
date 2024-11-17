@@ -29,3 +29,13 @@ def viewComplaint():
         return """<script>alert('forwarded');window.location='/view-complaint-staff'</script>"""
 
     return render_template('viewComplaint_staff.html', data=data)
+
+@staff.route('/view-profile-staff')
+def viewProfile():
+    data={}
+    q="select * from staff where staff_id='%s'"%(session['staff']) 
+    b= select(q)
+
+    if b:
+        data['view']=b
+    return render_template('viewProfile_staff.html', data=data)
