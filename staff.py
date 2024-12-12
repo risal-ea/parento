@@ -32,10 +32,16 @@ def viewComplaint():
 
 @staff.route('/view-profile-staff')
 def viewProfile():
-    data={}
-    q="select * from staff where staff_id='%s'"%(session['staff']) 
-    b= select(q)
+    data = {}
+    q = "SELECT * FROM staff WHERE staff_id='%s'" % (session['staff'])
+    b = select(q)
 
     if b:
-        data['view']=b
+        data['view'] = b[0]  # Pass only the first record
+    else:
+        data['view'] = None
+
+    # print("Staff ID:", session['staff'])
+    # print("Query Result:", b)
+
     return render_template('viewProfile_staff.html', data=data)
