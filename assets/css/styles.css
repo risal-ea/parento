@@ -114,7 +114,6 @@ body.dark-theme {
 html {
   scroll-behavior: smooth;
 }
-
 body {
   margin: var(--header-height) 0 0 0;
   font-family: var(--body-font);
@@ -161,7 +160,6 @@ input {
 .main {
   overflow-x: hidden;
 }
-
 /*=============== REUSABLE CSS CLASSES ===============*/
 .section {
   padding: 4.5rem 0 2.5rem;
@@ -259,6 +257,7 @@ input {
   color: var(--title-color);
   cursor: pointer;
 }
+
 
 /* show menu */
 .show-menu {

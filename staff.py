@@ -45,3 +45,12 @@ def viewProfile():
     # print("Query Result:", b)
 
     return render_template('viewProfile_staff.html', data=data)
+
+@staff.route("/view-babies-staff")
+def viewBabies():
+    data={}
+    a = 'select * from babies'
+    b=select(a)
+    if b:
+        data['view']=b
+    return render_template('viewBabies_daycare_staff.html', data=data)
