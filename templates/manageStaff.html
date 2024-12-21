@@ -7,13 +7,13 @@
         <form  method="POST">
             <h2>Update Staff</h1>
             <label for="staff_name">Staff Name:</label><br>
-            <input type="text" id="staff_name" name="staff_name" value="{{data['up'][0]['staff_name']}}" required><br><br>
+            <input type="text" id="staff_name" name="staff_name" value="{{data['up'][0]['staff_name']}}" pattern="[a-zA-Z ]+" title="Alphabets are only allowed" required><br><br>
         
             <label for="staff_email">Staff Email:</label><br>
             <input type="email" id="staff_email" name="staff_email" value="{{data['up'][0]['staff_email']}}" required><br><br>
         
             <label for="staff_phone">Staff Phone:</label><br>
-            <input type="tel" id="staff_phone" name="staff_phone" value="{{data['up'][0]['staff_phone']}}"required><br><br>
+            <input type="tel" id="staff_phone" name="staff_phone" value="{{data['up'][0]['staff_phone']}}" pattern="[1-10]{10}" title="Only 10 digits are allowed" required><br><br>
         
             <label for="staff_dob">Staff Date of Birth:</label><br>
             <input type="date" id="staff_dob" name="staff_dob" required><br><br>
