@@ -1,22 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>day care</title>
-</head>
-<body>
-    <center>
+{% include 'public/header.html' %}
+<body style="background-color: #4F6C7D;">
+    <div class="admin_table">
         <h1>DayCare</h1>
-        <a href="/manageStaff">manage staff</a>
         <br>
-        <a href="/manageFacilities">manage facilities</a>
-        <br>
-        <a href="/view-babies-daycare">view babies</a>
-        <br>
-        <a href="/view-feedback-daycare">view feedback</a>
-        <br>
-        <a href="/view-complaint-daycare">view complaint</a>
-    </center>
+        <table class="admin-links-table">
+            <tr>
+                <td><a href="/manageStaff">manage staff</a></td>
+            </tr>
+            <tr>
+                <td><a href="/manageFacilities">manage facilities</a></td>
+            </tr>
+            <tr>
+                <td><a href="/view-babies-daycare">view babies</a></td>
+            </tr>
+            <tr>
+                <td><a href="/view-feedback-daycare">view feedback</a></td>
+            </tr>
+            <tr>
+                <td><a href="/view-complaint-daycare">view complaint</a></td>
+            </tr>
+        </table>
+    </div>
 </body>
-</html>
+{% include 'public/footer.html' %}

@@ -228,6 +228,6 @@ def sendReply():
 
         q="update complaint set reply='%s' where complaint_id='%s'"%(reply,id)
         r=update(q)
-        return "<script>alert('replied');window.location='/view-complaint'</script>"
+        return "<script>alert('replied');window.location='/view-complaint-daycare'</script>"
 
     return render_template('sendReply.html')
