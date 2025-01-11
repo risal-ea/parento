@@ -4,7 +4,7 @@
     {% if data['up'] %}
         <form method="POST">
             <label for="facility_name">Facility Name:</label><br>
-            <input type="text" id="facility_name" name="facility_name" value="{{data['up'][0]['facility_name']}}" required><br><br>
+            <input type="text" id="facility_name" name="facility_name" value="{{data['up'][0]['facility_name']}}" pattern="[a-zA-Z ]+" title="Alphabets are only allowed" required><br><br>
         
             <label for="facility_type">Facility Type:</label><br>
             <input type="text" id="facility_type" name="facility_type" value="{{data['up'][0]['facility_type']}}" required><br><br>
