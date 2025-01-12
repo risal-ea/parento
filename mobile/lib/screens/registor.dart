@@ -160,7 +160,7 @@ class Register extends StatelessWidget {
                 ElevatedButton(onPressed: (){
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => login()));
-                }, child: Text('Login'))
+                }, child: Text('Login'),),
               ],
             )),
       ),

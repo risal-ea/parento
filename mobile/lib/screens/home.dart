@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/view_daycare.dart';
+import 'package:mobile/screens/view_facilities.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatelessWidget {
@@ -11,12 +13,26 @@ class Home extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Home'),
         ),
-        body: const Center(
-          child: Text(
-            'Hello, user!',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ),
+        body: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Facilities()));
+                  },
+                  child: Text('facilities'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Daycare()));
+                  },
+                  child: Text('Daycare'),
+                ),
+              ],
+            )),
       ),
     );
   }

@@ -52,7 +52,22 @@ def registor():
     print("Gender:", gender)
     print("Username:", uname)
     print("Password:", password)
-
-
     
+    return data
+
+@parent.route('/view_daycare',methods=['POST'])
+def daycare():
+    data={}
+    # lid=request.args['lid']
+
+    # print(lid,"///")
+    
+    a="select * from day_care"
+    s = select(a)
+    if s:
+        data['status']='success'
+        data['data']=s
+    else:
+        data['status']='failed'
+    print(data)
     return data
