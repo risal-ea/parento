@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/screens/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Register extends StatelessWidget {
@@ -32,68 +34,68 @@ class Register extends StatelessWidget {
                 TextFormField(
                   controller: parentName,
                   decoration: InputDecoration(labelText: "Parent name"),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "please enter the name";
-                    }return null;
+                    }
+                    return null;
                   },
                 ),
-
                 TextFormField(
                   controller: parentPhone,
                   decoration: InputDecoration(labelText: "phone number"),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "please enter the number";
-                    }return null;
+                    }
+                    return null;
                   },
                 ),
-
                 TextFormField(
                   controller: parentEmail,
                   decoration: InputDecoration(labelText: "Email"),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "please enter the email";
-                    }return null;
+                    }
+                    return null;
                   },
                 ),
-
                 TextFormField(
                   controller: parentAddress,
                   decoration: InputDecoration(labelText: "Adress"),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "please enter the adress";
-                    }return null;
+                    }
+                    return null;
                   },
                 ),
-
                 TextFormField(
                   controller: parentDob,
                   decoration: InputDecoration(labelText: "DOB"),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "please enter the DOB";
-                    }return null;
+                    }
+                    return null;
                   },
                 ),
-
                 TextFormField(
                   controller: parentGender,
                   decoration: InputDecoration(labelText: "Gender"),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "please enter the gender";
-                    }return null;
+                    }
+                    return null;
                   },
                 ),
-
                 TextFormField(
                   controller: username,
                   decoration: InputDecoration(labelText: "username"),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "please enter your username";
                     }
                     return null;
@@ -103,54 +105,62 @@ class Register extends StatelessWidget {
                   controller: password,
                   obscureText: true,
                   decoration: InputDecoration(labelText: "password"),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
                       return "please enter the password";
                     }
                     return null;
                   },
                 ),
-                SizedBox(height: 20.0,),
-                ElevatedButton(onPressed: () async{
-                  if(_registerKey.currentState!.validate()){
-                    try{
-                      final sh = await SharedPreferences.getInstance();
-                      String name = parentName.text.toString();
-                      String phn_num = parentPhone.text.toString();
-                      String email = parentEmail.text.toString();
-                      String addres = parentAddress.text.toString();
-                      String DOB = parentDob.text.toString();
-                      String gender = parentGender.text.toString();
-                      String uname = username.text.toString();
-                      String psw = password.text.toString();
+                SizedBox(
+                  height: 20.0,
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_registerKey.currentState!.validate()) {
+                      try {
+                        final sh = await SharedPreferences.getInstance();
+                        String name = parentName.text.toString();
+                        String phn_num = parentPhone.text.toString();
+                        String email = parentEmail.text.toString();
+                        String addres = parentAddress.text.toString();
+                        String DOB = parentDob.text.toString();
+                        String gender = parentGender.text.toString();
+                        String uname = username.text.toString();
+                        String psw = password.text.toString();
 
-                      String url = sh.getString("url").toString();
+                        String url = sh.getString("url").toString();
 
-                      var data = await http.post(
-                        Uri.parse(url + "and_registor"),
-                        body: {
-                          "name": name,
-                          "phone_number": phn_num,
-                          "email": email,
-                          "addres": addres,
-                          "dob": DOB,
-                          "gender": gender,
-                          "username": uname,
-                          "password": psw,
-                        },
-                      );
+                        var data = await http.post(
+                          Uri.parse(url + "and_registor"),
+                          body: {
+                            "name": name,
+                            "phone_number": phn_num,
+                            "email": email,
+                            "addres": addres,
+                            "dob": DOB,
+                            "gender": gender,
+                            "username": uname,
+                            "password": psw,
+                          },
+                        );
 
-                      print(data.body);
+                        print(data.body);
 
-                      var jasonData = json.decode(data.body);
-
-                    }catch(e){
-                      print("Error : "+e.toString());
+                        var jasonData = json.decode(data.body);
+                      } catch (e) {
+                        print("Error : " + e.toString());
+                      }
+                    } else {
+                      print("form is invalid");
                     }
-                  }else{
-                    print("form is invalid");
-                  }
-                }, child: Text("Register"))
+                  },
+                  child: Text("Register"),
+                ),
+                ElevatedButton(onPressed: (){
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => login()));
+                }, child: Text('Login'))
               ],
             )),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-// import 'package:mobile/login.dart'
-import 'registor.dart';
+import 'screens/login.dart';
+// import 'screens/registor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -22,6 +22,7 @@ class _AmbulanceState extends State<Ambulance> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.cyan),
       home: const ipset(),
     );
@@ -95,7 +96,7 @@ class _ipsetstate extends State<ipset> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => Register())
+                                      builder: (context) => login())
                               );
                             }
                           },
