@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/manage_babies.dart';
 import 'package:mobile/screens/view_daycare.dart';
 import 'package:mobile/screens/view_facilities.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,6 +31,13 @@ class Home extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => Daycare()));
                   },
                   child: Text('Daycare'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ManageBabies()));
+                  },
+                  child: Text('Manage Babies'),
                 ),
               ],
             )),

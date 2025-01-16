@@ -55,19 +55,26 @@ def registor():
     
     return data
 
-@parent.route('/view_daycare',methods=['POST'])
-def daycare():
+@parent.route('/and_manage_babie',methods=['POST'])
+def manage_babies():
     data={}
-    # lid=request.args['lid']
+    lid=request.form['lid']
 
-    # print(lid,"///")
-    
-    a="select * from day_care"
-    s = select(a)
-    if s:
-        data['status']='success'
-        data['data']=s
-    else:
-        data['status']='failed'
+    z="select * from parent where login_id='%s'"%(lid)
+    xx=select(z)
+    pid=xx[0]['parent_id']
+    print(pid)
+    baby_name = request.form['baby_name']
+    dob = request.form['baby_dob']
+    gender = request.form['baby_gender']
+    health = request.form['health_issues']
+    medical_condition = request.form['medical_condition']
+
+    print(lid,"/////")
+
+
+    x="insert into babies values(null, null,'%s','%s','%s','%s','%s','%s')"%(pid, baby_name, dob, gender, health, medical_condition)
+    b=insert(x)
+
     print(data)
     return data

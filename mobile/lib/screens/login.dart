@@ -68,6 +68,7 @@ class login extends StatelessWidget {
 
                       if (status == 'success') {
                         String login_id = jasonData['login_id'].toString();
+                        print(login_id);
                         sh.setString("login_id", login_id);
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) => Home()));
