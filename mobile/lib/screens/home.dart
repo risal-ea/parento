@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/manage_babies.dart';
 import 'package:mobile/screens/view_daycare.dart';
 import 'package:mobile/screens/view_facilities.dart';
@@ -38,6 +39,13 @@ class Home extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => ManageBabies()));
                   },
                   child: Text('Manage Babies'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Complaint()));
+                  },
+                  child: Text('Send complaint'),
                 ),
               ],
             )),
