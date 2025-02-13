@@ -86,7 +86,7 @@ def manage_babies():
     print(lid,"/////")
 
 
-    x="insert into babies values(null, null,'%s','%s','%s','%s','%s','%s')"%(pid, baby_name, dob, gender, health, medical_condition)
+    x="insert into babies values(null,'%s','%s','%s','%s','null','%s','%s')"%(pid, baby_name, dob, gender, health, medical_condition)
     b=insert(x)
 
     print(data)
