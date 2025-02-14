@@ -99,5 +99,19 @@ def sendComplaint():
     return data
 
     
+@parent.route('/and_send_feedback', methods=['POST'])
+def sendFeedback():
+    data={}
+    lid=request.form['lid']
+    feedback=request.form['feedback']
 
+    # Daycare id isnot set in the below query
+    query = "INSERT INTO feedback VALUES (NULL, '1', '%s', '%s', '%s')" % (lid, feedback, curentDateTime)
+    insertData = insert(query)
+
+    if insertData:
+        data['status'] = 'success'
+    else:
+        data['status'] = 'failed'
+    return data
     
