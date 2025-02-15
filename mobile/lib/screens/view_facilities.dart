@@ -12,154 +12,106 @@ class ViewFacilities extends StatefulWidget {
 }
 
 class _ViewFacilitiesState extends State<ViewFacilities> {
-  List<String> facility_name = <String>[];
-  List<String> fid = <String>[];
-
-  List<String> facility_type = <String>[];
-  List<String> facility_des = <String>[];
-  List<String> facility_capacity = <String>[];
-  List<String> facility_img = <String>[];
-  List<String> operating_hr = <String>[];
-  List<String> safty_msur = <String>[];
+  List<Map<String, String>> facilities = [];
 
   @override
-  void initState() {
-    super.initState();
-    load();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    load();  // Fetch data whenever dependencies change
   }
+
 
   Future<void> load() async {
     try {
       final sh = await SharedPreferences.getInstance();
       String login_id = sh.getString('login_id') ?? '';
       String ip = sh.getString('url') ?? '';
-      String url = ip + 'view_facility';
+      String url = '$ip/view_facility';
 
-      var data = await http.post(
-        Uri.parse(url),
-        body: {'lid': login_id},
-      );
+      var data = await http.post(Uri.parse(url), body: {'lid': login_id});
+      var jsonData = json.decode(data.body);
 
-      var jasonData = json.decode(data.body);
-      String status = jasonData['status'];
-      if (status == 'success') {
-        var arr = jasonData['data'];
+      if (jsonData['status'] == 'success') {
+        var arr = jsonData['data'];
 
-        for (int i = 0; i < arr.length; i++) {
-          fid.add(arr[i]['facility_id'].toString());
-          facility_name.add(arr[i]['facility_name'].toString());
-          facility_type.add(arr[i]['facility_type'].toString());
-          facility_capacity.add(arr[i]['facility_capacity'].toString());
-        }
-
-        // Trigger UI update after data is loaded
-        setState(() {});
+        setState(() {
+          facilities = arr.map<Map<String, String>>((facility) {
+            return {
+              'name': facility['facility_name'].toString(),
+              'type': facility['facility_type'].toString(),
+              'description': facility['facility_des'].toString(),
+              'capacity': facility['facility_capacity'].toString(),
+              'image': facility['facility_image'].toString(),
+              'op_hrs': facility['operating_hrs'].toString(),
+              'safety': facility['safety_measures'].toString(),
+            };
+          }).toList();
+        });
       }
     } catch (e) {
       print("Error: $e");
     }
   }
+
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          appBar: AppBar(
-            title: const Text('View daycare'),
-          ),
-          body: WillPopScope(child: SafeArea(
-              child: Container(
-                child: ListView.builder(
-                  physics: BouncingScrollPhysics(),
-                  itemCount: fid.length,
-                  itemBuilder: (BuildContext context,int index){
-                    return ListTile(
-                      title: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Column(
-                            children:[
-                              SizedBox(height: 16,),
-                              Row(
-                                children: [
-                                  SizedBox(height: 10,),
-                                  Text("Facility Name: ",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  SizedBox(width: 10),
-                                  Flexible(
-                                      flex:1,
-                                      fit:FlexFit.loose,
-                                      child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxWidth: 200,
-                                        ),
-                                        child: Text(
-                                          facility_name[index],
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      )),
-
-                                ],
-                              ),
-
-                              SizedBox(height: 16,),
-                              Row(
-                                children: [
-                                  SizedBox(height: 10,),
-                                  Text("Facility type: ",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  SizedBox(width: 10),
-                                  Flexible(
-                                      flex:1,
-                                      fit:FlexFit.loose,
-                                      child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxWidth: 200,
-                                        ),
-                                        child: Text(
-                                          facility_type[index],
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      )),
-
-                                ],
-                              ),
-
-                              SizedBox(height: 16,),
-                              Row(
-                                children: [
-                                  SizedBox(height: 10,),
-                                  Text("Facility capacity: ",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  SizedBox(width: 10),
-                                  Flexible(
-                                      flex:1,
-                                      fit:FlexFit.loose,
-                                      child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxWidth: 200,
-                                        ),
-                                        child: Text(
-                                          facility_capacity[index],
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      )),
-
-                                ],
-                              ),
-
-
-                            ]
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              )), onWillPop: () async {
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));
-
+        appBar: AppBar(title: const Text('View Facility')),
+        body: WillPopScope(
+          onWillPop: () async {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
             return true;
-          })
+          },
+          child: SafeArea(
+            child: ListView.builder(
+              physics: const BouncingScrollPhysics(),
+              itemCount: facilities.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        FacilityDetailRow(title: "Facility Name", value: facilities[index]['name']!),
+                        FacilityDetailRow(title: "Type", value: facilities[index]['type']!),
+                        FacilityDetailRow(title: "Description", value: facilities[index]['description']!),
+                        FacilityDetailRow(title: "Capacity", value: facilities[index]['capacity']!),
+                        FacilityDetailRow(title: "OP hrs", value: facilities[index]['op_hrs']!),
+                        FacilityDetailRow(title: "safety", value: facilities[index]['safety']!),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// **Reusable Widget for Facility Details**
+class FacilityDetailRow extends StatelessWidget {
+  final String title;
+  final String value;
+
+  const FacilityDetailRow({super.key, required this.title, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Text("$title: ", style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(value, style: const TextStyle(fontSize: 16), overflow: TextOverflow.ellipsis),
+          ),
+        ],
       ),
     );
   }
