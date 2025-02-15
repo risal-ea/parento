@@ -58,6 +58,19 @@ def registor():
     
     return data
 
+@parent.route('/view_daycare',methods=['POST'])
+def daycare():
+    data={}
+    a="select * from day_care"
+    s = select(a)
+    if s:
+        data['status']='success'
+        data['data']=s
+    else:
+        data['status']='failed'
+    print(data)
+    return data
+
 
 @parent.route('/and_manage_babie',methods=['POST'])
 def manage_babies():
@@ -115,3 +128,15 @@ def sendFeedback():
         data['status'] = 'failed'
     return data
     
+@parent.route('/view_facility',methods=['POST'])
+def view_facility():
+    data={}
+    a="select * from facilities"
+    s = select(a)
+    if s:
+        data['status']='success'
+        data['data']=s
+    else:
+        data['status']='failed'
+    print(data)
+    return data

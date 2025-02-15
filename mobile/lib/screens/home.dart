@@ -24,7 +24,7 @@ class Home extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Facilities()));
+                        MaterialPageRoute(builder: (context) => ViewFacilities()));
                   },
                   child: Text('facilities'),
                 ),
