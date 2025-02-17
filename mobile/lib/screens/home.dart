@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/baby_details.dart';
 import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/feedback.dart';
 import 'package:mobile/screens/manage_babies.dart';
@@ -62,6 +63,13 @@ class Home extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => SendFeedback()));
                   },
                   child: Text('Send feedback'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => BabyDetails()));
+                  },
+                  child: Text('Baby details'),
                 ),
               ],
             )),

@@ -140,3 +140,20 @@ def view_facility():
         data['status']='failed'
     print(data)
     return data
+
+@parent.route("/Activities", methods=['POST'])
+def activities():
+    data = {}
+    a = "SELECT * FROM daily_activity"
+    s = select(a) 
+    
+    print("Database Response:", s)  # Debugging line
+
+    if s:
+        data['status'] = 'success'
+        data['data'] = s  # Ensure `s` is a list of dictionaries
+    else:
+        data['status'] = 'failed'
+    
+    return data
+
