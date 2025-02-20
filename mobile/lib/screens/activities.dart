@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Activities extends StatefulWidget {
-  const Activities({super.key});
+  final String babyId;
+
+  const Activities({super.key, required this.babyId});
 
   @override
   State<Activities> createState() => _ActivitiesState();
@@ -26,7 +28,11 @@ class _ActivitiesState extends State<Activities> {
       String ip = sh.getString("url") ?? "";
       String url = "$ip/Activities";
 
-      var response = await http.post(Uri.parse(url), body: {'lid': login_id});
+      var response = await http.post(Uri.parse(url), body: {
+        'lid': login_id,
+        'baby_id': widget.babyId,  // Send baby_id to the backend
+      });
+
       var jsonData = json.decode(response.body);
       print(jsonData);
 
@@ -39,7 +45,7 @@ class _ActivitiesState extends State<Activities> {
               'Date': activity['date'].toString(),
               'Type': activity['activity_type'].toString(),
               'Description': activity['description'].toString(),
-              'Start Time': activity['start_time'].toString(), // Fixed typo
+              'Start Time': activity['start_time'].toString(),
               'End Time': activity['end_time'].toString(),
             };
           }).toList();

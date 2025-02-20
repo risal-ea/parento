@@ -72,29 +72,79 @@ def daycare():
     return data
 
 
-@parent.route('/and_manage_babie',methods=['POST'])
-def manage_babies():
-    data={}
-    lid=request.form['lid']
+import os
+from flask import request, jsonify
+from werkzeug.utils import secure_filename
+from database import insert, select
 
-    z="select * from parent where login_id='%s'"%(lid)
-    xx=select(z)
-    pid=xx[0]['parent_id']
-    print(pid)
+UPLOAD_FOLDER = 'static/baby_photos'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+@parent.route('/and_manage_babie', methods=['POST'])
+def manage_babies():
+    data = {}
+    lid = request.form['lid']
+
+    query = "SELECT * FROM parent WHERE login_id='%s'" % (lid)
+    parent_data = select(query)
+
+    if not parent_data:
+        return jsonify({"status": "failed", "message": "Invalid parent ID"})
+
+    pid = parent_data[0]['parent_id']
     baby_name = request.form['baby_name']
     dob = request.form['baby_dob']
     gender = request.form['baby_gender']
     health = request.form['health_issues']
     medical_condition = request.form['medical_condition']
 
-    print(lid,"/////")
+    baby_photo = "null"
+
+    if 'baby_photo' in request.files:
+        file = request.files['baby_photo']
+        if file.filename != '':
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(file_path)
+            baby_photo = file_path
+
+    insert_query = """
+        INSERT INTO babies VALUES 
+        (NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s')
+    """ % (pid, baby_name, dob, gender, baby_photo, health, medical_condition)
+    
+    insert(insert_query)
+
+    return jsonify({"status": "success", "message": "Baby details saved successfully"})
 
 
-    x="insert into babies values(null,'%s','%s','%s','%s','null','%s','%s')"%(pid, baby_name, dob, gender, health, medical_condition)
-    b=insert(x)
 
-    print(data)
-    return data
+# @parent.route('/and_manage_babie',methods=['POST'])
+# def manage_babies():
+#     data={}
+#     lid=request.form['lid']
+
+#     z="select * from parent where login_id='%s'"%(lid)
+#     xx=select(z)
+#     pid=xx[0]['parent_id']
+#     print(pid)
+#     baby_name = request.form['baby_name']
+#     dob = request.form['baby_dob']
+#     gender = request.form['baby_gender']
+#     health = request.form['health_issues']
+#     medical_condition = request.form['medical_condition']
+
+#     print(lid,"/////")
+
+
+#     x="insert into babies values(null,'%s','%s','%s','%s','null','%s','%s')"%(pid, baby_name, dob, gender, health, medical_condition)
+#     b=insert(x)
+
+#     print(data)
+#     return data
 
 @parent.route('/and_send_complaint', methods=['POST'])
 def sendComplaint():
@@ -143,8 +193,14 @@ def view_facility():
 
 @parent.route("/Activities", methods=['POST'])
 def activities():
+    lid=request.form['lid']
+    baby_id=request.form['baby_id']
+
+    print(lid,"////")
+
     data = {}
-    a = "SELECT * FROM daily_activity"
+    # a = "SELECT * FROM daily_activity"
+    a="SELECT * FROM parento.daily_activity inner join babies using(baby_id) inner join parent using(parent_id) where login_id='%s' and baby_id='%s'"%(lid,baby_id)
     s = select(a) 
     
     print("Database Response:", s)  # Debugging line
@@ -155,5 +211,20 @@ def activities():
     else:
         data['status'] = 'failed'
     
+    return data
+
+@parent.route('/baby_profile', methods=["POST"])
+def babyprofile():
+    data={}
+    lid=request.form['lid']
+    print(lid,"//")
+    a="SELECT * FROM parento.babies inner join parent using(parent_id) where parent.login_id='%s'"%(lid)
+    s = select(a)
+    if s:
+        data['status']='success'
+        data['data']=s
+    else:
+        data['status']='failed'
+    print(data)
     return data
 

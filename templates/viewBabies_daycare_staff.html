@@ -22,7 +22,7 @@
                 <td>{{ i['allergies_or_dietry_restriction'] }}</td>
                 <td>{{ i['medical_condition'] }}</td>
                 <td><a href="/view-parent-daycare?id={{i['parent_id']}}" class="accept-btn">View</a></td>
-                <td><a href="#" class="accept-btn">Add</a></td>
+                <td><a href="/addActivity?&id={{i['baby_id']}}" class="accept-btn">Add</a></td>
             </tr>
             {% endfor %}
         </table>
