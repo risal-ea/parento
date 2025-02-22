@@ -22,6 +22,14 @@ class ReusableCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15), // Rounded corners for the card
           color: colour, // Background color of the card
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1), // Shadow color
+              spreadRadius: 0.5, // How much the shadow spreads
+              blurRadius: 4, // Blur radius for a softer effect
+              offset: Offset(2, 4),
+            )// Horizontal and vertical offset
+          ]
         ),
         child: cardChild, // Widget inside the card
       ),
