@@ -72,16 +72,16 @@ def daycare():
     return data
 
 
-import os
-from flask import request, jsonify
-from werkzeug.utils import secure_filename
-from database import insert, select
+# import os
+# from flask import request, jsonify
+# from werkzeug.utils import secure_filename
+# from database import insert, select
 
-UPLOAD_FOLDER = 'static/baby_photos'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+# UPLOAD_FOLDER = 'static/baby_photos'
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+# if not os.path.exists(UPLOAD_FOLDER):
+#     os.makedirs(UPLOAD_FOLDER)
 
 @parent.route('/and_manage_babie', methods=['POST'])
 def manage_babies():
@@ -227,4 +227,21 @@ def babyprofile():
         data['status']='failed'
     print(data)
     return data
+
+@parent.route('/daycare_details', methods=['POST'])
+def daycare_details():
+    data = {}
+    daycare_id = request.form['day_care_id']
+
+    query = f"SELECT * FROM day_care WHERE day_care_id = '{daycare_id}'"
+    result = select(query)
+
+    if result:
+        data['status'] = 'success'
+        data['details'] = result[0]  # Assuming one record per daycare_id
+    else:
+        data['status'] = 'failed'
+
+    print(data)
+    return jsonify(data)
 

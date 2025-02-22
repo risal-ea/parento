@@ -1,170 +1,116 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:mobile/screens/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'daycare_details.dart'; // Import the details page
 
 class Daycare extends StatefulWidget {
-  const Daycare({super.key});
+  const Daycare({Key? key}) : super(key: key);
 
   @override
   State<Daycare> createState() => _DaycareState();
 }
 
 class _DaycareState extends State<Daycare> {
-  List<String> daycare_name = <String>[];
-  List<String> did = <String>[];
-
-  List<String> owner_name = <String>[];
-  List<String> phone = <String>[];
-  List<String> adress = <String>[];
-  List<String> license_number = <String>[];
-  List<String> capacity = <String>[];
-  List<String> operating_time = <String>[];
-  List<String> daycare_discription = <String>[];
+  List<Map<String, String>> daycareList = []; // Stores daycare details
+  bool isLoading = true; // Loading indicator
 
   @override
   void initState() {
     super.initState();
-    load();
+    loadDaycares();
   }
 
-  Future<void> load() async {
+  Future<void> loadDaycares() async {
     try {
       final sh = await SharedPreferences.getInstance();
-      String login_id = sh.getString('login_id') ?? '';
+      String loginId = sh.getString('login_id') ?? '';
       String ip = sh.getString('url') ?? '';
-      String url = ip + 'view_daycare';
+      String url = '$ip/view_daycare';
 
-      var data = await http.post(
-        Uri.parse(url),
-        body: {'lid': login_id},
-      );
+      var response = await http.post(Uri.parse(url), body: {'lid': loginId});
+      var jsonData = json.decode(response.body);
 
-      var jasonData = json.decode(data.body);
-      String status = jasonData['status'];
-      if (status == 'success') {
-        var arr = jasonData['data'];
+      if (jsonData['status'] == 'success') {
+        var data = jsonData['data'];
 
-        for (int i = 0; i < arr.length; i++) {
-          did.add(arr[i]['day_care_id'].toString());
-          daycare_name.add(arr[i]['day_care_name'].toString());
-          owner_name.add(arr[i]['owner_name'].toString());
-          phone.add(arr[i]['phone'].toString());
-        }
-
-        // Trigger UI update after data is loaded
-        setState(() {});
+        setState(() {
+          daycareList = List<Map<String, String>>.from(
+            data.map((item) => {
+              'id': item['day_care_id'].toString(),
+              'name': item['day_care_name'].toString(),
+              'owner': item['owner_name'].toString(),
+              'phone': item['phone'].toString(),
+            }),
+          );
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e) {
       print("Error: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('View daycare'),
-        ),
-        body: WillPopScope(child: SafeArea(
-            child: Container(
-              child: ListView.builder(
-                physics: BouncingScrollPhysics(),
-                itemCount: did.length,
-                itemBuilder: (BuildContext context,int index){
-                  return ListTile(
-                    title: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                      child: Column(
-                        children:[
-                          SizedBox(height: 16,),
-                          Row(
-                            children: [
-                              SizedBox(height: 10,),
-                              Text("Daycare Name: ",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold)),
-                                  SizedBox(width: 10),
-                                Flexible(
-                                  flex:1,
-                                      fit:FlexFit.loose,
-                                  child: ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxWidth: 200,
-                                      ),
-                                    child: Text(
-                                      daycare_name[index],
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                      )),
-
-                            ],
-                          ),
-
-                          SizedBox(height: 16,),
-                          Row(
-                            children: [
-                              SizedBox(height: 10,),
-                              Text("Owner Name: ",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(width: 10),
-                              Flexible(
-                                  flex:1,
-                                  fit:FlexFit.loose,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxWidth: 200,
-                                    ),
-                                    child: Text(
-                                      owner_name[index],
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  )),
-
-                            ],
-                          ),
-
-                          SizedBox(height: 16,),
-                          Row(
-                            children: [
-                              SizedBox(height: 10,),
-                              Text("Phone number: ",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(width: 10),
-                              Flexible(
-                                  flex:1,
-                                  fit:FlexFit.loose,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxWidth: 200,
-                                    ),
-                                    child: Text(
-                                      phone[index],
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  )),
-
-                            ],
-                          ),
-
-
-                        ]
-                      ),
-                    ),
-                  );
-                },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('View Daycare'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : daycareList.isEmpty
+          ? const Center(
+        child: Text("No daycares available", style: TextStyle(fontSize: 18)),
+      )
+          : ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        itemCount: daycareList.length,
+        itemBuilder: (context, index) {
+          return Card(
+            elevation: 4,
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(16),
+              title: Text(
+                daycareList[index]['name']!,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            )), onWillPop: () async {
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));
-
-          return true;
-        })
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 5),
+                  Text("Owner: ${daycareList[index]['owner']}",
+                      style: const TextStyle(fontSize: 16)),
+                  const SizedBox(height: 5),
+                  Text("Phone: ${daycareList[index]['phone']}",
+                      style: const TextStyle(fontSize: 16)),
+                ],
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, color: Colors.blueAccent),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DaycareDetails(daycareId: daycareList[index]['id']!),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
