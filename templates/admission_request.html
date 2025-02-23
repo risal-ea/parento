@@ -1,0 +1,39 @@
+{% include 'public/header.html' %}
+<body style="background-color: #4F6C7D;">
+    <div class="data-container">
+        <h1>Admission Requests</h1>
+        <table class="data-table">
+            <tr>
+                <th>Admission ID</th>
+                <th>Parent name</th>
+                <th>Phone no.</th>
+                <th>Baby name</th>
+                <th>Start Date</th>
+                <th>Preferred Schedule</th>
+                <th>payment</th>
+                <th>QR Code</th>
+            </tr>
+            {% for i in data['view'] %}
+            <tr>
+                <td>{{ i['adminssion_id'] }}</td>
+                <td>{{ i['parent_name'] }}</td>
+                <td>{{ i['parent_phone']}}</td>
+                <td>{{ i['baby_name'] }}</td>
+                <td>{{ i['start_date'] }}</td>
+                <td>{{ i['preferred_schedule'] }}</td>
+                <td>{{ i['payment'] }}</td>
+                {% if i['qr_code'] == 'pending' %}
+                <td>{{ i['qr_code'] }}</td>
+                <td><a href="/accept_request?id={{i['adminssion_id']}}" class="accept-btn">Accept</a></td>
+                <td><a href="/reject_request?id={{i['adminssion_id']}}" class="reject-btn">Reject</a></td>
+
+                {% else %}
+                <td><img src="{{ i['qr_code'] }}" alt="" width="200px"></td>
+                {% endif %}
+
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+{% include 'public/footer.html' %}

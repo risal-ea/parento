@@ -188,7 +188,7 @@ class HomeScreen extends StatelessWidget {
                 buildButton(context, "Manage Babies", ManageBabies()),
                 buildButton(context, "Send Complaint", Complaint()),
                 buildButton(context, "View Meetings", ViewMeetings()),
-                buildButton(context, "Send Feedback", SendFeedback()),
+                // buildButton(context, "Send Feedback", SendFeedback()),
                 buildButton(context, "Baby Profile", BabyProfile()),
               ],
             ),

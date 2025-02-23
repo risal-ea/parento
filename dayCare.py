@@ -231,3 +231,44 @@ def sendReply():
         return "<script>alert('replied');window.location='/view-complaint-daycare'</script>"
 
     return render_template('sendReply.html')
+
+@dayCare.route('/view-admission-requests', methods=['get', 'post'])
+def view_admission_requests():
+   data={}
+
+   z="select * from admission_request inner join parent using(parent_id) inner join babies using(baby_id) where daycare_id='%s'"%(session['day_care'])
+   data['view']=select(z)
+    
+   return render_template('admission_request.html', data=data)
+
+import qrcode
+import os
+
+# Ensure the 'static/qr/' directory exists
+os.makedirs("static/qr", exist_ok=True)
+
+@dayCare.route("/accept_request", methods=['GET', 'POST'])
+def accept_request():
+    id = request.args.get('id')
+
+    # Generate QR code
+    qr = qrcode.make(id)
+    qr_path = f"static/qr/{id}.png"
+    qr.save(qr_path)
+
+    if 'submit' in request.form:
+        pay = request.form['payment']
+        q="update admission_request set qr_code='%s', payment='%s'  where adminssion_id='%s'"%(qr_path,pay,id)
+        r=update(q)
+        return "<script>alert('request accepted');window.location='/view-admission-requests'</script>"
+
+    return render_template("payment_form.html", qr_code=qr_path)
+
+@dayCare.route("/reject_request", methods=['GET', 'post'])
+def reject_request():
+    id = request.args.get('id')
+
+    q="update admission_request set qr_code='rejected', payment='rejected'  where adminssion_id='%s'"%(id)
+    update(q)
+
+    return "<script>alert('request rejected');window.location='/view-admission-requests'</script>"

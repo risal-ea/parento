@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'request_form.dart'; // Import the RequestForm page
+import 'package:mobile/screens/feedback.dart';
 
 class DaycareDetails extends StatefulWidget {
   final String daycareId;
@@ -49,36 +51,6 @@ class _DaycareDetailsState extends State<DaycareDetails> {
       setState(() {
         isLoading = false;
       });
-    }
-  }
-
-  Future<void> requestAdmission() async {
-    try {
-      final sh = await SharedPreferences.getInstance();
-      String userId = sh.getString('user_id') ?? '';
-      String ip = sh.getString('url') ?? '';
-      String url = '$ip/request_admission';
-
-      var response = await http.post(
-        Uri.parse(url),
-        body: {'user_id': userId, 'day_care_id': widget.daycareId},
-      );
-
-      var jsonData = json.decode(response.body);
-      if (jsonData['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Admission request sent successfully!")),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to send request")),
-        );
-      }
-    } catch (e) {
-      print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("An error occurred. Please try again.")),
-      );
     }
   }
 
@@ -132,7 +104,13 @@ class _DaycareDetailsState extends State<DaycareDetails> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: requestAdmission,
+                onPressed: () {
+                  // Navigate to RequestForm Page when clicked
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RequestForm(daycareId:widget.daycareId)),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: Colors.blueAccent,
@@ -142,6 +120,30 @@ class _DaycareDetailsState extends State<DaycareDetails> {
                 ),
                 child: const Text(
                   "Request Admission",
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ),
+            SizedBox(height: 10,),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Navigate to RequestForm Page when clicked
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SendFeedback(daycareId:widget.daycareId),),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text(
+                  "Feedback",
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),

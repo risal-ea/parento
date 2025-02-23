@@ -4,7 +4,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SendFeedback extends StatelessWidget {
-  SendFeedback({super.key});
+
+  final String daycareId;
+  SendFeedback({Key? key, required this.daycareId}) : super(key: key);
+
 
   final GlobalKey<FormState> _sendFeedback = GlobalKey<FormState>();
   final TextEditingController feedback = TextEditingController();
@@ -69,6 +72,7 @@ class SendFeedback extends StatelessWidget {
                             Uri.parse(url + "and_send_feedback"),
                             body: {
                               'feedback': feedback.text.trim(),
+                              'daycareId': daycareId,
                               'lid': login_id,
                             },
                           );

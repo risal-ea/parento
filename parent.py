@@ -2,6 +2,8 @@ from flask import *
 from database import *
 from datetime import datetime
 
+import os
+
 curentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
@@ -72,16 +74,16 @@ def daycare():
     return data
 
 
-# import os
-# from flask import request, jsonify
-# from werkzeug.utils import secure_filename
-# from database import insert, select
+import os
+from flask import request, jsonify
+from werkzeug.utils import secure_filename
+from database import insert, select
 
-# UPLOAD_FOLDER = 'static/baby_photos'
-# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+UPLOAD_FOLDER = 'static/baby_photos'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# if not os.path.exists(UPLOAD_FOLDER):
-#     os.makedirs(UPLOAD_FOLDER)
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 @parent.route('/and_manage_babie', methods=['POST'])
 def manage_babies():
@@ -167,9 +169,10 @@ def sendFeedback():
     data={}
     lid=request.form['lid']
     feedback=request.form['feedback']
+    daycareId=request.form['daycareId']
 
     # Daycare id isnot set in the below query
-    query = "INSERT INTO feedback VALUES (NULL, '1', '%s', '%s', '%s')" % (lid, feedback, curentDateTime)
+    query = "INSERT INTO feedback VALUES (NULL, '%s', '%s', '%s', '%s')" % (daycareId, lid, feedback, curentDateTime)
     insertData = insert(query)
 
     if insertData:
@@ -245,3 +248,19 @@ def daycare_details():
     print(data)
     return jsonify(data)
 
+@parent.route('/admition_request', methods=['POST'])
+def admition_request():
+    startDate = request.form['startDate']
+    schedule = request.form['schedule']
+    daycare_id = request.form['daycareId']
+    print(daycare_id,"////")
+    loginID = request.form.get('lid')
+
+    getParentId = "select * from parent where login_id = '%s'" % (loginID)
+    parent_id = select(getParentId)[0]['parent_id']
+
+    insertData = "insert into admission_request values(null, '%s', 1, '%s', '%s', 'pending', '%s', 'pending', '%s','pending')"%(parent_id, startDate, schedule, daycare_id, curentDateTime)
+    insert(insertData)
+
+
+    return jsonify({"status": "success", "message": "Request received"})

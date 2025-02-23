@@ -104,7 +104,7 @@ class _DaycareState extends State<Daycare> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        DaycareDetails(daycareId: daycareList[index]['id']!),
+                          DaycareDetails(daycareId: daycareList[index]['id']!),
                   ),
                 );
               },
