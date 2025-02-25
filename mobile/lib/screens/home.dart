@@ -9,6 +9,7 @@ import 'package:mobile/screens/view_facilities.dart';
 import 'package:mobile/screens/view_meetings.dart';
 import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/feedback.dart';
+import 'package:mobile/bottom_sheet/baby_selection.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -38,14 +39,14 @@ class _HomeState extends State<Home> {
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
             const Spacer(),
-            ClipOval(
-              child: Image.asset(
-                "images/baby1.jpg",
-                width: 45,
-                height: 45,
-                fit: BoxFit.cover,
-              ),
+            BabySelection(
+              onBabySelected: (String newPhoto) {
+                setState(() {
+                  // selectedBabyPhoto = newPhoto;
+                });
+              },
             ),
+
           ],
         ),
       ),
@@ -171,7 +172,7 @@ class _HomeState extends State<Home> {
                   buildButton(context, "Manage Babies", ManageBabies()),
                   buildButton(context, "Send Complaint", Complaint()),
                   buildButton(context, "View Meetings", ViewMeetings()),
-                  buildButton(context, "Baby Profile", BabyProfile()),
+                  // buildButton(context, "Baby Profile", BabyProfile()),
                 ],
               ),
             ],
