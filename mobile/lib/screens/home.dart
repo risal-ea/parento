@@ -137,9 +137,25 @@ class _HomeState extends State<Home> {
                   colour: Colors.white,
                   cardChild: Column(
                     children: [
-                      Text("Sleeping"),
-                      Divider(color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
-                      Text("Sleeping"),
+                      Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Sleeping", style: TextStyle(
+                                  fontSize: 18,
+                                fontWeight: FontWeight.w500
+                              ),),
+                              Text("afternoon nap", style: TextStyle(
+                                  fontSize: 13
+                              ),),
+                            ],
+                          ),
+                          const Spacer(),
+                          Text("now"),
+                        ],
+                      ),
+                      Divider(color: Colors.grey, thickness: 0.5),
                     ],
                   ),
                   onPress: () {},

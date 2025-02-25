@@ -31,7 +31,10 @@ class ReusableCard extends StatelessWidget {
             )// Horizontal and vertical offset
           ]
         ),
-        child: cardChild, // Widget inside the card
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: cardChild,
+        ), // Widget inside the card
       ),
     );
   }
