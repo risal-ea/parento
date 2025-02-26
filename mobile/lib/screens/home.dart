@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile/components/bottom_nav_bar.dart';
 import 'package:mobile/components/reusable_card.dart';
 import 'package:mobile/screens/activities.dart';
-import 'package:mobile/screens/baby_profile.dart';
 import 'package:mobile/screens/manage_babies.dart';
 import 'package:mobile/screens/view_daycare.dart';
 import 'package:mobile/screens/view_facilities.dart';
@@ -10,6 +9,7 @@ import 'package:mobile/screens/view_meetings.dart';
 import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/feedback.dart';
 import 'package:mobile/bottom_sheet/baby_selection.dart';
+import 'package:mobile/screens/baby_details.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -19,11 +19,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _selectedIndex = 0; // Track selected tab
+  int _selectedIndex = 0;
+  String selectedBabyPhoto = "";
+  String selectedBabyId = "";
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+    });
+  }
+
+  void updateSelectedBaby(String newPhoto, String babyId) {
+    setState(() {
+      selectedBabyPhoto = newPhoto;
+      selectedBabyId = babyId;
     });
   }
 
@@ -39,14 +48,19 @@ class _HomeState extends State<Home> {
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
             const Spacer(),
-            BabySelection(
-              onBabySelected: (String newPhoto) {
-                setState(() {
-                  // selectedBabyPhoto = newPhoto;
-                });
+            GestureDetector(
+              onTap: () {
+                if (selectedBabyId.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => BabyDetails(babyId: selectedBabyId)),
+                  );
+                }
               },
+              child: BabySelection(
+                onBabySelected: updateSelectedBaby,
+              ),
             ),
-
           ],
         ),
       ),
@@ -145,7 +159,7 @@ class _HomeState extends State<Home> {
                             children: [
                               Text("Sleeping", style: TextStyle(
                                   fontSize: 18,
-                                fontWeight: FontWeight.w500
+                                  fontWeight: FontWeight.w500
                               ),),
                               Text("afternoon nap", style: TextStyle(
                                   fontSize: 13
@@ -172,7 +186,6 @@ class _HomeState extends State<Home> {
                   buildButton(context, "Manage Babies", ManageBabies()),
                   buildButton(context, "Send Complaint", Complaint()),
                   buildButton(context, "View Meetings", ViewMeetings()),
-                  // buildButton(context, "Baby Profile", BabyProfile()),
                 ],
               ),
             ],
