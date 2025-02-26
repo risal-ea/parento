@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/components/bottom_nav_bar.dart';
 import 'package:mobile/components/reusable_card.dart';
 import 'package:mobile/screens/activities.dart';
-import 'package:mobile/screens/manage_babies.dart';
+import 'package:mobile/screens/add_babies.dart';
 import 'package:mobile/screens/view_daycare.dart';
 import 'package:mobile/screens/view_facilities.dart';
 import 'package:mobile/screens/view_meetings.dart';
@@ -183,7 +183,7 @@ class _HomeState extends State<Home> {
                 children: [
                   buildButton(context, "Facilities", ViewFacilities()),
                   buildButton(context, "Daycare", Daycare()),
-                  buildButton(context, "Manage Babies", ManageBabies()),
+                  // buildButton(context, "Manage Babies", AddBabies()),
                   buildButton(context, "Send Complaint", Complaint()),
                   buildButton(context, "View Meetings", ViewMeetings()),
                 ],

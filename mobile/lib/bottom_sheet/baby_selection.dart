@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/add_babies.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/screens/baby_details.dart';
+import 'package:mobile/screens/add_babies.dart';
 
 class BabySelection extends StatefulWidget {
-  final Function(String, String) onBabySelected; // Callback with babyPhoto & babyId
+  final Function(String, String) onBabySelected;
 
   const BabySelection({super.key, required this.onBabySelected});
 
@@ -61,7 +63,7 @@ class _BabySelectionState extends State<BabySelection> {
       selectedBabyId = babyId;
       selectedBabyPhoto = babyPhoto;
     });
-    widget.onBabySelected(babyPhoto, babyId); // Update in parent widget
+    widget.onBabySelected(babyPhoto, babyId);
   }
 
   void showBabySelectionSheet(BuildContext context) {
@@ -81,29 +83,46 @@ class _BabySelectionState extends State<BabySelection> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              ListView.builder(
+              ListView(
                 shrinkWrap: true,
-                itemCount: babies.length,
-                itemBuilder: (context, index) {
-                  String babyPhoto = babies[index]['baby_photo'] ?? "";
-                  String babyId = babies[index]['baby_id'] ?? "";
-                  String babyName = babies[index]['baby_name'] ?? "Unknown";
-
-                  return ListTile(
+                children: [
+                  // Existing baby profiles
+                  ...babies.map((baby) => ListTile(
                     leading: CircleAvatar(
                       backgroundColor: Colors.grey[300],
-                      backgroundImage: babyPhoto.isNotEmpty ? NetworkImage(babyPhoto) : null,
-                      child: babyPhoto.isEmpty
+                      backgroundImage: baby['baby_photo']!.isNotEmpty
+                          ? NetworkImage(baby['baby_photo']!)
+                          : null,
+                      child: baby['baby_photo']!.isEmpty
                           ? const Icon(Icons.child_care, size: 30, color: Colors.white)
                           : null,
                     ),
-                    title: Text(babyName),
+                    title: Text(baby['baby_name'] ?? "Unknown Baby"),
                     onTap: () {
                       Navigator.pop(context);
-                      updateSelectedBaby(babyPhoto, babyId);
+                      updateSelectedBaby(baby['baby_photo']!, baby['baby_id']!);
                     },
-                  );
-                },
+                  )),
+
+                  // Add Baby Option (Looks like a profile)
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue,
+                      child: const Icon(Icons.add, size: 30, color: Colors.white),
+                    ),
+                    title: const Text(
+                      "Add Baby",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddBabies()),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

@@ -5,12 +5,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ManageBabies extends StatefulWidget {
+class AddBabies extends StatefulWidget {
   @override
-  _ManageBabiesState createState() => _ManageBabiesState();
+  _AddBabiesState createState() => _AddBabiesState();
 }
 
-class _ManageBabiesState extends State<ManageBabies> {
+class _AddBabiesState extends State<AddBabies> {
   final GlobalKey<FormState> _manageBabieKey = GlobalKey<FormState>();
   final TextEditingController baby_name = TextEditingController();
   final TextEditingController baby_dob = TextEditingController();
