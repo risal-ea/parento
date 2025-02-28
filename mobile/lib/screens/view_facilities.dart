@@ -5,7 +5,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ViewFacilities extends StatefulWidget {
-  const ViewFacilities({super.key});
+  final String daycareId;
+
+  ViewFacilities({Key? key, required this.daycareId}) : super(key: key);
 
   @override
   State<ViewFacilities> createState() => _ViewFacilitiesState();
@@ -17,9 +19,8 @@ class _ViewFacilitiesState extends State<ViewFacilities> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    load();  // Fetch data whenever dependencies change
+    load(); // Fetch data whenever dependencies change
   }
-
 
   Future<void> load() async {
     try {
@@ -28,7 +29,16 @@ class _ViewFacilitiesState extends State<ViewFacilities> {
       String ip = sh.getString('url') ?? '';
       String url = '$ip/view_facility';
 
-      var data = await http.post(Uri.parse(url), body: {'lid': login_id});
+      print("Sending request to: $url with daycareId: ${widget.daycareId}");
+
+      var data = await http.post(Uri.parse(url), body: {
+        'lid': login_id,
+        'daycareId': widget.daycareId,
+      });
+
+      print("Response Status: ${data.statusCode}");
+      print("Response Body: ${data.body}");
+
       var jsonData = json.decode(data.body);
 
       if (jsonData['status'] == 'success') {
@@ -47,6 +57,8 @@ class _ViewFacilitiesState extends State<ViewFacilities> {
             };
           }).toList();
         });
+      } else {
+        print("Failed to load facilities.");
       }
     } catch (e) {
       print("Error: $e");
@@ -61,7 +73,8 @@ class _ViewFacilitiesState extends State<ViewFacilities> {
         appBar: AppBar(title: const Text('View Facility')),
         body: WillPopScope(
           onWillPop: () async {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Home()));
             return true;
           },
           child: SafeArea(
@@ -74,12 +87,23 @@ class _ViewFacilitiesState extends State<ViewFacilities> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        FacilityDetailRow(title: "Facility Name", value: facilities[index]['name']!),
-                        FacilityDetailRow(title: "Type", value: facilities[index]['type']!),
-                        FacilityDetailRow(title: "Description", value: facilities[index]['description']!),
-                        FacilityDetailRow(title: "Capacity", value: facilities[index]['capacity']!),
-                        FacilityDetailRow(title: "OP hrs", value: facilities[index]['op_hrs']!),
-                        FacilityDetailRow(title: "safety", value: facilities[index]['safety']!),
+                        FacilityDetailRow(
+                            title: "Facility Name",
+                            value: facilities[index]['name']!),
+                        FacilityDetailRow(
+                            title: "Type", value: facilities[index]['type']!),
+                        FacilityDetailRow(
+                            title: "Description",
+                            value: facilities[index]['description']!),
+                        FacilityDetailRow(
+                            title: "Capacity",
+                            value: facilities[index]['capacity']!),
+                        FacilityDetailRow(
+                            title: "OP hrs",
+                            value: facilities[index]['op_hrs']!),
+                        FacilityDetailRow(
+                            title: "safety",
+                            value: facilities[index]['safety']!),
                       ],
                     ),
                   ),
@@ -98,7 +122,8 @@ class FacilityDetailRow extends StatelessWidget {
   final String title;
   final String value;
 
-  const FacilityDetailRow({super.key, required this.title, required this.value});
+  const FacilityDetailRow(
+      {super.key, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +134,9 @@ class FacilityDetailRow extends StatelessWidget {
           Text("$title: ", style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 10),
           Flexible(
-            child: Text(value, style: const TextStyle(fontSize: 16), overflow: TextOverflow.ellipsis),
+            child: Text(value,
+                style: const TextStyle(fontSize: 16),
+                overflow: TextOverflow.ellipsis),
           ),
         ],
       ),

@@ -181,18 +181,31 @@ def sendFeedback():
         data['status'] = 'failed'
     return data
     
-@parent.route('/view_facility',methods=['POST'])
+@parent.route('/view_facility', methods=['POST'])
 def view_facility():
-    data={}
-    a="select * from facilities"
-    s = select(a)
-    if s:
-        data['status']='success'
-        data['data']=s
-    else:
-        data['status']='failed'
-    print(data)
-    return data
+    try:
+        data = {}
+        daycare_id = request.form.get('daycareId')
+        print("id//////////////", daycare_id)
+
+        if not daycare_id:
+            return jsonify({'status': 'failed', 'message': 'Missing daycareId'}), 400
+
+        query = "SELECT * FROM facilities WHERE day_care_id = %s"
+        result = select(query, (daycare_id,))  # ✅ Secure query
+
+        if result:
+            data['status'] = 'success'
+            data['data'] = result
+        else:
+            data['status'] = 'failed'
+            data['message'] = 'No facilities found'
+
+        return jsonify(data)
+    except Exception as e:
+        print(f"Server Error: {e}")  # ✅ Corrected Error Handling
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 @parent.route("/Activities", methods=['POST'])
 def activities():

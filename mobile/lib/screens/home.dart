@@ -181,7 +181,7 @@ class _HomeState extends State<Home> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 children: [
-                  buildButton(context, "Facilities", ViewFacilities()),
+                  // buildButton(context, "Facilities", ViewFacilities()),
                   buildButton(context, "Daycare", Daycare()),
                   // buildButton(context, "Manage Babies", AddBabies()),
                   buildButton(context, "Send Complaint", Complaint()),
