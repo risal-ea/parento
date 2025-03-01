@@ -233,7 +233,7 @@ def activities():
 def babyprofile():
     data={}
     lid=request.form['lid']
-    print(lid,"//")
+    print(lid,"baby profile//")
     a="SELECT * FROM parento.babies inner join parent using(parent_id) where parent.login_id='%s'"%(lid)
     s = select(a)
     if s:
@@ -275,5 +275,32 @@ def admition_request():
     insertData = "insert into admission_request values(null, '%s', 1, '%s', '%s', 'pending', '%s', 'pending', '%s','pending')"%(parent_id, startDate, schedule, daycare_id, curentDateTime)
     insert(insertData)
 
-
     return jsonify({"status": "success", "message": "Request received"})
+
+@parent.route("/baby_details", methods=['POST'])
+def baby_details():
+    babyId = request.form.get('baby_id', '')  # Safely get baby_id
+
+    print(babyId, "baby_id ///////////////////////")
+
+    # Fetch baby details from database
+    query = "SELECT * FROM babies WHERE baby_id='%s'" % (babyId)
+    result = select(query)
+
+    if result:  # If data is found
+        baby_data = {
+            "status": "success",
+            "data": [{
+                "baby_name": result[0]["baby_name"],
+                "baby_dob": result[0]["baby_dob"],
+                "baby_photo": result[0]["baby_photo"],
+                "allergies_or_dietry_restriction": result[0]["allergies_or_dietry_restriction"],
+                "medical_condition": result[0]["medical_condition"]
+            }]
+        }
+    else:
+        baby_data = {"status": "error", "message": "Baby not found"}
+
+    return jsonify(baby_data)
+
+

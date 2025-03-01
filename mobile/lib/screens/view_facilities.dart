@@ -40,7 +40,6 @@ class _ViewFacilitiesState extends State<ViewFacilities> {
       print("Response Body: ${data.body}");
 
       var jsonData = json.decode(data.body);
-
       if (jsonData['status'] == 'success') {
         var arr = jsonData['data'];
 
