@@ -40,6 +40,7 @@ class _HomeState extends State<Home> {
     setState(() {
       selectedBabyPhoto = newPhoto;
       selectedBabyId = babyId;
+      activities.clear();
     });
     fetchData(); // Fetch data again when baby is updated
   }

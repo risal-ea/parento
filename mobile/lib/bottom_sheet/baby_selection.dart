@@ -4,7 +4,6 @@ import 'package:mobile/screens/add_babies.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/screens/baby_details.dart';
-import 'package:mobile/screens/add_babies.dart';
 
 class BabySelection extends StatefulWidget {
   final Function(String, String) onBabySelected;
@@ -89,7 +88,9 @@ class _BabySelectionState extends State<BabySelection> {
                   // Existing baby profiles
                   ...babies.map((baby) => ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: selectedBabyId == baby['baby_id']
+                          ? Colors.blue
+                          : Colors.grey[300],
                       backgroundImage: baby['baby_photo']!.isNotEmpty
                           ? NetworkImage(baby['baby_photo']!)
                           : null,
@@ -97,7 +98,20 @@ class _BabySelectionState extends State<BabySelection> {
                           ? const Icon(Icons.child_care, size: 30, color: Colors.white)
                           : null,
                     ),
-                    title: Text(baby['baby_name'] ?? "Unknown Baby"),
+                    title: Text(
+                      baby['baby_name'] ?? "Unknown Baby",
+                      style: TextStyle(
+                        fontWeight: selectedBabyId == baby['baby_id']
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: selectedBabyId == baby['baby_id']
+                            ? Colors.blue
+                            : Colors.black,
+                      ),
+                    ),
+                    trailing: selectedBabyId == baby['baby_id']
+                        ? const Icon(Icons.check, color: Colors.blue)
+                        : null,
                     onTap: () {
                       Navigator.pop(context);
                       updateSelectedBaby(baby['baby_photo']!, baby['baby_id']!);
