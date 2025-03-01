@@ -215,7 +215,6 @@ def activities():
     print(lid,"////")
 
     data = {}
-    # a = "SELECT * FROM daily_activity"
     a="SELECT * FROM parento.daily_activity inner join babies using(baby_id) inner join parent using(parent_id) where login_id='%s' and baby_id='%s'"%(lid,baby_id)
     s = select(a) 
     
@@ -224,6 +223,7 @@ def activities():
     if s:
         data['status'] = 'success'
         data['data'] = s  # Ensure `s` is a list of dictionaries
+        print(data['data'])
     else:
         data['status'] = 'failed'
     
@@ -331,6 +331,33 @@ def parent_profile():
         parent_data = {"status": "error", "message": "Parent not found"}
 
     return jsonify(parent_data)  # Ensure this is returned outside the else
+
+@parent.route("/home", methods=["POST"])
+def home():
+    data = {"status": "failed", "data": []}
+    loginId = request.form.get('login_id')
+    babyId = request.form.get('baby_id')
+
+    if not loginId or not babyId:
+        return jsonify({"status": "error", "message": "Missing login_id or baby_id"})
+
+    query = """
+    SELECT * 
+    FROM parento.daily_activity 
+    INNER JOIN babies USING(baby_id) 
+    INNER JOIN parent USING(parent_id) 
+    WHERE login_id=%s AND baby_id=%s
+    """
+    result = select(query, (loginId, babyId))
+
+    if result:
+        data["status"] = "success"
+        data["data"] = result
+    else:
+        print("No data found for login_id:", loginId, "and baby_id:", babyId)
+
+    print("Backend Response:", data)  # Log the response
+    return jsonify(data)
 
 
 
