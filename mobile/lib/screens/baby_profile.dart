@@ -28,7 +28,7 @@ class _BabyProfileState extends State<BabyProfile> {
 
   Future<void> load() async {
     try {
-        final sh = await SharedPreferences.getInstance();
+      final sh = await SharedPreferences.getInstance();
       String login_id = sh.getString("login_id") ?? "";
       String ip = sh.getString("url") ?? "";
       String url = '$ip/baby_profile';

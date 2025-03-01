@@ -36,7 +36,7 @@ class BottomNavBar extends StatelessWidget {
         unselectedLabelStyle: const TextStyle(fontSize: 12),
         iconSize: 30, // Bigger icons
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home, size: 30), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.home, size: 30), label: 'Home',),
           BottomNavigationBarItem(icon: Icon(Icons.notifications, size: 30), label: 'Notifications'),
           BottomNavigationBarItem(icon: Icon(Icons.person, size: 30), label: 'Profile'),
         ],

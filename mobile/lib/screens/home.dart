@@ -4,6 +4,7 @@ import 'package:mobile/components/reusable_card.dart';
 import 'package:mobile/screens/activities.dart';
 import 'package:mobile/screens/add_babies.dart';
 import 'package:mobile/screens/baby_profile.dart';
+import 'package:mobile/screens/parent_profile.dart';
 import 'package:mobile/screens/view_daycare.dart';
 import 'package:mobile/screens/view_facilities.dart';
 import 'package:mobile/screens/view_meetings.dart';
@@ -187,7 +188,7 @@ class _HomeState extends State<Home> {
                   // buildButton(context, "Manage Babies", AddBabies()),
                   buildButton(context, "Send Complaint", Complaint()),
                   buildButton(context, "View Meetings", ViewMeetings()),
-                  buildButton(context, "Baby profile", BabyProfile()),
+                  buildButton(context, "parent profile", ParentProfile()),
                 ],
               ),
             ],

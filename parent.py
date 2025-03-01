@@ -303,4 +303,30 @@ def baby_details():
 
     return jsonify(baby_data)
 
+@parent.route("/parent_profile", methods=['POST'])
+def parent_profile():
+    loginId = request.form.get('login_id')
+    query = "SELECT * FROM parent WHERE login_id = '%s'" % (loginId)
+    result = select(query)
+
+    print("Query Result:", result)  # Debugging line
+
+    if result:
+        parent_data = {
+            "status": "success",
+            "data": [{
+                "parent_name": result[0]["parent_name"],
+                "parent_email": result[0]["parent_email"],
+                "parent_phone": result[0]["parent_phone"],
+                "parent_address": result[0]["parent_adress"],
+            }]
+        }
+    else:
+        parent_data = {"status": "error", "message": "Parent not found"}
+
+    return jsonify(parent_data)  # Ensure this is returned outside the else
+
+
+
+
 
