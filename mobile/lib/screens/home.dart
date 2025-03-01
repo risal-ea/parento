@@ -257,32 +257,51 @@ class _HomeState extends State<Home> {
                 ],
               ),
               const SizedBox(height: 10),
-              if (latestActivity != null)
+              if (activities.isNotEmpty)
                 ReusableCard(
                   colour: Colors.white,
                   cardChild: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Column(
+                      for (var activity in activities.take(4)) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                latestActivity['Type'] ?? "Activity",
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w500),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    activity['Type'] ?? "Activity",
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                  ),
+                                  Text(
+                                    activity['Description'] ?? "",
+                                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                latestActivity['Description'] ?? "",
-                                style: TextStyle(fontSize: 13),
+                              Spacer(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    activity['Date'] ?? "",
+                                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                                  ),
+                                  Text(
+                                    "${activity['StartTime'] ?? ""} - ${activity['EndTime'] ?? ""}",
+                                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          const Spacer(),
-                          Text(latestActivity['Date'] ?? ""),
-                        ],
-                      ),
-                      Divider(color: Colors.grey, thickness: 0.5),
+                        ),
+                        if (activity != activities.take(4).last)
+                          Divider(color: Colors.grey.shade300, thickness: 0.8),
+                      ],
                     ],
                   ),
                   onPress: () {},
