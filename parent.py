@@ -284,8 +284,11 @@ def baby_details():
     print(babyId, "baby_id ///////////////////////")
 
     # Fetch baby details from database
-    query = "SELECT * FROM babies WHERE baby_id='%s'" % (babyId)
-    result = select(query)
+    query = "SELECT * FROM babies WHERE baby_id=%s"  # Use parameterized query to prevent SQL injection
+    result = select(query, (babyId,))
+
+    qr_query = "SELECT qr_code FROM admission_request WHERE baby_id = %s"
+    qr_result = select(qr_query, (babyId,))  # Fetch qr_code safely
 
     if result:  # If data is found
         baby_data = {
@@ -295,7 +298,8 @@ def baby_details():
                 "baby_dob": result[0]["baby_dob"],
                 "baby_photo": result[0]["baby_photo"],
                 "allergies_or_dietry_restriction": result[0]["allergies_or_dietry_restriction"],
-                "medical_condition": result[0]["medical_condition"]
+                "medical_condition": result[0]["medical_condition"],
+                "qr_code": qr_result[0]["qr_code"] if qr_result else None  # Ensure qr_result is not empty
             }]
         }
     else:
@@ -303,11 +307,13 @@ def baby_details():
 
     return jsonify(baby_data)
 
+
 @parent.route("/parent_profile", methods=['POST'])
 def parent_profile():
     loginId = request.form.get('login_id')
     query = "SELECT * FROM parent WHERE login_id = '%s'" % (loginId)
     result = select(query)
+
 
     print("Query Result:", result)  # Debugging line
 

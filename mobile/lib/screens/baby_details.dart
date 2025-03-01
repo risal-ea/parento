@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:mobile/screens/activities.dart';
 import 'package:mobile/screens/check_in_n_out.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class BabyDetails extends StatefulWidget {
   final String babyId;
@@ -18,8 +18,9 @@ class _BabyDetailsState extends State<BabyDetails> {
   String name = "";
   String dob = "";
   String photo = "";
-  String dietryRestriction = "";
+  String dietaryRestriction = "";
   String medicalCondition = "";
+  String qrCodePath = ""; // Store QR Code Image Path
   bool isLoading = true;
   bool hasError = false;
 
@@ -54,8 +55,9 @@ class _BabyDetailsState extends State<BabyDetails> {
           name = babyData['baby_name'].toString();
           dob = babyData['baby_dob'].toString();
           photo = babyData['baby_photo'].toString();
-          dietryRestriction = babyData['allergies_or_dietry_restriction'].toString();
+          dietaryRestriction = babyData['allergies_or_dietry_restriction'].toString();
           medicalCondition = babyData['medical_condition'].toString();
+          qrCodePath = babyData['qr_code'].toString(); // Store QR Code path
           isLoading = false;
         });
       } else {
@@ -80,44 +82,53 @@ class _BabyDetailsState extends State<BabyDetails> {
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: isLoading
-            ? Center(child: CircularProgressIndicator()) // Show loader while fetching data
+            ? Center(child: CircularProgressIndicator()) // Loader while fetching data
             : hasError
             ? Center(child: Text("Failed to load baby details. Try again later."))
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: photo.isNotEmpty
-                  ? Image.network(photo, height: 150, width: 150, fit: BoxFit.cover)
-                  : Icon(Icons.person, size: 100), // Placeholder if no photo
-            ),
-            SizedBox(height: 10),
-            Text("Name: $name", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text("Date of Birth: $dob"),
-            Text("Dietary Restrictions: ${dietryRestriction.isEmpty ? 'None' : dietryRestriction}"),
-            Text("Medical Condition: ${medicalCondition.isEmpty ? 'None' : medicalCondition}"),
-            SizedBox(height: 20),
+            : SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: photo.isNotEmpty
+                    ? Image.network(photo, height: 150, width: 150, fit: BoxFit.cover)
+                    : Icon(Icons.person, size: 100), // Placeholder if no photo
+              ),
+              SizedBox(height: 10),
+              Text("Name: $name", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text("Date of Birth: $dob"),
+              Text("Dietary Restrictions: ${dietaryRestriction.isEmpty ? 'None' : dietaryRestriction}"),
+              Text("Medical Condition: ${medicalCondition.isEmpty ? 'None' : medicalCondition}"),
+              SizedBox(height: 20),
 
-            // Buttons for Activities and Check-in
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Activities(babyId: widget.babyId)),
-                );
-              },
-              child: Text('Activities'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CheckInNOut(babyId: widget.babyId)),
-                );
-              },
-              child: Text('Check in and out'),
-            ),
-          ],
+              // Display QR Code Image
+              Center(
+                child: qrCodePath.isNotEmpty
+                    ? Image.network(qrCodePath, height: 200, width: 200, fit: BoxFit.contain)
+                    : Text("No QR Code Available"),
+              ),
+
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Activities(babyId: widget.babyId)),
+                  );
+                },
+                child: Text('Activities'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CheckInNOut(babyId: widget.babyId)),
+                  );
+                },
+                child: Text('Check in and out'),
+              ),
+            ],
+          ),
         ),
       ),
     );
