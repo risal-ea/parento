@@ -92,29 +92,52 @@ class _HomeState extends State<Home> {
     }
   }
 
-  String calculateTotalSleepDuration() {
-    double totalSleepHours = 0.0;
+  // String calculateTotalSleepDuration() {
+  //   double totalSleepHours = 0.0;
+  //   for (var activity in activities) {
+  //     if (activity['Type'] == 'Sleeping') {
+  //       String startTime = activity['StartTime'] ?? "";
+  //       String endTime = activity['EndTime'] ?? "";
+  //       try {
+  //         DateTime start = DateTime.parse("2024-01-01 $startTime");
+  //         DateTime end = DateTime.parse("2024-01-01 $endTime");
+  //
+  //         if (end.isBefore(start)) {
+  //           end = end.add(Duration(days: 1));
+  //         }
+  //
+  //         Duration sleepDuration = end.difference(start);
+  //         totalSleepHours += sleepDuration.inMinutes / 60.0;
+  //       } catch (e) {
+  //         print("Error parsing sleep time: $e");
+  //       }
+  //     }
+  //   }
+  //   return totalSleepHours > 0 ? "${totalSleepHours.toStringAsFixed(1)} hrs" : "N/A";
+  // }
+
+  String calculateDuration(String activityType) {
+    double totalHours = 0.0;
     for (var activity in activities) {
-      if (activity['Type'] == 'Sleeping') {
+      if (activity['Type'] == activityType) {
         String startTime = activity['StartTime'] ?? "";
         String endTime = activity['EndTime'] ?? "";
         try {
           DateTime start = DateTime.parse("2024-01-01 $startTime");
           DateTime end = DateTime.parse("2024-01-01 $endTime");
-
           if (end.isBefore(start)) {
             end = end.add(Duration(days: 1));
           }
-
-          Duration sleepDuration = end.difference(start);
-          totalSleepHours += sleepDuration.inMinutes / 60.0;
+          Duration duration = end.difference(start);
+          totalHours += duration.inMinutes / 60.0;
         } catch (e) {
-          print("Error parsing sleep time: $e");
+          print("Error parsing $activityType time: $e");
         }
       }
     }
-    return totalSleepHours > 0 ? "${totalSleepHours.toStringAsFixed(1)} hrs" : "N/A";
+    return totalHours > 0 ? "${totalHours.toStringAsFixed(1)} hrs" : "N/A";
   }
+
 
   Map<String, dynamic>? getLatestActivity() {
     if (activities.isNotEmpty) {
@@ -194,7 +217,7 @@ class _HomeState extends State<Home> {
                                     Icon(Icons.bedtime,
                                         size: 40, color: Colors.blue),
                                     const SizedBox(width: 5),
-                                    Text("Sleep ${calculateTotalSleepDuration()}",
+                                    Text("Sleep ${calculateDuration('Sleeping')}",
                                         style: TextStyle(fontSize: 16)),
                                   ],
                                 ),
@@ -212,7 +235,7 @@ class _HomeState extends State<Home> {
                                   Icon(Icons.restaurant,
                                       size: 40, color: Colors.orange),
                                   const SizedBox(width: 5),
-                                  Text("Eat 3x",
+                                  Text("Eat ${calculateDuration("Playing")}",
                                       style: TextStyle(fontSize: 16)),
                                 ],
                               ),
@@ -234,7 +257,7 @@ class _HomeState extends State<Home> {
                               Icon(Icons.menu_book,
                                   size: 40, color: Colors.green),
                               const SizedBox(height: 5),
-                              Text("Play 2hr", style: TextStyle(fontSize: 16)),
+                              Text("Play ${calculateDuration("Studying")}", style: TextStyle(fontSize: 16)),
                             ],
                           ),
                         ),
@@ -323,3 +346,4 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
