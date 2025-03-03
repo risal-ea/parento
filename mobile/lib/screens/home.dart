@@ -102,18 +102,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       // Notifications: Not implemented yet
         break;
       case 2:
-        if (selectedBabyId.isNotEmpty) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Chat(babyId: selectedBabyId),
-            ),
-          ).then((_) => fetchData()); // Refresh data when returning
-        } else {
-          _showSnackBar("Please select a baby first", isError: true);
-        }
-        break;
-      case 3:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ParentProfile()),
