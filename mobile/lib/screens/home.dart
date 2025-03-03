@@ -411,91 +411,120 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       }
     }
 
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: getActivityColor().withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            getActivityIcon(),
+            color: getActivityColor(),
+            size: 24,
+          ),
+        ),
+        SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                activity['Type'] ?? "Activity",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: textPrimaryColor,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                activity['Description'] ?? "",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: textSecondaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              activity['Date'] ?? "",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: textPrimaryColor,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              "${activity['StartTime'] ?? ""} - ${activity['EndTime'] ?? ""}",
+              style: TextStyle(
+                fontSize: 12,
+                color: textSecondaryColor,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget buildActivitiesCard() {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: Offset(0, 2),
+            offset: Offset(0, 4),
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            HapticFeedback.lightImpact();
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: getActivityColor().withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    getActivityIcon(),
-                    color: getActivityColor(),
-                    size: 24,
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        activity['Type'] ?? "Activity",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: textPrimaryColor,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        activity['Description'] ?? "",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: textSecondaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      activity['Date'] ?? "",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: textPrimaryColor,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "${activity['StartTime'] ?? ""} - ${activity['EndTime'] ?? ""}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: textSecondaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+      padding: EdgeInsets.all(16),
+      child: activities.isEmpty
+          ? Container(
+        height: 150,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event_note,
+              size: 48,
+              color: textSecondaryColor.withOpacity(0.5),
             ),
-          ),
+            SizedBox(height: 16),
+            Text(
+              "No activities recorded yet",
+              style: TextStyle(
+                fontSize: 16,
+                color: textSecondaryColor,
+              ),
+            ),
+          ],
         ),
+      )
+          : Column(
+        children: activities.take(4).map((activity) {
+          return Column(
+            children: [
+              buildActivityItem(activity),
+              if (activities.indexOf(activity) < activities.take(4).length - 1)
+                Divider(
+                  height: 24,
+                  thickness: 1,
+                  color: Colors.grey.withOpacity(0.1),
+                ),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
@@ -760,35 +789,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
                       ),
                     ),
                   )
-                      : activities.isEmpty
-                      ? Container(
-                    height: 200,
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.event_note,
-                          size: 48,
-                          color: textSecondaryColor.withOpacity(0.5),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          "No activities recorded yet",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: textSecondaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : Column(
-                    children: activities
-                        .take(4)
-                        .map((activity) => buildActivityItem(activity))
-                        .toList(),
-                  ),
+                      : buildActivitiesCard(),
                   SizedBox(height: 100),
                 ],
               ),
