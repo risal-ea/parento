@@ -3,123 +3,142 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class RequestForm extends StatelessWidget {
+class RequestForm extends StatefulWidget {
   final String daycareId;
 
-  RequestForm({Key? key, required this.daycareId}) : super(key: key);
+  const RequestForm({Key? key, required this.daycareId}) : super(key: key);
 
+  @override
+  _RequestFormState createState() => _RequestFormState();
+}
 
+class _RequestFormState extends State<RequestForm> {
   final GlobalKey<FormState> _requestForm = GlobalKey<FormState>();
   final TextEditingController startDate = TextEditingController();
   final TextEditingController preferredSchedule = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: Text("Request form"),),
-        body: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Form(
-            key: _requestForm,
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: startDate,
-                  decoration: InputDecoration(labelText: "Start date"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "please enter start date";
-                    } else {
-                      return null;
-                    }
-                  },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Request Form",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Color(0xFF6C63FF),
+        centerTitle: true,
+        elevation: 2,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _requestForm,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Start Date",
+                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8.0),
+              TextFormField(
+                controller: startDate,
+                decoration: const InputDecoration(
+                  hintText: "Select start date",
+                  prefixIcon: Icon(Icons.calendar_today, color: Color(0xFF6C63FF)),
                 ),
-                SizedBox(
-                  height: 16.0,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter start date";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24.0),
+              const Text(
+                "Preferred Schedule",
+                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8.0),
+              TextFormField(
+                controller: preferredSchedule,
+                decoration: const InputDecoration(
+                  hintText: "What days/times work best for you?",
+                  prefixIcon: Icon(Icons.schedule, color: Color(0xFF6C63FF)),
                 ),
-                TextFormField(
-                  controller: preferredSchedule,
-                  decoration: InputDecoration(labelText: "Preferred schedule"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "what is the preferred schedule";
-                    } else {
-                      return null;
-                    }
-                  },
-                ),
-                SizedBox(
-                  height: 16.0,
-                ),
-                ElevatedButton(
-                    onPressed: () async {
-                      if (_requestForm.currentState!.validate()) {
-                        try {
-                          final sh = await SharedPreferences.getInstance();
-                          String login_id = sh.getString('login_id') ?? '';
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter preferred schedule";
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SizedBox(
+          width: double.infinity,
+          height: 50.0,
+          child: ElevatedButton(
+            onPressed: () async {
+              if (_requestForm.currentState!.validate()) {
+                try {
+                  final sh = await SharedPreferences.getInstance();
+                  String loginId = sh.getString('login_id') ?? '';
+                  String url = sh.getString('url') ?? '';
 
-                          if (login_id.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                Text('Login is not found! please login.'),
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                            return;
-                          }
+                  if (loginId.isEmpty || url.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Error: Missing login or server info'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
 
-                          String url = sh.getString('url') ?? '';
-
-                          if (url.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Server URL is not configured.'),
-                              ),
-                            );
-                            return;
-                          }
-
-                          var data = await http.post(
-                            Uri.parse(url + "admition_request"),
-                            body: {
-                              'startDate': startDate.text.trim(),
-                              'schedule': preferredSchedule.text.trim(),
-                              'daycareId': daycareId,
-                              'lid': login_id,
-                            },
-                          );
-
-
-                          var jsonData = json.decode(data.body);
-                          String status = jsonData['status'].toString();
-
-                          if (status == 'success') {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('request send successfully!'),
-                              duration: Duration(seconds: 3),
-                            ));
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Failed to send request.'),
-                              duration: Duration(seconds: 3),
-                            ));
-                          }
-
-                        } catch (e) {
-                          print("Error: $e");
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('An error occurred. Please try again.'),
-                            duration: Duration(seconds: 3),
-                          ));
-                        }
-                      }else{
-                        print("Form is invalid");
-                      }
+                  var response = await http.post(
+                    Uri.parse('$url/admition_request'),
+                    body: {
+                      'startDate': startDate.text.trim(),
+                      'schedule': preferredSchedule.text.trim(),
+                      'daycareId': widget.daycareId,
+                      'lid': loginId,
                     },
-                    child: Text("Submit"))
-              ],
+                  );
+
+                  var jsonData = json.decode(response.body);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(jsonData['status'] == 'success' ?
+                      'Request sent successfully!' : 'Failed to send request.'),
+                      backgroundColor: jsonData['status'] == 'success' ? Colors.green : Colors.red,
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('An error occurred. Please try again.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF6C63FF),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+            child: const Text(
+              "Submit Request",
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
             ),
           ),
         ),

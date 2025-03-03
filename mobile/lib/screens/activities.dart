@@ -65,6 +65,7 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
       });
 
       var jsonData = json.decode(response.body);
+      print("Response: $jsonData");
 
       if (jsonData['status'] == 'success') {
         var arr = jsonData['data'] as List;
@@ -79,7 +80,16 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
               'End Time': activity['end_time'].toString(),
             };
           }).toList();
+
+          // Sort activities by date and start time (newest first)
+          activities.sort((a, b) {
+            DateTime dateA = DateTime.parse("${a['Date']} ${a['Start Time']}");
+            DateTime dateB = DateTime.parse("${b['Date']} ${b['Start Time']}");
+            return dateB.compareTo(dateA); // Descending order
+          });
+
           isLoading = false;
+          print("Sorted activities: ${activities.map((a) => "${a['Date']} ${a['Start Time']} - ${a['Type']}").toList()}");
         });
       } else {
         setState(() {
@@ -91,7 +101,7 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
       setState(() {
         isLoading = false;
       });
-      _showSnackBar("Error loading activities", isError: true);
+      _showSnackBar("Error loading activities: $e", isError: true);
       print("Error: $e");
     }
   }

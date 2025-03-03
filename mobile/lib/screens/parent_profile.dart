@@ -17,11 +17,12 @@ class _ParentProfileState extends State<ParentProfile> {
   String address = "";
   bool isLoading = true;
   String errorMessage = "";
+  final Color primaryColor = const Color(0xFF6C63FF);
 
   @override
   void initState() {
     super.initState();
-    fetchData(); // Fetch parent details when the page loads
+    fetchData();
   }
 
   Future<void> fetchData() async {
@@ -70,31 +71,158 @@ class _ParentProfileState extends State<ParentProfile> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: primaryColor,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor,
+          primary: primaryColor,
+        ),
+        useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+      ),
       home: Scaffold(
-        appBar: AppBar(title: const Text("Parent Profile")),
+        backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          title: const Text(
+            "Parent Profile",
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                // Edit profile functionality
+              },
+            ),
+          ],
+        ),
         body: isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(
+          child: CircularProgressIndicator(
+            color: primaryColor,
+          ),
+        )
             : errorMessage.isNotEmpty
-            ? Center(child: Text(errorMessage, style: const TextStyle(color: Colors.red)))
-            : Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ? Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: Colors.red[400],
+                size: 60,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                errorMessage,
+                style: TextStyle(
+                  color: Colors.red[700],
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: fetchData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text("Try Again"),
+              ),
+            ],
+          ),
+        )
+            : SingleChildScrollView(
+          child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Parent Details",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 20),
+                  // Profile avatar
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundColor: primaryColor.withOpacity(0.2),
+                    child: Icon(
+                      Icons.person,
+                      size: 70,
+                      color: primaryColor,
+                    ),
                   ),
-                  const Divider(),
-                  infoRow("Name", name),
-                  infoRow("Email", email),
-                  infoRow("Phone", phone),
-                  infoRow("Address", address),
+                  const SizedBox(height: 16),
+                  // Name
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Contact Info Section
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        profileInfoTile(
+                          Icons.email_outlined,
+                          "Email",
+                          email,
+                        ),
+                        const Divider(height: 1),
+                        profileInfoTile(
+                          Icons.phone_outlined,
+                          "Phone",
+                          phone,
+                        ),
+                        const Divider(height: 1),
+                        profileInfoTile(
+                          Icons.location_on_outlined,
+                          "Address",
+                          address,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      // Logout functionality
+                    },
+                    icon: const Icon(Icons.logout),
+                    label: const Text("Logout"),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      side: BorderSide(color: primaryColor),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -104,20 +232,44 @@ class _ParentProfileState extends State<ParentProfile> {
     );
   }
 
-  Widget infoRow(String label, String value) {
+  Widget profileInfoTile(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          Text(
-            "$label: ",
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: primaryColor,
+              size: 24,
+            ),
           ),
+          const SizedBox(width: 16),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

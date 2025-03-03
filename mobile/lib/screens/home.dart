@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/components/bottom_nav_bar.dart';
-import 'package:mobile/components/reusable_card.dart';
 import 'package:mobile/screens/activities.dart';
 import 'package:mobile/screens/baby_details.dart';
 import 'package:mobile/screens/view_daycare.dart';
@@ -22,7 +21,7 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   List<Map<String, dynamic>> activities = [];
   int _selectedIndex = 0;
   String selectedBabyPhoto = "";
@@ -68,13 +67,25 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+    WidgetsBinding.instance.addObserver(this); // Add observer for lifecycle events
     fetchData();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    WidgetsBinding.instance.removeObserver(this); // Remove observer
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Refresh data when the app resumes (e.g., returning to Home screen)
+      if (selectedBabyId.isNotEmpty) {
+        fetchData();
+      }
+    }
   }
 
   void _onItemTapped(int index) {
@@ -85,8 +96,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
     switch (index) {
       case 0:
+      // Home: Already here
         break;
       case 1:
+      // Notifications: Not implemented yet
         break;
       case 2:
         if (selectedBabyId.isNotEmpty) {
@@ -95,7 +108,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             MaterialPageRoute(
               builder: (context) => Chat(babyId: selectedBabyId),
             ),
-          );
+          ).then((_) => fetchData()); // Refresh data when returning
         } else {
           _showSnackBar("Please select a baby first", isError: true);
         }
@@ -104,7 +117,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ParentProfile()),
-        );
+        ).then((_) => fetchData()); // Refresh data when returning
         break;
     }
   }
@@ -139,6 +152,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Future<void> fetchData() async {
     setState(() {
       isRefreshing = true;
+      isLoading = true;
     });
 
     try {
@@ -147,10 +161,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       String ip = sh.getString("url") ?? "";
       String url = "$ip/home";
 
+      print("Fetching data from: $url");
+      print("Login ID: $login_id");
+      print("Baby ID: $selectedBabyId");
+
       var response = await http.post(
         Uri.parse(url),
         body: {"login_id": login_id, "baby_id": selectedBabyId},
       );
+
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       var jsonData = json.decode(response.body);
 
@@ -167,23 +188,34 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               'EndTime': activity['end_time'].toString(),
             };
           }).toList();
+
+          // Sort activities by date and start time (newest first)
+          activities.sort((a, b) {
+            DateTime dateA = DateTime.parse("${a['Date']} ${a['StartTime']}");
+            DateTime dateB = DateTime.parse("${b['Date']} ${b['StartTime']}");
+            return dateB.compareTo(dateA); // Descending order
+          });
+
           isLoading = false;
           isRefreshing = false;
+          print("Activities loaded: ${activities.length}");
+          print("Sorted activities: ${activities.map((a) => "${a['Date']} ${a['StartTime']} - ${a['Type']}").toList()}");
         });
       } else {
         setState(() {
           isLoading = false;
           isRefreshing = false;
         });
-        _showSnackBar("Failed to fetch data: ${jsonData['message']}",
-            isError: true);
+        _showSnackBar("Failed to fetch data: ${jsonData['message']}", isError: true);
+        print("Fetch failed: ${jsonData['message']}");
       }
     } catch (e) {
       setState(() {
         isLoading = false;
         isRefreshing = false;
       });
-      _showSnackBar("Error loading data. Pull down to refresh.", isError: true);
+      _showSnackBar("Error loading data: $e", isError: true);
+      print("Error fetching data: $e");
     }
   }
 
@@ -209,8 +241,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return totalHours > 0 ? "${totalHours.toStringAsFixed(1)} hrs" : "0 hrs";
   }
 
-  Widget buildActivityCard(
-      String title, IconData icon, Color color, String duration) {
+  Widget buildActivityCard(String title, IconData icon, Color color, String duration) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -280,8 +311,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             children: [
               Text('Total duration: $duration'),
               SizedBox(height: 16),
-              Text('Recent sessions:',
-                  style: TextStyle(fontWeight: FontWeight.w600)),
+              Text('Recent sessions:', style: TextStyle(fontWeight: FontWeight.w600)),
               SizedBox(height: 8),
               ...activities
                   .where((act) => act['Type'] == activity)
@@ -292,8 +322,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(act['Date'] ?? ""),
-                    Text(
-                        '${act['StartTime'] ?? ""} - ${act['EndTime'] ?? ""}'),
+                    Text('${act['StartTime'] ?? ""} - ${act['EndTime'] ?? ""}'),
                   ],
                 ),
               )),
@@ -317,17 +346,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-            action['destination'],
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
+            pageBuilder: (context, animation, secondaryAnimation) => action['destination'],
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(
                 opacity: animation,
                 child: child,
               );
             },
           ),
-        );
+        ).then((_) => fetchData()); // Refresh data when returning from quick actions
       },
       child: Container(
         decoration: BoxDecoration(
@@ -375,7 +402,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         case 'Sleeping':
           return Icons.bedtime;
         case 'Playing':
-          return Icons.restaurant;
+          return Icons.sports_baseball;
         case 'Studying':
           return Icons.menu_book;
         default:
@@ -517,8 +544,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
                             BabyDetails(babyId: selectedBabyId),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
                           return SlideTransition(
                             position: Tween<Offset>(
                               begin: const Offset(1, 0),
@@ -528,7 +554,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           );
                         },
                       ),
-                    );
+                    ).then((_) => fetchData()); // Refresh data when returning
                   }
                 },
                 child: BabySelection(
@@ -629,8 +655,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       height: 170,
                       child: Center(
                         child: CircularProgressIndicator(
-                          valueColor:
-                          AlwaysStoppedAnimation<Color>(primaryColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
                         ),
                       ),
                     ),
@@ -698,11 +723,19 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       Spacer(),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Activities(babyId: selectedBabyId),),);
+                          if (selectedBabyId.isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Activities(babyId: selectedBabyId),
+                              ),
+                            ).then((_) => fetchData()); // Refresh data when returning
+                          } else {
+                            _showSnackBar("Please select a baby first", isError: true);
+                          }
                         },
                         style: TextButton.styleFrom(
-                          padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -734,8 +767,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       height: 200,
                       child: Center(
                         child: CircularProgressIndicator(
-                          valueColor:
-                          AlwaysStoppedAnimation<Color>(primaryColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
                         ),
                       ),
                     ),
@@ -788,15 +820,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       Chat(babyId: selectedBabyId),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
                     return ScaleTransition(
                       scale: animation,
                       child: child,
                     );
                   },
                 ),
-              );
+              ).then((_) => fetchData()); // Refresh data when returning
             } else {
               _showSnackBar("Please select a baby first", isError: true);
             }
