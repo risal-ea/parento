@@ -89,7 +89,7 @@ class _BabySelectionState extends State<BabySelection> {
                   ...babies.map((baby) => ListTile(
                     leading: CircleAvatar(
                       backgroundColor: selectedBabyId == baby['baby_id']
-                          ? Colors.blue
+                          ? Color(0xFF6C63FF)
                           : Colors.grey[300],
                       backgroundImage: baby['baby_photo']!.isNotEmpty
                           ? NetworkImage(baby['baby_photo']!)
@@ -105,12 +105,12 @@ class _BabySelectionState extends State<BabySelection> {
                             ? FontWeight.bold
                             : FontWeight.normal,
                         color: selectedBabyId == baby['baby_id']
-                            ? Colors.blue
+                            ? Color(0xFF6C63FF)
                             : Colors.black,
                       ),
                     ),
                     trailing: selectedBabyId == baby['baby_id']
-                        ? const Icon(Icons.check, color: Colors.blue)
+                        ? const Icon(Icons.check, color: Color(0xFF6C63FF))
                         : null,
                     onTap: () {
                       Navigator.pop(context);
@@ -121,7 +121,7 @@ class _BabySelectionState extends State<BabySelection> {
                   // Add Baby Option (Looks like a profile)
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Color(0xFF6C63FF),
                       child: const Icon(Icons.add, size: 30, color: Colors.white),
                     ),
                     title: const Text(

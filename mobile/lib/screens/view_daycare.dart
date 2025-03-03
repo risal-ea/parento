@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'daycare_details.dart'; // Import the details page
+import 'daycare_details.dart';
 
 class Daycare extends StatefulWidget {
   const Daycare({Key? key}) : super(key: key);
@@ -12,8 +12,8 @@ class Daycare extends StatefulWidget {
 }
 
 class _DaycareState extends State<Daycare> {
-  List<Map<String, String>> daycareList = []; // Stores daycare details
-  bool isLoading = true; // Loading indicator
+  List<Map<String, String>> daycareList = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -61,56 +61,99 @@ class _DaycareState extends State<Daycare> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FBFF), // Light background
       appBar: AppBar(
-        title: const Text('View Daycare'),
-        backgroundColor: Colors.blueAccent,
+        title: const Text('View Daycares'),
+        backgroundColor: const Color(0xFF6C63FF), // Home Page Theme Color
+        elevation: 0,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF)))
           : daycareList.isEmpty
           ? const Center(
-        child: Text("No daycares available", style: TextStyle(fontSize: 18)),
+        child: Text(
+          "No daycares available",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+        ),
       )
-          : ListView.builder(
-        physics: const BouncingScrollPhysics(),
-        itemCount: daycareList.length,
-        itemBuilder: (context, index) {
-          return Card(
-            elevation: 4,
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+          : Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
+          itemCount: daycareList.length,
+          itemBuilder: (context, index) {
+            return _buildDaycareCard(index);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDaycareCard(int index) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DaycareDetails(daycareId: daycareList[index]['id']!),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: const Offset(0, 4),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              title: Text(
-                daycareList[index]['name']!,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              subtitle: Column(
+          ],
+          gradient: const LinearGradient(
+            colors: [Colors.white, Color(0xFFF8FBFF)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Circular Icon Avatar
+            CircleAvatar(
+              backgroundColor: const Color(0xFF6C63FF).withOpacity(0.15),
+              radius: 28,
+              child: const Icon(Icons.storefront_rounded, color: Color(0xFF6C63FF), size: 28),
+            ),
+            const SizedBox(width: 16),
+            // Text Content
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 5),
-                  Text("Owner: ${daycareList[index]['owner']}",
-                      style: const TextStyle(fontSize: 16)),
-                  const SizedBox(height: 5),
-                  Text("Phone: ${daycareList[index]['phone']}",
-                      style: const TextStyle(fontSize: 16)),
+                  Text(
+                    daycareList[index]['name']!,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Owner: ${daycareList[index]['owner']}",
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Phone: ${daycareList[index]['phone']}",
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  ),
                 ],
               ),
-              trailing: const Icon(Icons.arrow_forward_ios, color: Colors.blueAccent),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                          DaycareDetails(daycareId: daycareList[index]['id']!),
-                  ),
-                );
-              },
             ),
-          );
-        },
+            // Forward Icon
+            const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF6C63FF), size: 20),
+          ],
+        ),
       ),
     );
   }

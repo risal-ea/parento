@@ -1,28 +1,362 @@
-{% include 'public/header.html' %}
-<body style="background-color: #4F6C7D;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Profile</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4F6C7D;
+            --secondary-color: #2D3E4B;
+            --accent-color: #6EA5C8;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --background-light: #f5f7f9;
+            --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-color);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .data-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        h1 {
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+        
+        section {
+            background-color: var(--background-light);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+        }
+        
+        .profile-header {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .profile-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+        }
+        
+        @media (min-width: 768px) {
+            .profile-content {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+        
+        .profile-image {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .profile-placeholder {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ddd;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-placeholder i {
+            font-size: 120px;
+            color: #888;
+        }
+
+        
+        @media (min-width: 768px) {
+            .profile-image {
+                margin-bottom: 0;
+                margin-right: 40px;
+            }
+        }
+        
+        .profile-image img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .position-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-details {
+            flex: 1;
+        }
+        
+        .profile-name {
+            color: var(--secondary-color);
+            font-size: 2rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .profile-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(110, 165, 200, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--accent-color);
+        }
+        
+        .info-icon i {
+            font-size: 1.2rem;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            color: #777;
+            margin-bottom: 3px;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: #777;
+        }
+        
+        .empty-profile-icon {
+            width: 150px;
+            height: 150px;
+            background-color: #eaeaea;
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-profile-icon i {
+            font-size: 80px;
+            color: #bbb;
+        }
+        
+        .empty-state p {
+            font-size: 1.2rem;
+            color: #888;
+            margin-top: 15px;
+        }
+        
+        .empty-state .action-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .empty-state .action-btn:hover {
+            background-color: #5a8aa6;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
     <div class="data-container">
-        <section>
-            <h1>Profile</h1>
-        </section>
+        <h1>Staff Profile</h1>
+        
         {% if data.view %}
         <section>
-            <div>
-                <img src="https://via.placeholder.com/150" alt="Profile picture of {{ data.view.staff_name }}">
+            <div class="profile-header">
+                <h2>Information</h2>
             </div>
-            <div>
-                <h2>{{ data.view.staff_name }}</h2>
-                <p><strong>Position:</strong> {{ data.view.position }}</p>
-                <p><strong>Email:</strong> {{ data.view.staff_email }}</p>
-                <p><strong>Phone:</strong> {{ data.view.staff_phone }}</p>
-                <p><strong>Date of Birth:</strong> {{ data.view.staff_dob }}</p>
-                <p><strong>Gender:</strong> {{ data.view.gender }}</p>
-                <p><strong>Address:</strong> {{ data.view.staff_adress }}</p>
-                <p><strong>Qualification:</strong> {{ data.view.qualification }}</p>
+            
+            <div class="profile-content">
+                <div class="profile-image">
+                    <div class="profile-image">
+                        {% if data.view.staff_image %}
+                            <img src="{{ data.view.staff_image }}" alt="Profile picture of {{ data.view.staff_name }}">
+                        {% else %}
+                            <div class="profile-placeholder">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                        {% endif %}
+                        <div class="position-badge">{{ data.view.position }}</div>
+                    </div>
+                </div>
+                
+                <div class="profile-details">
+                    <h2 class="profile-name">{{ data.view.staff_name }}</h2>
+                    
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Email Address</div>
+                                <div class="info-value">{{ data.view.staff_email }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Phone Number</div>
+                                <div class="info-value">{{ data.view.staff_phone }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-birthday-cake"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Date of Birth</div>
+                                <div class="info-value">{{ data.view.staff_dob }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-venus-mars"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Gender</div>
+                                <div class="info-value">{{ data.view.gender }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Address</div>
+                                <div class="info-value">{{ data.view.staff_adress }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Qualification</div>
+                                <div class="info-value">{{ data.view.qualification }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
         {% else %}
-        <p>No profile data available.</p>
+        <section>
+            <div class="empty-state">
+                <div class="empty-profile-icon">
+                    <i class="far fa-user-circle"></i>
+                </div>
+                <h3>No Profile Found</h3>
+                <p>The staff profile information is not available.</p>
+                <a href="#" class="action-btn">
+                    <i class="fas fa-plus-circle"></i> Create Profile
+                </a>
+            </div>
+        </section>
         {% endif %}
     </div>
 </body>
-{% include 'public/footer.html' %}
+</html>
