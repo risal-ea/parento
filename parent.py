@@ -9,7 +9,7 @@ curentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 parent=Blueprint('parent',__name__)
 
-@parent.route('/and_login',methods=['POST'])
+@parent.route('/and_login',methods=['POST','GET'])
 def login():
     data={}
 
@@ -24,6 +24,7 @@ def login():
     else:
         data['status']='failed'
     return data
+
 
 @parent.route('/and_registor',methods=['POST'])
 def registor():
@@ -277,35 +278,47 @@ def admition_request():
 
     return jsonify({"status": "success", "message": "Request received"})
 
+
 @parent.route("/baby_details", methods=['POST'])
 def baby_details():
-    babyId = request.form.get('baby_id', '')  # Safely get baby_id
+    try:
+        baby_id = request.form.get('baby_id', '')  # Safely get baby_id
+        
+        if not baby_id:
+            return jsonify({"status": "error", "message": "Baby ID is required"}), 400
 
-    print(babyId, "baby_id ///////////////////////")
+        print(f"Baby ID received: {baby_id}")  # Improved logging
 
-    # Fetch baby details from database
-    query = "SELECT * FROM babies WHERE baby_id=%s"  # Use parameterized query to prevent SQL injection
-    result = select(query, (babyId,))
+        # Fetch baby details from database
+        query = "SELECT baby_name, baby_dob, baby_photo, allergies_or_dietry_restriction, medical_condition FROM babies WHERE baby_id=%s"
+        result = select(query, (baby_id,))
 
-    qr_query = "SELECT qr_code FROM admission_request WHERE baby_id = %s"
-    qr_result = select(qr_query, (babyId,))  # Fetch qr_code safely
+        # Fetch QR code separately
+        qr_query = "SELECT qr_code FROM admission_request WHERE baby_id = %s"
+        qr_result = select(qr_query, (baby_id,))
 
-    if result:  # If data is found
-        baby_data = {
-            "status": "success",
-            "data": [{
-                "baby_name": result[0]["baby_name"],
-                "baby_dob": result[0]["baby_dob"],
-                "baby_photo": result[0]["baby_photo"],
-                "allergies_or_dietry_restriction": result[0]["allergies_or_dietry_restriction"],
-                "medical_condition": result[0]["medical_condition"],
-                "qr_code": qr_result[0]["qr_code"] if qr_result else None  # Ensure qr_result is not empty
-            }]
-        }
-    else:
-        baby_data = {"status": "error", "message": "Baby not found"}
+        if result and len(result) > 0:  # If baby data is found
+            baby_data = {
+                "status": "success",
+                "data": [{
+                    "baby_name": result[0]["baby_name"],
+                    "baby_dob": str(result[0]["baby_dob"]),  # Convert date to string
+                    "baby_photo": result[0]["baby_photo"] or "",  # Handle null values
+                    "allergies_or_dietry_restriction": result[0]["allergies_or_dietry_restriction"] or "",
+                    "medical_condition": result[0]["medical_condition"] or "",
+                    "qr_code": qr_result[0]["qr_code"] if qr_result and len(qr_result) > 0 else ""
+                }]
+            }
+            print(f"Returning baby data: {baby_data}")  # Log the response
+            return jsonify(baby_data), 200
+        else:
+            print(f"No baby found for ID: {baby_id}")
+            return jsonify({"status": "error", "message": "Baby not found"}), 404
 
-    return jsonify(baby_data)
+    except Exception as e:
+        print(f"Error in baby_details: {str(e)}")
+        return jsonify({"status": "error", "message": "Internal server error"}), 500
+
 
 
 @parent.route("/parent_profile", methods=['POST'])
@@ -359,7 +372,106 @@ def home():
     print("Backend Response:", data)  # Log the response
     return jsonify(data)
 
+from flask import Blueprint, request, jsonify
+from database import insert, select
+from datetime import datetime
+
+parent = Blueprint('parent', __name__)
+
+currentDateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+@parent.route("/send_chat_message", methods=["POST"])
+def send_chat_messages():
+    baby_id = request.form.get('baby_id')
+    login_id = request.form.get('login_id')
+    message = request.form.get('message')
+
+    if not baby_id or not login_id or not message:
+        return jsonify({"status": "error", "message": "Missing required fields"}), 400
+
+    print(f"baby_id: {baby_id}, login_id: {login_id}")
+
+    # Get daycare_id from admission_request
+    admission_query = "SELECT * FROM admission_request WHERE baby_id='%s'" % (baby_id)
+    admission_data = select(admission_query)
+
+    if not admission_data:
+        return jsonify({"status": "error", "message": "No admission request found"}), 404
+
+    daycare_id = admission_data[0]['daycare_id']
+    print(f"daycare_id: {daycare_id}")
+
+    # Get daycare login_id from day_care
+    daycare_query = "SELECT * FROM day_care WHERE day_care_id='%s'" % (daycare_id)
+    daycare_data = select(daycare_query)
+
+    if not daycare_data:
+        return jsonify({"status": "error", "message": "Daycare not found"}), 404
+
+    daycare_login_id = daycare_data[0]['login_id']
+    print(f"daycare_login_id: {daycare_login_id}")
+
+    # Insert chat message with date_time column
+    chat_query = "INSERT INTO chat VALUES (NULL, '%s', 'parent', '%s', 'daycare', '%s', '%s')" % (
+        login_id, daycare_login_id, message, currentDateTime
+    )
+    insert(chat_query)
+
+    return jsonify({"status": "success", "message": "Message sent successfully"})
 
 
+@parent.route("/get_chat_messages", methods=["POST"])
+def get_chat_messages():
+    baby_id = request.form.get('baby_id')
+    login_id = request.form.get('login_id')
 
+    if not baby_id or not login_id:
+        return jsonify({"status": "error", "message": "Missing baby_id or login_id"}), 400
 
+    print(f"Fetching chats for baby_id: {baby_id}, login_id: {login_id}")
+
+    # Get daycare_id from admission_request
+    admission_query = "SELECT * FROM admission_request WHERE baby_id='%s'" % (baby_id)
+    admission_data = select(admission_query)
+
+    if not admission_data:
+        return jsonify({"status": "error", "message": "No admission request found for this baby"}), 404
+
+    daycare_id = admission_data[0]['daycare_id']
+    print(f"Daycare ID: {daycare_id}")
+
+    # Get daycare login_id from day_care
+    daycare_query = "SELECT * FROM day_care WHERE day_care_id='%s'" % (daycare_id)
+    daycare_data = select(daycare_query)
+
+    if not daycare_data:
+        return jsonify({"status": "error", "message": "Daycare not found"}), 404
+
+    daycare_login_id = daycare_data[0]['login_id']
+    print(f"Daycare Login ID: {daycare_login_id}")
+
+    # Fetch chat messages with date_time column, oldest first
+    chat_query = """
+        SELECT message, date_time, sender_type 
+        FROM chat 
+        WHERE (sender_id='%s' AND receiver_id='%s' AND sender_type='parent' AND receiver_type='daycare') 
+           OR (sender_id='%s' AND receiver_id='%s' AND sender_type='daycare' AND receiver_type='parent') 
+        ORDER BY date_time Desc
+    """ % (login_id, daycare_login_id, daycare_login_id, login_id)
+    chat_data = select(chat_query)
+
+    if not chat_data:
+        print("No chat messages found")
+        return jsonify({"status": "success", "data": []})
+
+    # Format messages with date_time
+    messages = [
+        {
+            "message": row['message'],
+            "timestamp": row['date_time'],  # Named 'timestamp' for frontend compatibility
+            "sender_type": row['sender_type']
+        } for row in chat_data
+    ]
+
+    print(f"Messages fetched: {messages}")
+    return jsonify({"status": "success", "data": messages})

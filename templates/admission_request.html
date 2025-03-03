@@ -12,6 +12,7 @@
                 <th>Preferred Schedule</th>
                 <th>payment</th>
                 <th>QR Code</th>
+                <th>Chat</th>
             </tr>
             {% for i in data['view'] %}
             <tr>
@@ -30,6 +31,9 @@
                 {% else %}
                 <td><img src="{{ i['qr_code'] }}" alt="" width="200px"></td>
                 {% endif %}
+
+                <td><a href="/chat?id={{i['adminssion_id']}}" class="accept-btn">Chat</a></td>
+
 
             </tr>
             {% endfor %}

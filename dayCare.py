@@ -68,26 +68,44 @@ def manageStaff():
 
 @dayCare.route('/addStaff', methods=['GET', 'POST'])
 def addstaff():
-    if 'add_staff' in request.form:
-        staff_name = request.form['staff_name']
-        staff_email = request.form['staff_email']
-        staff_phone = request.form['staff_phone']
-        staff_dob = request.form['staff_dob']
-        gender = request.form['gender']
-        staff_adress = request.form['staff_adress']
-        position = request.form['position']
-        qualification = request.form['qualification']
-        username = request.form['username']
-        password = request.form['password']
+    if request.method == 'POST':
+        print("Form submitted!")  # Check if form submission is happening
+        print("Received Form Data:", request.form)  # Debugging
 
-        z="insert into login values(null,'%s','%s','staff')"%(username,password)
-        login_id=insert(z)
+        if 'add_staff' in request.form:
+            staff_name = request.form['staff_name']
+            staff_email = request.form['staff_email']
+            staff_phone = request.form['staff_phone']
+            staff_dob = request.form['staff_dob']
+            gender = request.form['gender']
+            staff_adress = request.form['staff_adress']
+            position = request.form['position']
+            qualification = request.form['qualification']
+            username = request.form['username']
+            password = request.form['password']
 
-       
-        x="insert into staff values(null,'%s','%s','%s','%s','%s','%s','%s','%s','%s', '%s')"%(login_id, session['day_care'], staff_name,staff_email,staff_phone,staff_dob,gender,staff_adress,position, qualification)
-        insert(x)
+            print(f"Name: {staff_name}, Email: {staff_email}, Phone: {staff_phone}")
+
+            # Insert into login table
+            z = "insert into login values(null,'%s','%s','staff')" % (username, password)
+            login_id = insert(z)
+            print(f"Generated Login ID: {login_id}")
+
+            # Insert into staff table
+            x = "insert into staff values(null,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                login_id, session['day_care'], staff_name, staff_email, staff_phone, 
+                staff_dob, gender, staff_adress, position, qualification)
+            
+            if 'day_care' not in session:
+                print("Session variable 'day_care' is missing!")
+                return "Session expired. Please log in again."
+
+            
+            insert(x)
+            print("Data inserted into staff table.")
 
     return render_template('addStaff.html')
+
 
 @dayCare.route('/manageFacilities', methods=['POST', 'GET'])
 def manageFacilities():
@@ -272,3 +290,63 @@ def reject_request():
     update(q)
 
     return "<script>alert('request rejected');window.location='/view-admission-requests'</script>"
+
+
+@dayCare.route("/chat", methods=['GET', 'POST'])
+def chat():
+    # Get the admission ID from the query parameter
+    admission_id = request.args.get('id')
+
+    # Fetch admission request details to get parent_id
+    query_admission = "SELECT * FROM admission_request WHERE adminssion_id = '%s'" % (admission_id)
+    admission_data = select(query_admission)
+    if not admission_data:
+        return "Admission not found", 404
+    parent_id = admission_data[0]['parent_id']
+
+    print(parent_id, "////pid")
+
+    # Fetch parent details to get login_id
+    query_parent = "SELECT * FROM parent WHERE parent_id = '%s'" % (parent_id)
+    parent_data = select(query_parent)
+    if not parent_data:
+        return "Parent not found", 404
+    parent_login_id = parent_data[0]['login_id']
+
+    # Get daycare login ID from session (corrected from 'log' to 'day_care' if needed)
+    daycare_login_id = session.get('log')  # Confirm this key matches your login logic
+    if not daycare_login_id:
+        return "Daycare not logged in", 401
+
+    print(parent_login_id, daycare_login_id, "/////")
+
+    # Handle POST request (sending a new message)
+    if request.method == 'POST':
+        message = request.form.get('message')
+        if message:
+            # Insert new message into chat table
+            query_insert = """
+                INSERT INTO chat (sender_id, sender_type, receiver_id, receiver_type, message, date_time)
+                VALUES ('%s', 'daycare', '%s', 'parent', '%s', NOW())
+            """ % (daycare_login_id, parent_login_id, message)
+            select(query_insert)  # Replace with your insert function if select doesn't work for INSERT
+
+            # Redirect to the same chat page with GET to prevent resubmission
+            return redirect(url_for('dayCare.chat', id=admission_id))
+
+    # Fetch chat history between daycare and parent (GET request)
+    query_chat = """
+        SELECT * FROM chat 
+        WHERE (sender_id = '%s' AND receiver_id = '%s') 
+           OR (sender_id = '%s' AND receiver_id = '%s') 
+        ORDER BY date_time 
+    """ % (daycare_login_id, parent_login_id, parent_login_id, daycare_login_id)
+    chat_history = select(query_chat)
+
+    # Pass data to the template
+    return render_template("chat.html", 
+                          chat_history=chat_history, 
+                          daycare_id=daycare_login_id, 
+                          parent_id=parent_login_id,
+                          admission_id=admission_id)
+

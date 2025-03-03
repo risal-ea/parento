@@ -3,44 +3,70 @@
     <div class="data-container">
         
     {% if data['up'] %}
+        <div class="form__container">
+            <form method="POST" class="form-container margin">
+                <h2 align="center">Update Staff Information</h2>
+                <br>
+                <div class="form-group">
+                    <label for="staff_name">Staff Name:</label><br>
+                    <input type="text" id="staff_name" name="staff_name" class="form-input" 
+                           value="{{data['up'][0]['staff_name']}}" pattern="[a-zA-Z ]+" 
+                           title="Alphabets are only allowed" required><br><br>
+                </div>
 
-        <form  method="POST">
-            <h2>Update Staff</h1>
-            <label for="staff_name">Staff Name:</label><br>
-            <input type="text" id="staff_name" name="staff_name" value="{{data['up'][0]['staff_name']}}" pattern="[a-zA-Z ]+" title="Alphabets are only allowed" required><br><br>
-        
-            <label for="staff_email">Staff Email:</label><br>
-            <input type="email" id="staff_email" name="staff_email" value="{{data['up'][0]['staff_email']}}" required><br><br>
-        
-            <label for="staff_phone">Staff Phone:</label><br>
-            <input type="tel" id="staff_phone" name="staff_phone" value="{{data['up'][0]['staff_phone']}}" pattern="[1-10]{10}" title="Only 10 digits are allowed" required><br><br>
-        
-            <label for="staff_dob">Staff Date of Birth:</label><br>
-            <input type="date" id="staff_dob" name="staff_dob" required><br><br>
-        
-            <label for="gender">Gender:</label><br>
-            <select id="gender" name="gender" required>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select><br><br>
-        
-            <label for="staff_adress">Staff Address:</label><br>
-            <input type="text" id="staff_adress" name="staff_adress" value="{{data['up'][0]['staff_adress']}}"required><br><br>
-        
-            <label for="position">Position:</label><br>
-            <input type="text" id="position" name="position" value="{{data['up'][0]['position']}}"required><br><br>
-        
-            <label for="qualification">Qualification:</label><br>
-            <input type="text" id="qualification" name="qualification" value="{{data['up'][0]['qualification']}}"required><br><br>
-        
-        
-            <input type="submit" value="update Staff" name="update_staff">
-        </form>
-{% else %}
+                <div class="form-group">
+                    <label for="staff_email">Staff Email:</label><br>
+                    <input type="email" id="staff_email" name="staff_email" class="form-input" 
+                           value="{{data['up'][0]['staff_email']}}" required><br><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="staff_phone">Staff Phone:</label><br>
+                    <input type="tel" id="staff_phone" name="staff_phone" class="form-input"
+                           value="{{data['up'][0]['staff_phone']}}" pattern="[0-9]{10}" 
+                           title="Only 10 digits are allowed" required><br><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="staff_dob">Staff Date of Birth:</label><br>
+                    <input type="date" id="staff_dob" name="staff_dob" class="form-input" required><br><br>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="gender-options">
+                        <input type="radio" value="Male" name="gender" id="male" class="form-radio" required> 
+                        <label for="male">Male</label>
+                        <input type="radio" value="Female" name="gender" id="female" class="form-radio" required>
+                        <label for="female">Female</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="staff_adress">Staff Address:</label><br>
+                    <input type="text" id="staff_adress" name="staff_adress" class="form-input" 
+                           value="{{data['up'][0]['staff_adress']}}" required><br><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="position">Position:</label><br>
+                    <input type="text" id="position" name="position" class="form-input" 
+                           value="{{data['up'][0]['position']}}" required><br><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="qualification">Qualification:</label><br>
+                    <input type="text" id="qualification" name="qualification" class="form-input" 
+                           value="{{data['up'][0]['qualification']}}" required><br><br>
+                </div>
+
+                <input type="submit" value="Update Staff" name="update_staff" class="form-button">
+            </form>
+        </div>
+    {% else %}
         <h1>Manage Staff</h1>
         <a href="/addStaff">Add Staff</a>
-        <br>
-        <br>
+        <br><br>
         <table class="data-table">
             <tr>
                 <th>Staff name</th>
@@ -48,7 +74,7 @@
                 <th>Staff phone</th>
                 <th>Staff dob</th>
                 <th>Gender</th>
-                <th>Staff adress</th>
+                <th>Staff address</th>
                 <th>Position</th>
                 <th>Qualification</th>
                 <th>Update</th>
@@ -69,7 +95,6 @@
             </tr>
             {% endfor %}
         </table>
-
     {% endif %}
     </div>
 </body>

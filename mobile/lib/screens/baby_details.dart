@@ -20,9 +20,10 @@ class _BabyDetailsState extends State<BabyDetails> {
   String photo = "";
   String dietaryRestriction = "";
   String medicalCondition = "";
-  String qrCodePath = ""; // Store QR Code Image Path
+  String qrCodePath = "";
   bool isLoading = true;
   bool hasError = false;
+  String baseUrl = "";
 
   @override
   void initState() {
@@ -34,9 +35,16 @@ class _BabyDetailsState extends State<BabyDetails> {
     try {
       final sh = await SharedPreferences.getInstance();
       String ip = sh.getString("url") ?? "";
-      String url = '$ip/baby_details';
+      if (ip.isEmpty) {
+        throw Exception("Base URL not found in SharedPreferences");
+      }
+      setState(() {
+        baseUrl = ip.endsWith('/') ? ip : '$ip/';
+      });
+      String url = '${baseUrl}baby_details';
 
-      print("Fetching data for babyId: ${widget.babyId}");
+      print("Fetching data from: $url");
+      print("Baby ID: ${widget.babyId}");
 
       var response = await http.post(
         Uri.parse(url),
@@ -48,16 +56,16 @@ class _BabyDetailsState extends State<BabyDetails> {
       print("Response body: ${response.body}");
 
       var jsonData = json.decode(response.body);
-      if (jsonData['status'] == 'success' && jsonData["data"].isNotEmpty) {
+      if (response.statusCode == 200 && jsonData['status'] == 'success' && jsonData["data"].isNotEmpty) {
         var babyData = jsonData["data"][0];
 
         setState(() {
-          name = babyData['baby_name'].toString();
-          dob = babyData['baby_dob'].toString();
-          photo = babyData['baby_photo'].toString();
-          dietaryRestriction = babyData['allergies_or_dietry_restriction'].toString();
-          medicalCondition = babyData['medical_condition'].toString();
-          qrCodePath = babyData['qr_code'].toString(); // Store QR Code path
+          name = babyData['baby_name'] ?? "";
+          dob = babyData['baby_dob'] ?? "";
+          photo = babyData['baby_photo'] ?? "";
+          dietaryRestriction = babyData['allergies_or_dietry_restriction'] ?? "";
+          medicalCondition = babyData['medical_condition'] ?? "";
+          qrCodePath = babyData['qr_code'] ?? "";
           isLoading = false;
         });
       } else {
@@ -75,14 +83,47 @@ class _BabyDetailsState extends State<BabyDetails> {
     }
   }
 
+  void _showFullScreenQR(String qrCodeUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text('QR Code'),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+          body: Center(
+            child: Image.network(
+              qrCodeUrl,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                print("Error loading full screen QR code: $error");
+                return Text("Failed to load QR Code");
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    String photoUrl = photo.isNotEmpty ? '$baseUrl$photo' : '';
+    String qrCodeUrl = qrCodePath.isNotEmpty ? '$baseUrl$qrCodePath' : '';
+
+    if (photoUrl.isNotEmpty) print("Baby Photo URL: $photoUrl");
+    if (qrCodeUrl.isNotEmpty) print("QR Code URL: $qrCodeUrl");
+
     return Scaffold(
       appBar: AppBar(title: Text("Baby Details")),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: isLoading
-            ? Center(child: CircularProgressIndicator()) // Loader while fetching data
+            ? Center(child: CircularProgressIndicator())
             : hasError
             ? Center(child: Text("Failed to load baby details. Try again later."))
             : SingleChildScrollView(
@@ -90,9 +131,18 @@ class _BabyDetailsState extends State<BabyDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: photo.isNotEmpty
-                    ? Image.network(photo, height: 150, width: 150, fit: BoxFit.cover)
-                    : Icon(Icons.person, size: 100), // Placeholder if no photo
+                child: photoUrl.isNotEmpty
+                    ? Image.network(
+                  photoUrl,
+                  height: 150,
+                  width: 150,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    print("Error loading baby photo: $error");
+                    return Icon(Icons.person, size: 100);
+                  },
+                )
+                    : Icon(Icons.person, size: 100),
               ),
               SizedBox(height: 10),
               Text("Name: $name", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -100,14 +150,23 @@ class _BabyDetailsState extends State<BabyDetails> {
               Text("Dietary Restrictions: ${dietaryRestriction.isEmpty ? 'None' : dietaryRestriction}"),
               Text("Medical Condition: ${medicalCondition.isEmpty ? 'None' : medicalCondition}"),
               SizedBox(height: 20),
-
-              // Display QR Code Image
               Center(
-                child: qrCodePath.isNotEmpty
-                    ? Image.network(qrCodePath, height: 200, width: 200, fit: BoxFit.contain)
+                child: qrCodeUrl.isNotEmpty
+                    ? GestureDetector(
+                  onTap: () => _showFullScreenQR(qrCodeUrl),
+                  child: Image.network(
+                    qrCodeUrl,
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      print("Error loading QR code: $error");
+                      return Text("Failed to load QR Code");
+                    },
+                  ),
+                )
                     : Text("No QR Code Available"),
               ),
-
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
@@ -134,3 +193,6 @@ class _BabyDetailsState extends State<BabyDetails> {
     );
   }
 }
+
+
+

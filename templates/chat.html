@@ -1,0 +1,206 @@
+{% include 'public/header.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent-Daycare Chat</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --sent-bg: #e3f2fd;
+            --received-bg: #f5f5f5;
+            --light-gray: #eaeaea;
+            --dark-gray: #666;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            margin-top: 30px;
+        }
+        
+        .chat-header h1 {
+            font-size: 1.5rem;
+            margin-left: 10px;
+        }
+        
+        .chat-icon {
+            font-size: 1.8rem;
+        }
+        
+        .chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: var(--white);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            max-width: 75%;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 18px;
+            position: relative;
+            line-height: 1.5;
+        }
+        
+        .sent {
+            background-color: var(--sent-bg);
+            color: #333;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .received {
+            background-color: var(--received-bg);
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .timestamp {
+            font-size: 0.7rem;
+            color: var(--dark-gray);
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .input-container {
+            padding: 15px 20px;
+            background-color: var(--white);
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            margin: 0 20px 20px 20px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+        }
+        
+        .input-container textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px;
+            resize: none;
+            max-height: 100px;
+            font-size: 1rem;
+        }
+        
+        .send-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .send-btn:hover {
+            background-color: #3a5a8a;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: var(--dark-gray);
+            margin: auto;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: var(--light-gray);
+        }
+        
+        /* Animation for new messages */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body style="background-color: #4F6C7D; padding-top: 40px;">
+    <div class="chat-header">
+        
+    </div>
+    
+    <div class="chat-container">
+        {% if chat_history %}
+            {% for message in chat_history %}
+                {% if message.sender_id == daycare_id and message.sender_type == 'daycare' %}
+                    <div class="message sent">
+                        <p>{{ message.message }}</p>
+                        <span class="timestamp">{{ message.date_time }}</span>
+                    </div>
+                {% elif message.receiver_id == daycare_id and message.receiver_type == 'daycare' %}
+                    <div class="message received">
+                        <p>{{ message.message }}</p>
+                        <span class="timestamp">{{ message.date_time }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="far fa-comment-dots"></i>
+                <p>Start a conversation with the daycare</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="input-container">
+        <form method="POST" action="/chat?id={{ admission_id }}" style="display: flex; width: 100%;">
+            <textarea name="message" placeholder="Type your message..." rows="1" required></textarea>
+            <button type="submit" class="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+    
+    <script>
+        // Auto-scroll to bottom of chat
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.querySelector('.chat-container');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Auto-resize textarea
+            const textarea = document.querySelector('textarea');
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    </script>
+</body>
+</html>
+{% include 'public/footer.html' %}

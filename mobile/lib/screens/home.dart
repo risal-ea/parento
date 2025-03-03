@@ -7,6 +7,7 @@ import 'package:mobile/screens/view_daycare.dart';
 import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/view_meetings.dart';
 import 'package:mobile/screens/parent_profile.dart';
+import 'package:mobile/screens/chat.dart'; // New chat screen import
 import 'package:mobile/bottom_sheet/baby_selection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -19,7 +20,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Map<String, dynamic>> activities = []; // Updated to dynamic for flexibility
+  List<Map<String, dynamic>> activities = [];
   int _selectedIndex = 0;
   String selectedBabyPhoto = "";
   String selectedBabyId = "";
@@ -42,7 +43,7 @@ class _HomeState extends State<Home> {
       selectedBabyId = babyId;
       activities.clear();
     });
-    fetchData(); // Fetch data again when baby is updated
+    fetchData();
   }
 
   Future<void> fetchData() async {
@@ -52,19 +53,18 @@ class _HomeState extends State<Home> {
       String ip = sh.getString("url") ?? "";
       String url = "$ip/home";
 
-      print("Stored login_id: $login_id"); // Log the login_id
-      print("Stored URL: $url"); // Log the URL
-
-      print("Sending request to: $url"); // Log the URL
-      print("Request body: login_id=$login_id, baby_id=$selectedBabyId"); // Log the request body
+      print("Stored login_id: $login_id");
+      print("Stored URL: $url");
+      print("Sending request to: $url");
+      print("Request body: login_id=$login_id, baby_id=$selectedBabyId");
 
       var response = await http.post(
         Uri.parse(url),
         body: {"login_id": login_id, "baby_id": selectedBabyId},
       );
 
-      print("Response status code: ${response.statusCode}"); // Log the status code
-      print("Response body: ${response.body}"); // Log the response body
+      print("Response status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       var jsonData = json.decode(response.body);
 
@@ -83,7 +83,7 @@ class _HomeState extends State<Home> {
           }).toList();
         });
 
-        print("Activities fetched: ${activities.length}"); // Log the number of activities
+        print("Activities fetched: ${activities.length}");
       } else {
         print("Failed to fetch data: ${jsonData['message']}");
       }
@@ -91,30 +91,6 @@ class _HomeState extends State<Home> {
       print("Error fetching data: $e");
     }
   }
-
-  // String calculateTotalSleepDuration() {
-  //   double totalSleepHours = 0.0;
-  //   for (var activity in activities) {
-  //     if (activity['Type'] == 'Sleeping') {
-  //       String startTime = activity['StartTime'] ?? "";
-  //       String endTime = activity['EndTime'] ?? "";
-  //       try {
-  //         DateTime start = DateTime.parse("2024-01-01 $startTime");
-  //         DateTime end = DateTime.parse("2024-01-01 $endTime");
-  //
-  //         if (end.isBefore(start)) {
-  //           end = end.add(Duration(days: 1));
-  //         }
-  //
-  //         Duration sleepDuration = end.difference(start);
-  //         totalSleepHours += sleepDuration.inMinutes / 60.0;
-  //       } catch (e) {
-  //         print("Error parsing sleep time: $e");
-  //       }
-  //     }
-  //   }
-  //   return totalSleepHours > 0 ? "${totalSleepHours.toStringAsFixed(1)} hrs" : "N/A";
-  // }
 
   String calculateDuration(String activityType) {
     double totalHours = 0.0;
@@ -137,7 +113,6 @@ class _HomeState extends State<Home> {
     }
     return totalHours > 0 ? "${totalHours.toStringAsFixed(1)} hrs" : "N/A";
   }
-
 
   Map<String, dynamic>? getLatestActivity() {
     if (activities.isNotEmpty) {
@@ -257,7 +232,8 @@ class _HomeState extends State<Home> {
                               Icon(Icons.menu_book,
                                   size: 40, color: Colors.green),
                               const SizedBox(height: 5),
-                              Text("Play ${calculateDuration("Studying")}", style: TextStyle(fontSize: 16)),
+                              Text("Play ${calculateDuration("Studying")}",
+                                  style: TextStyle(fontSize: 16)),
                             ],
                           ),
                         ),
@@ -298,11 +274,15 @@ class _HomeState extends State<Home> {
                                 children: [
                                   Text(
                                     activity['Type'] ?? "Activity",
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600),
                                   ),
                                   Text(
                                     activity['Description'] ?? "",
-                                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade700),
                                   ),
                                 ],
                               ),
@@ -312,11 +292,15 @@ class _HomeState extends State<Home> {
                                 children: [
                                   Text(
                                     activity['Date'] ?? "",
-                                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600),
                                   ),
                                   Text(
                                     "${activity['StartTime'] ?? ""} - ${activity['EndTime'] ?? ""}",
-                                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade500),
                                   ),
                                 ],
                               ),
@@ -331,10 +315,16 @@ class _HomeState extends State<Home> {
                   onPress: () {},
                 ),
               const SizedBox(height: 20),
+              buildButton(context, "Chat", Chat(babyId: selectedBabyId)),
               buildButton(context, "View Daycare", Daycare()),
               buildButton(context, "Send Complaint", Complaint()),
               buildButton(context, "View Meetings", ViewMeetings()),
               buildButton(context, "Parent Profile", ParentProfile()),
+              buildButton(
+                context,
+                "Chat with Daycare",
+                Chat(babyId: selectedBabyId), // Added Chat button
+              ),
             ],
           ),
         ),
@@ -346,4 +336,3 @@ class _HomeState extends State<Home> {
     );
   }
 }
-
