@@ -205,8 +205,8 @@ def view_facility():
         if not daycare_id:
             return jsonify({'status': 'failed', 'message': 'Missing daycareId'}), 400
 
-        query = "SELECT * FROM facilities WHERE day_care_id = %s"
-        result = select(query, (daycare_id,))  # ✅ Secure query
+        query = "SELECT * FROM facilities WHERE day_care_id = %s"%(daycare_id)
+        result = select(query)  # ✅ Secure query
 
         if result:
             data['status'] = 'success'
@@ -282,11 +282,13 @@ def admition_request():
     daycare_id = request.form['daycareId']
     print(daycare_id,"////")
     loginID = request.form.get('lid')
+    babyId = request.form.get('babyId')
+    print(babyId,"///")
 
     getParentId = "select * from parent where login_id = '%s'" % (loginID)
     parent_id = select(getParentId)[0]['parent_id']
 
-    insertData = "insert into admission_request values(null, '%s', 1, '%s', '%s', 'pending', '%s', 'pending', '%s','pending')"%(parent_id, startDate, schedule, daycare_id, curentDateTime)
+    insertData = "insert into admission_request values(null, '%s', '%s', '%s', '%s', 'pending', '%s', 'pending', '%s','pending')"%(parent_id, babyId, startDate, schedule, daycare_id, curentDateTime)
     insert(insertData)
 
     return jsonify({"status": "success", "message": "Request received"})
@@ -384,6 +386,7 @@ def home():
 
     print("Backend Response:", data)  # Log the response
     return jsonify(data)
+
 
 from flask import Blueprint, request, jsonify
 from database import insert, select
@@ -489,6 +492,24 @@ def get_chat_messages():
     print(f"Messages fetched: {messages}")
     return jsonify({"status": "success", "data": messages})
 
+@app.route("/daycare_staff", methods=["POST"])
+def daycare_staff():
+    data={}
+    dayCareId = request.form.get('daycareId')
+
+    query = "SELECT * FROM Staff WHERE day_care_id = %s"%(dayCareId)
+    result = select(query)  # ✅ Secure query
+
+    if result:
+        data['status'] = 'success'
+        data['data'] = result
+    else:
+        data['status'] = 'failed'
+        data['message'] = 'No facilities found'
+
+    return jsonify(data)
 
 
+
+#/////////////////////////
 app.run(debug=True, host='0.0.0.0', port=5001)

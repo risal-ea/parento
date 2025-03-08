@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile/screens/home.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -105,6 +107,11 @@ class _AddBabiesState extends State<AddBabies> {
       if (jsonData['status'] == 'success') {
         _showSnackBar('Baby details saved successfully!');
         _resetForm();
+        // Redirect to existing Home screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Home()),
+        );
       } else {
         _showSnackBar('Failed to save baby details.');
       }

@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'daycare_details.dart';
 
 class Daycare extends StatefulWidget {
-  const Daycare({Key? key}) : super(key: key);
+  final String selectedBabyId;
+  const Daycare({Key? key, required this.selectedBabyId}) : super(key: key);
 
   @override
   State<Daycare> createState() => _DaycareState();
@@ -95,7 +96,7 @@ class _DaycareState extends State<Daycare> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DaycareDetails(daycareId: daycareList[index]['id']!),
+            builder: (context) => DaycareDetails(daycareId: daycareList[index]['id']!, selectedBabyId: widget.selectedBabyId),
           ),
         );
       },

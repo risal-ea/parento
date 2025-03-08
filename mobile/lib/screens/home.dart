@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:mobile/components/bottom_nav_bar.dart';
 import 'package:mobile/screens/activities.dart';
 import 'package:mobile/screens/baby_details.dart';
+import 'package:mobile/screens/notifications.dart';
 import 'package:mobile/screens/view_daycare.dart';
 import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/view_meetings.dart';
@@ -43,7 +44,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     {
       'title': 'View Daycare',
       'icon': Icons.business,
-      'destination': Daycare(),
       'color': const Color(0xFF00D3B0),
     },
     {
@@ -67,21 +67,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    WidgetsBinding.instance.addObserver(this); // Add observer for lifecycle events
+    WidgetsBinding.instance.addObserver(this);
     fetchData();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
-    WidgetsBinding.instance.removeObserver(this); // Remove observer
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Refresh data when the app resumes (e.g., returning to Home screen)
       if (selectedBabyId.isNotEmpty) {
         fetchData();
       }
@@ -96,16 +95,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
 
     switch (index) {
       case 0:
-      // Home: Already here
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ParentProfile()),
+        ).then((_) => Home());
         break;
       case 1:
-      // Notifications: Not implemented yet
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Notifications()),
+        ).then((_) => fetchData());
         break;
       case 2:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ParentProfile()),
-        ).then((_) => fetchData()); // Refresh data when returning
+        ).then((_) => fetchData());
         break;
     }
   }
@@ -177,11 +182,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
             };
           }).toList();
 
-          // Sort activities by date and start time (newest first)
           activities.sort((a, b) {
             DateTime dateA = DateTime.parse("${a['Date']} ${a['StartTime']}");
             DateTime dateB = DateTime.parse("${b['Date']} ${b['StartTime']}");
-            return dateB.compareTo(dateA); // Descending order
+            return dateB.compareTo(dateA);
           });
 
           isLoading = false;
@@ -331,10 +335,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     return GestureDetector(
       onTap: () {
         HapticFeedback.mediumImpact();
+        Widget destination;
+
+        if (action['title'] == 'View Daycare') {
+          if (selectedBabyId.isEmpty) {
+            _showSnackBar("Please select a baby first", isError: true);
+            return;
+          }
+          destination = Daycare(selectedBabyId: selectedBabyId);
+        } else {
+          destination = action['destination'] as Widget;
+        }
+
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => action['destination'],
+            pageBuilder: (context, animation, secondaryAnimation) => destination,
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(
                 opacity: animation,
@@ -342,7 +358,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
               );
             },
           ),
-        ).then((_) => fetchData()); // Refresh data when returning from quick actions
+        ).then((_) => fetchData());
       },
       child: Container(
         decoration: BoxDecoration(
@@ -571,7 +587,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
                           );
                         },
                       ),
-                    ).then((_) => fetchData()); // Refresh data when returning
+                    ).then((_) => fetchData());
                   }
                 },
                 child: BabySelection(
@@ -722,9 +738,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.85,
-                    children: quickActions
-                        .map((action) => buildQuickActionButton(action))
-                        .toList(),
+                    children: quickActions.map((action) => buildQuickActionButton(action)).toList(),
                   ),
                   SizedBox(height: 24),
                   Row(
@@ -746,7 +760,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
                               MaterialPageRoute(
                                 builder: (context) => Activities(babyId: selectedBabyId),
                               ),
-                            ).then((_) => fetchData()); // Refresh data when returning
+                            ).then((_) => fetchData());
                           } else {
                             _showSnackBar("Please select a baby first", isError: true);
                           }
@@ -816,7 +830,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
                     );
                   },
                 ),
-              ).then((_) => fetchData()); // Refresh data when returning
+              ).then((_) => fetchData());
             } else {
               _showSnackBar("Please select a baby first", isError: true);
             }

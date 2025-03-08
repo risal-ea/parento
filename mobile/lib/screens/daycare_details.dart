@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/screens/dayCare_staff.dart';
 import 'package:mobile/screens/view_facilities.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'request_form.dart';
@@ -8,8 +9,9 @@ import 'package:mobile/screens/feedback.dart';
 
 class DaycareDetails extends StatefulWidget {
   final String daycareId;
+  final String selectedBabyId;
 
-  const DaycareDetails({Key? key, required this.daycareId}) : super(key: key);
+  const DaycareDetails({Key? key, required this.daycareId, required this.selectedBabyId}) : super(key: key);
 
   @override
   _DaycareDetailsState createState() => _DaycareDetailsState();
@@ -311,6 +313,21 @@ class _DaycareDetailsState extends State<DaycareDetails> {
 
                   _buildActionButton(
                     icon: Icons.room_preferences_outlined,
+                    label: "View Staffs",
+                    onPressed: () {
+                      print("Navigating to ViewFacilities with daycareId: ${widget.daycareId}");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DaycareStaff(daycareId: widget.daycareId),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 12),
+
+                  _buildActionButton(
+                    icon: Icons.room_preferences_outlined,
                     label: "View Facilities",
                     onPressed: () {
                       print("Navigating to ViewFacilities with daycareId: ${widget.daycareId}");
@@ -332,7 +349,7 @@ class _DaycareDetailsState extends State<DaycareDetails> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RequestForm(daycareId: widget.daycareId),
+                          builder: (context) => RequestForm(daycareId: widget.daycareId, selectedBabyId: widget.selectedBabyId),
                         ),
                       );
                     },

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+// Import the home.dart file where your Home class is defined
+import 'home.dart'; // Make sure this path matches your project structure
 
 class RequestForm extends StatefulWidget {
   final String daycareId;
+  final String selectedBabyId;
 
-  const RequestForm({Key? key, required this.daycareId}) : super(key: key);
+  const RequestForm({Key? key, required this.daycareId, required this.selectedBabyId}) : super(key: key);
 
   @override
   _RequestFormState createState() => _RequestFormState();
@@ -16,6 +19,13 @@ class _RequestFormState extends State<RequestForm> {
   final GlobalKey<FormState> _requestForm = GlobalKey<FormState>();
   final TextEditingController startDate = TextEditingController();
   final TextEditingController preferredSchedule = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Print the selected baby ID to logcat when the screen initializes
+    print('Selected Baby ID: ${widget.selectedBabyId}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +46,16 @@ class _RequestFormState extends State<RequestForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Display the selected baby ID for debugging purposes
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                color: Colors.grey[200],
+                child: Text(
+                  "Debug Info - Baby ID: ${widget.selectedBabyId}",
+                  style: TextStyle(fontSize: 12.0, color: Colors.grey[700]),
+                ),
+              ),
+              const SizedBox(height: 16.0),
               const Text(
                 "Start Date",
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
@@ -86,6 +106,9 @@ class _RequestFormState extends State<RequestForm> {
             onPressed: () async {
               if (_requestForm.currentState!.validate()) {
                 try {
+                  // Print baby ID again right before submission
+                  print('Submitting form with Baby ID: ${widget.selectedBabyId}');
+
                   final sh = await SharedPreferences.getInstance();
                   String loginId = sh.getString('login_id') ?? '';
                   String url = sh.getString('url') ?? '';
@@ -107,6 +130,7 @@ class _RequestFormState extends State<RequestForm> {
                       'schedule': preferredSchedule.text.trim(),
                       'daycareId': widget.daycareId,
                       'lid': loginId,
+                      'babyId': widget.selectedBabyId,
                     },
                   );
 
@@ -119,7 +143,20 @@ class _RequestFormState extends State<RequestForm> {
                       backgroundColor: jsonData['status'] == 'success' ? Colors.green : Colors.red,
                     ),
                   );
+
+                  // Navigate to Home() if request was successful
+                  if (jsonData['status'] == 'success') {
+                    // Short delay to allow the user to see the success message
+                    await Future.delayed(const Duration(seconds: 1));
+
+                    // Navigate to Home class and clear the navigation stack
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => Home()),
+                            (Route<dynamic> route) => false
+                    );
+                  }
                 } catch (e) {
+                  print('Error submitting form: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('An error occurred. Please try again.'),
