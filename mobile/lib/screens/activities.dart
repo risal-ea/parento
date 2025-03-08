@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile/actions/activity_detail.dart';
+import 'package:mobile/actions/activity_analytics.dart';
+import 'package:mobile/actions/activity_model.dart';
+import 'package:mobile/actions/activity_timeline.dart';
 
 class Activities extends StatefulWidget {
   final String babyId;
@@ -14,9 +18,9 @@ class Activities extends StatefulWidget {
 }
 
 class _ActivitiesState extends State<Activities> with SingleTickerProviderStateMixin {
-  List<Map<String, String>> activities = [];
+  List<ActivityModel> activities = [];
   bool isLoading = true;
-  late AnimationController _animationController;
+  late TabController _tabController;
 
   // Colors for the modern theme
   final Color primaryColor = const Color(0xFF6C63FF);
@@ -29,10 +33,7 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
+    _tabController = TabController(length: 3, vsync: this);
     load();
   }
 
@@ -44,7 +45,7 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -71,25 +72,19 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
         var arr = jsonData['data'] as List;
 
         setState(() {
-          activities = arr.map<Map<String, String>>((activity) {
-            return {
-              'Date': activity['date'].toString(),
-              'Type': activity['activity_type'].toString(),
-              'Description': activity['description'].toString(),
-              'Start Time': activity['start_time'].toString(),
-              'End Time': activity['end_time'].toString(),
-            };
+          activities = arr.map<ActivityModel>((activity) {
+            return ActivityModel(
+              date: activity['date'].toString(),
+              type: activity['activity_type'].toString(),
+              description: activity['description'].toString(),
+              startTime: activity['start_time'].toString(),
+              endTime: activity['end_time'].toString(),
+            );
           }).toList();
 
           // Sort activities by date and start time (newest first)
-          activities.sort((a, b) {
-            DateTime dateA = DateTime.parse("${a['Date']} ${a['Start Time']}");
-            DateTime dateB = DateTime.parse("${b['Date']} ${b['Start Time']}");
-            return dateB.compareTo(dateA); // Descending order
-          });
-
+          activities.sort((a, b) => b.dateTime.compareTo(a.dateTime));
           isLoading = false;
-          print("Sorted activities: ${activities.map((a) => "${a['Date']} ${a['Start Time']} - ${a['Type']}").toList()}");
         });
       } else {
         setState(() {
@@ -115,291 +110,15 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        margin: EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
         elevation: 4,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  IconData getActivityIcon(String type) {
-    switch (type) {
-      case 'Sleeping':
-        return Icons.bedtime;
-      case 'Playing':
-        return Icons.sports_baseball;
-      case 'Studying':
-        return Icons.menu_book;
-      default:
-        return Icons.event;
-    }
-  }
-
-  Color getActivityColor(String type) {
-    switch (type) {
-      case 'Sleeping':
-        return Colors.blue;
-      case 'Playing':
-        return Colors.orange;
-      case 'Studying':
-        return Colors.green;
-      default:
-        return primaryColor;
-    }
-  }
-
-  Widget buildActivityCard(Map<String, String> activity) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, (1 - _animationController.value) * 20),
-          child: Opacity(
-            opacity: _animationController.value,
-            child: Container(
-              margin: EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: cardBgColor,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    _showActivityDetails(activity);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: getActivityColor(activity['Type']!).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            getActivityIcon(activity['Type']!),
-                            color: getActivityColor(activity['Type']!),
-                            size: 28,
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                activity['Type'] ?? "Activity",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: textPrimaryColor,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                activity['Description'] ?? "",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: textSecondaryColor,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                "${activity['Start Time'] ?? ""} - ${activity['End Time'] ?? ""}",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: textSecondaryColor,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: getActivityColor(activity['Type']!).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                activity['Date'] ?? "",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: getActivityColor(activity['Type']!),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showActivityDetails(Map<String, String> activity) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          padding: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.white,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: getActivityColor(activity['Type']!).withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      getActivityIcon(activity['Type']!),
-                      color: getActivityColor(activity['Type']!),
-                      size: 30,
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  Text(
-                    activity['Type'] ?? "Activity",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: textPrimaryColor,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              Text(
-                "Description",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: textPrimaryColor,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                activity['Description'] ?? "",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: textSecondaryColor,
-                ),
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Date",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: textPrimaryColor,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        activity['Date'] ?? "",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: textSecondaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        "Time",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: textPrimaryColor,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        "${activity['Start Time'] ?? ""} - ${activity['End Time'] ?? ""}",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: textSecondaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: TextButton.styleFrom(
-                    backgroundColor: primaryColor.withOpacity(0.1),
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    "Close",
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    _animationController.forward();
-
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
@@ -414,6 +133,17 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
           ),
         ),
         centerTitle: true,
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: primaryColor,
+          unselectedLabelColor: textSecondaryColor,
+          indicatorColor: primaryColor,
+          tabs: const [
+            Tab(icon: Icon(Icons.list_alt), text: "Activities"),
+            Tab(icon: Icon(Icons.timeline), text: "Timeline"),
+            Tab(icon: Icon(Icons.analytics), text: "Analytics"),
+          ],
+        ),
       ),
       body: RefreshIndicator(
         color: primaryColor,
@@ -422,57 +152,189 @@ class _ActivitiesState extends State<Activities> with SingleTickerProviderStateM
           HapticFeedback.mediumImpact();
           await load();
         },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: isLoading
-              ? Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-            ),
-          )
-              : activities.isEmpty
-              ? SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            child: Container(
-              height: MediaQuery.of(context).size.height - 200,
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.event_note,
-                    size: 60,
-                    color: textSecondaryColor.withOpacity(0.5),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    "No activities found",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: textSecondaryColor,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "Pull down to refresh",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: textSecondaryColor.withOpacity(0.7),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-              : ListView.builder(
-            itemCount: activities.length,
-            itemBuilder: (context, index) {
-              return buildActivityCard(activities[index]);
-            },
+        child: isLoading
+            ? Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
           ),
+        )
+            : activities.isEmpty
+            ? _buildEmptyState()
+            : TabBarView(
+          controller: _tabController,
+          children: [
+            // Activities List View
+            _buildActivitiesList(),
+
+            // Timeline View
+            ActivityTimeline(activities: activities),
+
+            // Analytics View
+            ActivityAnalytics(activities: activities),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Container(
+        height: MediaQuery.of(context).size.height - 200,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event_note,
+              size: 60,
+              color: textSecondaryColor.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "No activities found",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textSecondaryColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Pull down to refresh",
+              style: TextStyle(
+                fontSize: 14,
+                color: textSecondaryColor.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActivitiesList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: activities.length,
+      itemBuilder: (context, index) {
+        final activity = activities[index];
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: cardBgColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ActivityDetailView(activity: activity),
+                    )
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: activity.color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        activity.icon,
+                        color: activity.color,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            activity.type,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: textPrimaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            activity.description,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: textSecondaryColor,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "${activity.startTime} - ${activity.endTime}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: textSecondaryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: activity.color.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            activity.date,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: activity.color,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          activity.durationText,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: textSecondaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

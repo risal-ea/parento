@@ -13,7 +13,7 @@ import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/view_meetings.dart';
 import 'package:mobile/screens/parent_profile.dart';
 import 'package:mobile/screens/chat.dart';
-import 'package:mobile/bottom_sheet/baby_selection.dart';
+import 'package:mobile/actions//baby_selection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
@@ -33,6 +33,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
   late AnimationController _animationController;
   Timer? _notificationTimer; // Timer for periodic notification checks
   List<Map<String, dynamic>> notifications = []; // To store notifications
+  Set<String> seenNotificationIds = {}; // Track seen notification IDs
 
   // Colors for the futuristic theme
   final Color primaryColor = const Color(0xFF6C63FF);
@@ -92,6 +93,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     _notificationTimer = Timer.periodic(Duration(seconds: 60), (timer) {
       fetchNotifications();
     });
+    _loadSeenNotifications(); // Load previously seen notifications
   }
 
   @override
@@ -100,6 +102,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     _notificationTimer?.cancel(); // Cancel the timer when disposing
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  // Load seen notifications from SharedPreferences
+  Future<void> _loadSeenNotifications() async {
+    final sh = await SharedPreferences.getInstance();
+    List<String>? savedIds = sh.getStringList("seen_notification_ids");
+    if (savedIds != null) {
+      setState(() {
+        seenNotificationIds = savedIds.toSet();
+      });
+    }
+  }
+
+  // Save seen notifications to SharedPreferences
+  Future<void> _saveSeenNotifications() async {
+    final sh = await SharedPreferences.getInstance();
+    await sh.setStringList("seen_notification_ids", seenNotificationIds.toList());
   }
 
   @override
@@ -152,7 +171,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     );
   }
 
-  // New method to show a dialog for notifications
+  // Show a dialog for new notifications
   void _showNotificationDialog(String message) {
     showDialog(
       context: context,
@@ -254,7 +273,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     }
   }
 
-  // New method to fetch notifications
+  // Fetch notifications and show only new ones
   Future<void> fetchNotifications() async {
     try {
       final sh = await SharedPreferences.getInstance();
@@ -265,15 +284,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       print("Fetching notifications from: $url");
       print("Login ID: $login_id");
 
-      if (login_id.isEmpty) {
-        print("Error: login_id is empty");
-        _showSnackBar("Login ID is missing", isError: true);
-        return;
-      }
-
-      if (ip.isEmpty) {
-        print("Error: IP address is empty");
-        _showSnackBar("Server URL is missing", isError: true);
+      if (login_id.isEmpty || ip.isEmpty) {
+        _showSnackBar("Login ID or Server URL is missing", isError: true);
         return;
       }
 
@@ -288,36 +300,34 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == 'success') {
+          List<Map<String, dynamic>> newNotifications = List<Map<String, dynamic>>.from(jsonData['data']);
+
           setState(() {
-            notifications = List<Map<String, dynamic>>.from(jsonData['data']);
+            notifications = newNotifications;
           });
 
-          // Check for notifications matching the current date
           DateTime now = DateTime.now();
           String currentDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
 
-          for (var notification in notifications) {
+          for (var notification in newNotifications) {
+            String notificationId = notification['id']?.toString() ?? notification['date_time']?.toString() ?? '';
             String notificationDate = notification['date_time']?.toString().substring(0, 10) ?? '';
-            if (notificationDate == currentDate) {
+
+            if (!seenNotificationIds.contains(notificationId) && notificationDate == currentDate) {
               _showNotificationDialog(notification['notification'] ?? "You have a new notification!");
+              seenNotificationIds.add(notificationId); // Mark as seen
+              _saveSeenNotifications(); // Persist to SharedPreferences
             }
           }
         } else {
           print("No notifications found: ${jsonData['message']}");
-          _showSnackBar("No notifications found: ${jsonData['message']}", isError: true);
         }
       } else {
-        print("Failed with status: ${response.statusCode}, Body: ${response.body}");
         _showSnackBar("Failed to fetch notifications. Status: ${response.statusCode}", isError: true);
       }
     } catch (e) {
       print("Error fetching notifications: $e");
-      if (e is FormatException) {
-        print("Invalid JSON response: ${e.message}");
-        _showSnackBar("Error parsing notification data: Invalid response format", isError: true);
-      } else {
-        _showSnackBar("Error fetching notifications: $e", isError: true);
-      }
+      _showSnackBar("Error fetching notifications: $e", isError: true);
     }
   }
 
