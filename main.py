@@ -513,9 +513,15 @@ def daycare_staff():
 def notifications():
     data={}
     loginId = request.form.get('lid')
+    print(loginId,"////")
 
-    query = "select * from notification inner joint parent where login_id = %s"%(loginId)
+    cc="select * from parent where login_id='%s'"%(loginId)
+    ccc=select(cc)
+    pid=ccc[0]['parent_id']
+
+    query = "select * from notification where parent_id = %s"%(pid)
     result = select(query)  # ✅ Secure query
+    print(result,"////")
     if result:
         data['status'] = 'success'
         data['data'] = result

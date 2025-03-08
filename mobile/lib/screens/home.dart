@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -30,6 +31,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
   bool isLoading = true;
   bool isRefreshing = false;
   late AnimationController _animationController;
+  Timer? _notificationTimer; // Timer for periodic notification checks
+  List<Map<String, dynamic>> notifications = []; // To store notifications
 
   // Colors for the futuristic theme
   final Color primaryColor = const Color(0xFF6C63FF);
@@ -84,11 +87,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     );
     WidgetsBinding.instance.addObserver(this);
     fetchData();
+    fetchNotifications(); // Initial fetch for notifications
+    // Start periodic checking for notifications every 60 seconds
+    _notificationTimer = Timer.periodic(Duration(seconds: 60), (timer) {
+      fetchNotifications();
+    });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _notificationTimer?.cancel(); // Cancel the timer when disposing
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -98,6 +107,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     if (state == AppLifecycleState.resumed) {
       if (selectedBabyId.isNotEmpty) {
         fetchData();
+        fetchNotifications();
       }
     }
   }
@@ -121,6 +131,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
           _selectedIndex = 0;
         });
         fetchData();
+        fetchNotifications();
       });
     }
   }
@@ -141,6 +152,27 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     );
   }
 
+  // New method to show a dialog for notifications
+  void _showNotificationDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Notification Alert"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK", style: TextStyle(color: primaryColor)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void updateSelectedBaby(String newPhoto, String babyId) {
     HapticFeedback.selectionClick();
     setState(() {
@@ -150,6 +182,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       isLoading = true;
     });
     fetchData();
+    fetchNotifications();
   }
 
   Future<void> fetchData() async {
@@ -218,6 +251,73 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       });
       _showSnackBar("Error loading data: $e", isError: true);
       print("Error fetching data: $e");
+    }
+  }
+
+  // New method to fetch notifications
+  Future<void> fetchNotifications() async {
+    try {
+      final sh = await SharedPreferences.getInstance();
+      String login_id = sh.getString("login_id") ?? "";
+      String ip = sh.getString("url") ?? "";
+      String url = "$ip/notifications";
+
+      print("Fetching notifications from: $url");
+      print("Login ID: $login_id");
+
+      if (login_id.isEmpty) {
+        print("Error: login_id is empty");
+        _showSnackBar("Login ID is missing", isError: true);
+        return;
+      }
+
+      if (ip.isEmpty) {
+        print("Error: IP address is empty");
+        _showSnackBar("Server URL is missing", isError: true);
+        return;
+      }
+
+      var response = await http.post(
+        Uri.parse(url),
+        body: {"lid": login_id},
+      );
+
+      print("Notification response status: ${response.statusCode}");
+      print("Notification response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == 'success') {
+          setState(() {
+            notifications = List<Map<String, dynamic>>.from(jsonData['data']);
+          });
+
+          // Check for notifications matching the current date
+          DateTime now = DateTime.now();
+          String currentDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+          for (var notification in notifications) {
+            String notificationDate = notification['date_time']?.toString().substring(0, 10) ?? '';
+            if (notificationDate == currentDate) {
+              _showNotificationDialog(notification['notification'] ?? "You have a new notification!");
+            }
+          }
+        } else {
+          print("No notifications found: ${jsonData['message']}");
+          _showSnackBar("No notifications found: ${jsonData['message']}", isError: true);
+        }
+      } else {
+        print("Failed with status: ${response.statusCode}, Body: ${response.body}");
+        _showSnackBar("Failed to fetch notifications. Status: ${response.statusCode}", isError: true);
+      }
+    } catch (e) {
+      print("Error fetching notifications: $e");
+      if (e is FormatException) {
+        print("Invalid JSON response: ${e.message}");
+        _showSnackBar("Error parsing notification data: Invalid response format", isError: true);
+      } else {
+        _showSnackBar("Error fetching notifications: $e", isError: true);
+      }
     }
   }
 
@@ -563,6 +663,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
           onRefresh: () async {
             HapticFeedback.mediumImpact();
             await fetchData();
+            await fetchNotifications();
           },
           child: SingleChildScrollView(
             physics: AlwaysScrollableScrollPhysics(),

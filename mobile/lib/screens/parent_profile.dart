@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/screens/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ParentProfile extends StatefulWidget {
@@ -210,7 +211,7 @@ class _ParentProfileState extends State<ParentProfile> {
                   const SizedBox(height: 20),
                   OutlinedButton.icon(
                     onPressed: () {
-                      // Logout functionality
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => login()));
                     },
                     icon: const Icon(Icons.logout),
                     label: const Text("Logout"),
