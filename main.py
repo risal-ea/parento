@@ -509,6 +509,22 @@ def daycare_staff():
 
     return jsonify(data)
 
+@app.route("/notifications", methods=["POST"])
+def notifications():
+    data={}
+    loginId = request.form.get('lid')
+
+    query = "select * from notification inner joint parent where login_id = %s"%(loginId)
+    result = select(query)  # ✅ Secure query
+    if result:
+        data['status'] = 'success'
+        data['data'] = result
+    else:
+        data['status'] = 'failed'
+        data['message'] = 'No notification found'
+    return jsonify(data)
+
+
 
 
 #/////////////////////////

@@ -12,6 +12,7 @@
                 <th>Medical Condition</th>
                 <th>View Parent</th>
                 <th>Add Activity details</th>
+                <th>Send notification</th>
             </tr>
             {% for i in data['view'] %}
             <tr>
@@ -23,6 +24,7 @@
                 <td>{{ i['medical_condition'] }}</td>
                 <td><a href="/view-parent-daycare?id={{i['parent_id']}}" class="accept-btn">View</a></td>
                 <td><a href="/addActivity?&id={{i['baby_id']}}" class="accept-btn">Add</a></td>
+                <td><a href="/notification?&id={{i['baby_id']}}" class="accept-btn">Send</a></td>
             </tr>
             {% endfor %}
         </table>

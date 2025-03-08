@@ -87,3 +87,11 @@ def addActivity():
 
     return render_template('addActivity_staff.html', data=data)
 
+@staff.route("/send_notification", methods=['GET', 'POST'])
+def notification():
+    data={}
+    # if 'send' in request.form:
+    #     subject = request.form['subject']
+
+
+    return render_template('notification.html', data=data)

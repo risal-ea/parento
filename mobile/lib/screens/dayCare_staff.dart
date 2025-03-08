@@ -60,7 +60,7 @@ class _DaycareStaffState extends State<DaycareStaff> {
           isLoading = false;
         });
       } else {
-        print("Failed to load facilities.");
+        print("Failed to load staff details.");
         setState(() {
           isLoading = false;
         });

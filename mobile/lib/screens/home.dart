@@ -60,6 +60,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     },
   ];
 
+  final List<Map<String, dynamic>> navItems = [
+    {
+      'index': 0,
+      'screen': null, // Home screen
+    },
+    {
+      'index': 1,
+      'screen': Notifications(),
+    },
+    {
+      'index': 2,
+      'screen': ParentProfile(),
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -89,29 +104,24 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
 
   void _onItemTapped(int index) {
     HapticFeedback.lightImpact();
+    if (index == _selectedIndex) return;
+
     setState(() {
       _selectedIndex = index;
     });
 
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ParentProfile()),
-        ).then((_) => Home());
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Notifications()),
-        ).then((_) => fetchData());
-        break;
-      case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ParentProfile()),
-        ).then((_) => fetchData());
-        break;
+    final selectedNav = navItems.firstWhere((item) => item['index'] == index);
+
+    if (selectedNav['screen'] != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => selectedNav['screen']),
+      ).then((_) {
+        setState(() {
+          _selectedIndex = 0;
+        });
+        fetchData();
+      });
     }
   }
 
@@ -234,99 +244,49 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
   }
 
   Widget buildActivityCard(String title, IconData icon, Color color, String duration) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        _showActivityDetailsDialog(title, duration);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: cardBgColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.1),
-              blurRadius: 8,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, size: 28, color: color),
-            ),
-            SizedBox(height: 12),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
-              ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              duration,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: color,
-              ),
-            ),
-          ],
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBgColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
-    );
-  }
-
-  void _showActivityDetailsDialog(String activity, String duration) {
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Text('$activity Activity'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Total duration: $duration'),
-              SizedBox(height: 16),
-              Text('Recent sessions:', style: TextStyle(fontWeight: FontWeight.w600)),
-              SizedBox(height: 8),
-              ...activities
-                  .where((act) => act['Type'] == activity)
-                  .take(3)
-                  .map((act) => Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(act['Date'] ?? ""),
-                    Text('${act['StartTime'] ?? ""} - ${act['EndTime'] ?? ""}'),
-                  ],
-                ),
-              )),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Close', style: TextStyle(color: primaryColor)),
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
-        ),
+            child: Icon(icon, size: 28, color: color),
+          ),
+          SizedBox(height: 12),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: textPrimaryColor,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            duration,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }
