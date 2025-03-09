@@ -14,7 +14,7 @@ import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/view_meetings.dart';
 import 'package:mobile/screens/parent_profile.dart';
 import 'package:mobile/screens/chat.dart';
-import 'package:mobile/actions//baby_selection.dart';
+import 'package:mobile/actions/baby_selection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
@@ -32,9 +32,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
   bool isLoading = true;
   bool isRefreshing = false;
   late AnimationController _animationController;
-  Timer? _notificationTimer; // Timer for periodic notification checks
-  List<Map<String, dynamic>> notifications = []; // To store notifications
-  Set<String> seenNotificationIds = {}; // Track seen notification IDs
+  List<Map<String, dynamic>> notifications = [];
+  OverlayEntry? _notificationOverlay;
 
   // Colors for the futuristic theme
   final Color primaryColor = const Color(0xFF6C63FF);
@@ -46,38 +45,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
   final Color textSecondaryColor = const Color(0xFF7C7C7C);
 
   final List<Map<String, dynamic>> quickActions = [
-    {
-      'title': 'View Daycare',
-      'icon': Icons.business,
-      'color': const Color(0xFF00D3B0),
-    },
-    {
-      'title': 'Send Complaint',
-      'icon': Icons.feedback,
-      'destination': Complaint(),
-      'color': const Color(0xFFFF7D54),
-    },
-    {
-      'title': 'View Meetings',
-      'icon': Icons.calendar_today,
-      'destination': ViewMeetings(),
-      'color': const Color(0xFF6C63FF),
-    },
+    {'title': 'View Daycare', 'icon': Icons.business, 'color': const Color(0xFF00D3B0)},
+    {'title': 'Send Complaint', 'icon': Icons.feedback, 'destination': Complaint(), 'color': const Color(0xFFFF7D54)},
+    {'title': 'View Meetings', 'icon': Icons.calendar_today, 'destination': ViewMeetings(), 'color': const Color(0xFF6C63FF)},
   ];
 
   final List<Map<String, dynamic>> navItems = [
-    {
-      'index': 0,
-      'screen': null, // Home screen
-    },
-    {
-      'index': 1,
-      'screen': Notifications(),
-    },
-    {
-      'index': 2,
-      'screen': ParentProfile(),
-    },
+    {'index': 0, 'screen': null},
+    {'index': 1, 'screen': Notifications()},
+    {'index': 2, 'screen': ParentProfile()},
   ];
 
   @override
@@ -89,46 +65,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     );
     WidgetsBinding.instance.addObserver(this);
     fetchData();
-    fetchNotifications(); // Initial fetch for notifications
-    // Start periodic checking for notifications every 60 seconds
-    _notificationTimer = Timer.periodic(Duration(seconds: 60), (timer) {
-      fetchNotifications();
-    });
-    _loadSeenNotifications(); // Load previously seen notifications
+    fetchNotificationsAndShow();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
-    _notificationTimer?.cancel(); // Cancel the timer when disposing
+    _notificationOverlay?.remove();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
-  // Load seen notifications from SharedPreferences
-  Future<void> _loadSeenNotifications() async {
-    final sh = await SharedPreferences.getInstance();
-    List<String>? savedIds = sh.getStringList("seen_notification_ids");
-    if (savedIds != null) {
-      setState(() {
-        seenNotificationIds = savedIds.toSet();
-      });
-    }
-  }
-
-  // Save seen notifications to SharedPreferences
-  Future<void> _saveSeenNotifications() async {
-    final sh = await SharedPreferences.getInstance();
-    await sh.setStringList("seen_notification_ids", seenNotificationIds.toList());
-  }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      if (selectedBabyId.isNotEmpty) {
-        fetchData();
-        fetchNotifications();
-      }
+    if (state == AppLifecycleState.resumed && selectedBabyId.isNotEmpty) {
+      fetchData();
+      fetchNotificationsAndShow();
     }
   }
 
@@ -151,9 +103,48 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
           _selectedIndex = 0;
         });
         fetchData();
-        fetchNotifications();
+        fetchNotificationsAndShow();
       });
     }
+  }
+
+  void _showCenterNotification(String message) {
+    _notificationOverlay?.remove();
+    _notificationOverlay = OverlayEntry(
+      builder: (context) => Center(
+        child: Material(
+          color: Colors.transparent,
+          child: FadeTransition(
+            opacity: _animationController,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))],
+              ),
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_notificationOverlay!);
+    _animationController.forward(from: 0.0);
+
+    // Automatically remove the notification after 4 seconds
+    Future.delayed(const Duration(seconds: 4), () {
+      _animationController.reverse().then((_) {
+        _notificationOverlay?.remove();
+        _notificationOverlay = null;
+      });
+    });
   }
 
   void _showSnackBar(String message, {bool isError = false}) {
@@ -162,34 +153,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
         content: Text(message),
         backgroundColor: isError ? Colors.redAccent : primaryColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        margin: EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
         elevation: 4,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
-    );
-  }
-
-  // Show a dialog for new notifications
-  void _showNotificationDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Notification Alert"),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("OK", style: TextStyle(color: primaryColor)),
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -202,7 +170,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       isLoading = true;
     });
     fetchData();
-    fetchNotifications();
+    fetchNotificationsAndShow();
   }
 
   Future<void> fetchData() async {
@@ -217,17 +185,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       String ip = sh.getString("url") ?? "";
       String url = "$ip/home";
 
-      print("Fetching data from: $url");
-      print("Login ID: $login_id");
-      print("Baby ID: $selectedBabyId");
-
       var response = await http.post(
         Uri.parse(url),
         body: {"login_id": login_id, "baby_id": selectedBabyId},
       );
-
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       var jsonData = json.decode(response.body);
 
@@ -245,16 +206,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
             };
           }).toList();
 
-          activities.sort((a, b) {
-            DateTime dateA = DateTime.parse("${a['Date']} ${a['StartTime']}");
-            DateTime dateB = DateTime.parse("${b['Date']} ${b['StartTime']}");
-            return dateB.compareTo(dateA);
-          });
-
+          activities.sort((a, b) => DateTime.parse("${b['Date']} ${b['StartTime']}").compareTo(DateTime.parse("${a['Date']} ${a['StartTime']}")));
           isLoading = false;
           isRefreshing = false;
-          print("Activities loaded: ${activities.length}");
-          print("Sorted activities: ${activities.map((a) => "${a['Date']} ${a['StartTime']} - ${a['Type']}").toList()}");
         });
       } else {
         setState(() {
@@ -262,7 +216,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
           isRefreshing = false;
         });
         _showSnackBar("Failed to fetch data: ${jsonData['message']}", isError: true);
-        print("Fetch failed: ${jsonData['message']}");
       }
     } catch (e) {
       setState(() {
@@ -270,64 +223,52 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
         isRefreshing = false;
       });
       _showSnackBar("Error loading data: $e", isError: true);
-      print("Error fetching data: $e");
     }
   }
 
-  // Fetch notifications and show only new ones
-  Future<void> fetchNotifications() async {
+  Future<void> fetchNotificationsAndShow() async {
     try {
       final sh = await SharedPreferences.getInstance();
       String login_id = sh.getString("login_id") ?? "";
       String ip = sh.getString("url") ?? "";
       String url = "$ip/notifications";
 
-      print("Fetching notifications from: $url");
-      print("Login ID: $login_id");
-
-      if (login_id.isEmpty || ip.isEmpty) {
-        _showSnackBar("Login ID or Server URL is missing", isError: true);
-        return;
-      }
+      if (login_id.isEmpty || ip.isEmpty) return;
 
       var response = await http.post(
         Uri.parse(url),
         body: {"lid": login_id},
       );
 
-      print("Notification response status: ${response.statusCode}");
-      print("Notification response body: ${response.body}");
-
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == 'success') {
-          List<Map<String, dynamic>> newNotifications = List<Map<String, dynamic>>.from(jsonData['data']);
-
           setState(() {
-            notifications = newNotifications;
+            notifications = List<Map<String, dynamic>>.from(jsonData['data']);
           });
 
           DateTime now = DateTime.now();
           String currentDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
 
-          for (var notification in newNotifications) {
-            String notificationId = notification['id']?.toString() ?? notification['date_time']?.toString() ?? '';
-            String notificationDate = notification['date_time']?.toString().substring(0, 10) ?? '';
+          String? shownNotificationsJson = sh.getString('shown_notifications_$currentDate');
+          Set<String> shownNotifications = shownNotificationsJson != null
+              ? Set<String>.from(json.decode(shownNotificationsJson))
+              : {};
 
-            if (!seenNotificationIds.contains(notificationId) && notificationDate == currentDate) {
-              _showNotificationDialog(notification['notification'] ?? "You have a new notification!");
-              seenNotificationIds.add(notificationId); // Mark as seen
-              _saveSeenNotifications(); // Persist to SharedPreferences
+          for (var notification in notifications) {
+            String notificationDate = notification['date_time']?.toString().substring(0, 10) ?? '';
+            String notificationId = notification['notification_id']?.toString() ?? notification['notification'].hashCode.toString();
+
+            if (notificationDate == currentDate && !shownNotifications.contains(notificationId)) {
+              _showCenterNotification(notification['notification'] ?? "You have a new notification!");
+              shownNotifications.add(notificationId);
+              await sh.setString('shown_notifications_$currentDate', json.encode(shownNotifications.toList()));
+              break;
             }
           }
-        } else {
-          print("No notifications found: ${jsonData['message']}");
         }
-      } else {
-        _showSnackBar("Failed to fetch notifications. Status: ${response.statusCode}", isError: true);
       }
     } catch (e) {
-      print("Error fetching notifications: $e");
       _showSnackBar("Error fetching notifications: $e", isError: true);
     }
   }
@@ -341,11 +282,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
         try {
           DateTime start = DateTime.parse("2024-01-01 $startTime");
           DateTime end = DateTime.parse("2024-01-01 $endTime");
-          if (end.isBefore(start)) {
-            end = end.add(Duration(days: 1));
-          }
-          Duration duration = end.difference(start);
-          totalHours += duration.inMinutes / 60.0;
+          if (end.isBefore(start)) end = end.add(const Duration(days: 1));
+          totalHours += end.difference(start).inMinutes / 60.0;
         } catch (e) {
           print("Error parsing $activityType time: $e");
         }
@@ -359,44 +297,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       decoration: BoxDecoration(
         color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: color.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))],
       ),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
             child: Icon(icon, size: 28, color: color),
           ),
-          SizedBox(height: 12),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: textPrimaryColor,
-            ),
-          ),
-          SizedBox(height: 4),
-          Text(
-            duration,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: color,
-            ),
-          ),
+          const SizedBox(height: 12),
+          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textPrimaryColor)),
+          const SizedBox(height: 4),
+          Text(duration, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: color)),
         ],
       ),
     );
@@ -406,65 +321,37 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     return GestureDetector(
       onTap: () {
         HapticFeedback.mediumImpact();
-        Widget destination;
+        Widget destination = action['title'] == 'View Daycare'
+            ? (selectedBabyId.isEmpty ? Container() : Daycare(selectedBabyId: selectedBabyId))
+            : action['destination'] as Widget;
 
-        if (action['title'] == 'View Daycare') {
-          if (selectedBabyId.isEmpty) {
-            _showSnackBar("Please select a baby first", isError: true);
-            return;
-          }
-          destination = Daycare(selectedBabyId: selectedBabyId);
-        } else {
-          destination = action['destination'] as Widget;
+        if (action['title'] == 'View Daycare' && selectedBabyId.isEmpty) {
+          _showSnackBar("Please select a baby first", isError: true);
+          return;
         }
 
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => destination,
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-          ),
-        ).then((_) => fetchData());
+        Navigator.push(context, PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => destination,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
+        )).then((_) => fetchData());
       },
       child: Container(
         decoration: BoxDecoration(
           color: cardBgColor,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
         ),
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: action['color'].withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: action['color'].withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
               child: Icon(action['icon'], color: action['color'], size: 24),
             ),
-            SizedBox(height: 12),
-            Text(
-              action['title'],
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: textPrimaryColor,
-              ),
-            ),
+            const SizedBox(height: 12),
+            Text(action['title'], textAlign: TextAlign.center, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textPrimaryColor)),
           ],
         ),
       ),
@@ -472,89 +359,33 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
   }
 
   Widget buildActivityItem(Map<String, dynamic> activity) {
-    IconData getActivityIcon() {
-      switch (activity['Type']) {
-        case 'Sleeping':
-          return Icons.bedtime;
-        case 'Playing':
-          return Icons.sports_baseball;
-        case 'Studying':
-          return Icons.menu_book;
-        default:
-          return Icons.category;
-      }
-    }
-
-    Color getActivityColor() {
-      switch (activity['Type']) {
-        case 'Sleeping':
-          return Colors.blue;
-        case 'Playing':
-          return Colors.orange;
-        case 'Studying':
-          return Colors.green;
-        default:
-          return primaryColor;
-      }
-    }
+    IconData getActivityIcon() => {'Sleeping': Icons.bedtime, 'Playing': Icons.sports_baseball, 'Studying': Icons.menu_book}[activity['Type']] ?? Icons.category;
+    Color getActivityColor() => {'Sleeping': Colors.blue, 'Playing': Colors.orange, 'Studying': Colors.green}[activity['Type']] ?? primaryColor;
 
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: getActivityColor().withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            getActivityIcon(),
-            color: getActivityColor(),
-            size: 24,
-          ),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(color: getActivityColor().withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+          child: Icon(getActivityIcon(), color: getActivityColor(), size: 24),
         ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                activity['Type'] ?? "Activity",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: textPrimaryColor,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                activity['Description'] ?? "",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: textSecondaryColor,
-                ),
-              ),
+              Text(activity['Type'] ?? "Activity", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textPrimaryColor)),
+              const SizedBox(height: 4),
+              Text(activity['Description'] ?? "", style: TextStyle(fontSize: 14, color: textSecondaryColor)),
             ],
           ),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              activity['Date'] ?? "",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: textPrimaryColor,
-              ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              "${activity['StartTime'] ?? ""} - ${activity['EndTime'] ?? ""}",
-              style: TextStyle(
-                fontSize: 12,
-                color: textSecondaryColor,
-              ),
-            ),
+            Text(activity['Date'] ?? "", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textPrimaryColor)),
+            const SizedBox(height: 4),
+            Text("${activity['StartTime'] ?? ""} - ${activity['EndTime'] ?? ""}", style: TextStyle(fontSize: 12, color: textSecondaryColor)),
           ],
         ),
       ],
@@ -566,15 +397,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
       decoration: BoxDecoration(
         color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: activities.isEmpty
           ? Container(
         height: 150,
@@ -582,36 +407,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.event_note,
-              size: 48,
-              color: textSecondaryColor.withOpacity(0.5),
-            ),
-            SizedBox(height: 16),
-            Text(
-              "No activities recorded yet",
-              style: TextStyle(
-                fontSize: 16,
-                color: textSecondaryColor,
-              ),
-            ),
+            Icon(Icons.event_note, size: 48, color: textSecondaryColor.withOpacity(0.5)),
+            const SizedBox(height: 16),
+            Text("No activities recorded yet", style: TextStyle(fontSize: 16, color: textSecondaryColor)),
           ],
         ),
       )
           : Column(
-        children: activities.take(4).map((activity) {
-          return Column(
-            children: [
-              buildActivityItem(activity),
-              if (activities.indexOf(activity) < activities.take(4).length - 1)
-                Divider(
-                  height: 24,
-                  thickness: 1,
-                  color: Colors.grey.withOpacity(0.1),
-                ),
-            ],
-          );
-        }).toList(),
+        children: activities.take(4).map((activity) => Column(
+          children: [
+            buildActivityItem(activity),
+            if (activities.indexOf(activity) < activities.take(4).length - 1)
+              Divider(height: 24, thickness: 1, color: Colors.grey.withOpacity(0.1)),
+          ],
+        )).toList(),
       ),
     );
   }
@@ -619,10 +428,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
+      value: const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark),
       child: Scaffold(
         backgroundColor: bgColor,
         appBar: AppBar(
@@ -631,14 +437,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
           automaticallyImplyLeading: false,
           title: Row(
             children: [
-              Text(
-                "Parento",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor,
-                ),
-              ),
+              Text("Parento", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor)),
               const Spacer(),
               GestureDetector(
                 onTap: () {
@@ -662,27 +461,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
               GestureDetector(
                 onTap: () {
                   if (selectedBabyId.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            BabyDetails(babyId: selectedBabyId),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                          return SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(1, 0),
-                              end: Offset.zero,
-                            ).animate(animation),
-                            child: child,
-                          );
-                        },
+                    Navigator.push(context, PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) => BabyDetails(babyId: selectedBabyId),
+                      transitionsBuilder: (context, animation, secondaryAnimation, child) => SlideTransition(
+                        position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(animation),
+                        child: child,
                       ),
-                    ).then((_) => fetchData());
+                    )).then((_) => fetchData());
                   }
                 },
-                child: BabySelection(
-                  onBabySelected: updateSelectedBaby,
-                ),
+                child: BabySelection(onBabySelected: updateSelectedBaby),
               ),
             ],
           ),
@@ -693,35 +481,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
           onRefresh: () async {
             HapticFeedback.mediumImpact();
             await fetchData();
-            await fetchNotifications();
+            await fetchNotificationsAndShow();
           },
           child: SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          primaryColor,
-                          primaryColor.withOpacity(0.8),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      gradient: LinearGradient(colors: [primaryColor, primaryColor.withOpacity(0.8)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withOpacity(0.3),
-                          blurRadius: 15,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
+                      boxShadow: [BoxShadow(color: primaryColor.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 5))],
                     ),
                     child: Row(
                       children: [
@@ -729,205 +504,100 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "Hello Parent!",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                "Track your child's daily activities and development in real-time.",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
-                              ),
+                              const Text("Hello Parent!", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                              const SizedBox(height: 8),
+                              Text("Track your child's daily activities and development in real-time.",
+                                  style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.9))),
                             ],
                           ),
                         ),
                         Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          padding: EdgeInsets.all(12),
-                          child: Icon(
-                            Icons.child_care,
-                            color: Colors.white,
-                            size: 42,
-                          ),
+                          decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                          padding: const EdgeInsets.all(12),
+                          child: const Icon(Icons.child_care, color: Colors.white, size: 42),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 24),
-                  Text(
-                    "Daily Activity Summary",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textPrimaryColor,
-                    ),
-                  ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 24),
+                  Text("Daily Activity Summary", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textPrimaryColor)),
+                  const SizedBox(height: 16),
                   isLoading
-                      ? Center(
-                    child: SizedBox(
-                      height: 170,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                        ),
-                      ),
-                    ),
-                  )
+                      ? const Center(child: SizedBox(height: 170, child: Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)))))
                       : GridView.count(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 3,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.85,
                     children: [
-                      buildActivityCard(
-                        "Sleep",
-                        Icons.bedtime,
-                        Colors.blue,
-                        calculateDuration('Sleeping'),
-                      ),
-                      buildActivityCard(
-                        "Eat",
-                        Icons.restaurant,
-                        Colors.orange,
-                        calculateDuration('Playing'),
-                      ),
-                      buildActivityCard(
-                        "Study",
-                        Icons.menu_book,
-                        Colors.green,
-                        calculateDuration('Studying'),
-                      ),
+                      buildActivityCard("Sleep", Icons.bedtime, Colors.blue, calculateDuration('Sleeping')),
+                      buildActivityCard("Eat", Icons.restaurant, Colors.orange, calculateDuration('Playing')),
+                      buildActivityCard("Study", Icons.menu_book, Colors.green, calculateDuration('Studying')),
                     ],
                   ),
-                  SizedBox(height: 24),
-                  Text(
-                    "Quick Actions",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textPrimaryColor,
-                    ),
-                  ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 24),
+                  Text("Quick Actions", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textPrimaryColor)),
+                  const SizedBox(height: 16),
                   GridView.count(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 3,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.85,
                     children: quickActions.map((action) => buildQuickActionButton(action)).toList(),
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   Row(
                     children: [
-                      Text(
-                        "Latest Activities",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: textPrimaryColor,
-                        ),
-                      ),
-                      Spacer(),
+                      Text("Latest Activities", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textPrimaryColor)),
+                      const Spacer(),
                       TextButton(
                         onPressed: () {
                           if (selectedBabyId.isNotEmpty) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Activities(babyId: selectedBabyId),
-                              ),
-                            ).then((_) => fetchData());
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Activities(babyId: selectedBabyId))).then((_) => fetchData());
                           } else {
                             _showSnackBar("Please select a baby first", isError: true);
                           }
                         },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
+                        style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                         child: Row(
                           children: [
-                            Text(
-                              "See all",
-                              style: TextStyle(
-                                color: primaryColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              size: 12,
-                              color: primaryColor,
-                            ),
+                            Text("See all", style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500)),
+                            const SizedBox(width: 4),
+                            Icon(Icons.arrow_forward_ios, size: 12, color: primaryColor),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   isLoading
-                      ? Center(
-                    child: SizedBox(
-                      height: 200,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                        ),
-                      ),
-                    ),
-                  )
+                      ? const Center(child: SizedBox(height: 200, child: Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)))))
                       : buildActivitiesCard(),
-                  SizedBox(height: 100),
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
           ),
         ),
-        bottomNavigationBar: BottomNavBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-        ),
+        bottomNavigationBar: BottomNavBar(currentIndex: _selectedIndex, onTap: _onItemTapped),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             HapticFeedback.mediumImpact();
             if (selectedBabyId.isNotEmpty) {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      Chat(babyId: selectedBabyId),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return ScaleTransition(
-                      scale: animation,
-                      child: child,
-                    );
-                  },
-                ),
-              ).then((_) => fetchData());
+              Navigator.push(context, PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => Chat(babyId: selectedBabyId),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) => ScaleTransition(scale: animation, child: child),
+              )).then((_) => fetchData());
             } else {
               _showSnackBar("Please select a baby first", isError: true);
             }
           },
           backgroundColor: primaryColor,
-          child: Icon(Icons.chat, color: Colors.white),
+          child: const Icon(Icons.chat, color: Colors.white),
           elevation: 4,
         ),
       ),
