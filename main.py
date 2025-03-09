@@ -16,7 +16,67 @@ app.register_blueprint(parent)
 
 app.secret_key="aaaaaaaaaaaaaaaa"
 
+from flask import Flask, request, jsonify
 
+@app.route('/update_payment_status', methods=['POST','GET'])  # Restrict to POST only
+def update_payment_status():
+    data = {}
+    try:
+        # Extract admission from form data (matches Flutter's "admission" key)
+        admission = request.form.get('admission', '')
+        if not admission:
+            data['status'] = 'error'
+            data['message'] = 'Admission ID is required'
+            return jsonify(data), 400
+
+        print(f"Admission ID: {admission} ////")
+
+        # Use parameterized query to safely select data
+        select_query = "SELECT * FROM admission_request WHERE adminssion_id = %s"%(admission)
+        select_result = select(select_query)
+
+        print(f"Select result: {select_result} //////")
+
+        if not select_result:
+            data['status'] = 'error'
+            data['message'] = 'No admission request found for the given ID'
+            return jsonify(data), 404
+
+        # Use parameterized query to safely update payment status
+        update_query = "UPDATE admission_request SET payment_status = 'paid' WHERE adminssion_id = %s"%(admission)
+        update_result = update(update_query)
+
+        # Check if update was successful (assuming update returns rows affected or True)
+        if update_result:
+            # Uncomment and fix this if you want to insert into admission_payment
+            # insert_query = "INSERT INTO admission_payment VALUES (NULL, %s, %s, NOW(), 'paid')"
+            # insert_result = insert(insert_query, (admission, select_result[0].get('payment', '')))
+            # if insert_result:
+            #     data['status'] = 'success'
+            #     data['message'] = 'Payment status updated and recorded successfully'
+            # else:
+            #     data['status'] = 'failed'
+            #     data['message'] = 'Failed to record payment'
+            # return jsonify(data), 200 if insert_result else 500
+
+            data['status'] = 'success'
+            data['message'] = 'Payment status updated successfully'
+        else:
+            data['status'] = 'failed'
+            data['message'] = 'Failed to update payment status'
+
+        return jsonify(data), 200 if update_result else 500
+
+    except KeyError as e:
+        print(f"KeyError: {str(e)}")
+        data['status'] = 'error'
+        data['message'] = f'Missing required field: {str(e)}'
+        return jsonify(data), 400
+    except Exception as e:
+        print(f"Error in update_payment_status: {str(e)}")
+        data['status'] = 'error'
+        data['message'] = f'Internal server error: {str(e)}'
+        return jsonify(data), 500
 
 
 
@@ -294,7 +354,8 @@ def admition_request():
     return jsonify({"status": "success", "message": "Request received"})
 
 
-@app.route("/baby_details", methods=['POST'])
+
+@app.route("/baby_details", methods=['POST', 'GET'])
 def baby_details():
     try:
         baby_id = request.form.get('baby_id', '')  # Safely get baby_id
@@ -304,24 +365,27 @@ def baby_details():
 
         print(f"Baby ID received: {baby_id}")  # Improved logging
 
-        # Fetch baby details from database
+        # Fetch baby details from database (unchanged query)
         query = "SELECT baby_name, baby_dob, baby_photo, allergies_or_dietry_restriction, medical_condition FROM babies WHERE baby_id=%s"
         result = select(query, (baby_id,))
 
-        # Fetch QR code separately
-        qr_query = "SELECT qr_code FROM admission_request WHERE baby_id = %s"
+        # Fetch QR code separately (unchanged query)
+        qr_query = "SELECT * FROM admission_request WHERE baby_id = %s"
         qr_result = select(qr_query, (baby_id,))
 
         if result and len(result) > 0:  # If baby data is found
             baby_data = {
                 "status": "success",
                 "data": [{
-                    "baby_name": result[0]["baby_name"],
-                    "baby_dob": str(result[0]["baby_dob"]),  # Convert date to string
-                    "baby_photo": result[0]["baby_photo"] or "",  # Handle null values
-                    "allergies_or_dietry_restriction": result[0]["allergies_or_dietry_restriction"] or "",
-                    "medical_condition": result[0]["medical_condition"] or "",
-                    "qr_code": qr_result[0]["qr_code"] if qr_result and len(qr_result) > 0 else ""
+                    "baby_name": result[0].get("baby_name", ""),
+                    "payment": str(qr_result[0].get("payment", "")) if qr_result and len(qr_result) > 0 else "",
+                    "payment_status": qr_result[0].get("payment_status", "") if qr_result and len(qr_result) > 0 else "",
+                    "admision": str(qr_result[0].get("adminssion_id", "")) if qr_result and len(qr_result) > 0 else "",
+                    "baby_dob": str(result[0].get("baby_dob", "")) if result[0].get("baby_dob") else "",
+                    "baby_photo": "" if result[0].get("baby_photo", "") == "null" else result[0].get("baby_photo", ""),
+                    "allergies_or_dietry_restriction": result[0].get("allergies_or_dietry_restriction", ""),
+                    "medical_condition": result[0].get("medical_condition", ""),
+                    "qr_code": qr_result[0].get("qr_code", "") if qr_result and len(qr_result) > 0 else ""
                 }]
             }
             print(f"Returning baby data: {baby_data}")  # Log the response
@@ -333,6 +397,50 @@ def baby_details():
     except Exception as e:
         print(f"Error in baby_details: {str(e)}")
         return jsonify({"status": "error", "message": "Internal server error"}), 500
+    
+
+# @app.route("/baby_details", methods=['POST','GET'])
+# def baby_details():
+#     try:
+#         baby_id = request.form.get('baby_id', '')  # Safely get baby_id
+        
+#         if not baby_id:
+#             return jsonify({"status": "error", "message": "Baby ID is required"}), 400
+
+#         print(f"Baby ID received: {baby_id}")  # Improved logging
+
+#         # Fetch baby details from database
+#         query = "SELECT baby_name, baby_dob, baby_photo, allergies_or_dietry_restriction, medical_condition FROM babies WHERE baby_id=%s"
+#         result = select(query, (baby_id,))
+
+#         # Fetch QR code separately
+#         qr_query = "SELECT * FROM admission_request WHERE baby_id = %s"
+#         qr_result = select(qr_query, (baby_id,))
+
+#         if result and len(result) > 0:  # If baby data is found
+#             baby_data = {
+#                 "status": "success",
+#                 "data": [{
+#                     "baby_name": result[0]["baby_name"],
+#                     "payment": qr_result[0]["payment"],
+#                     "payment_status": qr_result[0]["payment_status"],
+#                     "admision": qr_result[0]["adminssion_id"],
+#                     "baby_dob": str(result[0]["baby_dob"]),  # Convert date to string
+#                     "baby_photo": result[0]["baby_photo"] or "",  # Handle null values
+#                     "allergies_or_dietry_restriction": result[0]["allergies_or_dietry_restriction"] or "",
+#                     "medical_condition": result[0]["medical_condition"] or "",
+#                     "qr_code": qr_result[0]["qr_code"] if qr_result and len(qr_result) > 0 else ""
+#                 }]
+#             }
+#             print(f"Returning baby data: {baby_data}")  # Log the response
+#             return jsonify(baby_data), 200
+#         else:
+#             print(f"No baby found for ID: {baby_id}")
+#             return jsonify({"status": "error", "message": "Baby not found"}), 404
+
+#     except Exception as e:
+#         print(f"Error in baby_details: {str(e)}")
+#         return jsonify({"status": "error", "message": "Internal server error"}), 500
 
 
 
