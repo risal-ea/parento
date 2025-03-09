@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Notification</title>
+    <title>Notifications</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #6C63FF;
+            --primary-light: #8A84FF;
             --primary-dark: #5046e5;
+            --text-dark: #333333;
             --text-light: #ffffff;
+            --text-muted: #6c757d;
             --bg-light: #f8f9fa;
-            --shadow: 0 4px 6px rgba(108, 99, 255, 0.1);
+            --bg-subtle: #f0f2f5;
+            --card-shadow: 0 10px 25px rgba(108, 99, 255, 0.12);
+            --hover-shadow: 0 15px 30px rgba(108, 99, 255, 0.2);
+            --border-radius: 12px;
             --transition: all 0.3s ease;
         }
         
@@ -18,85 +25,156 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
         
         body {
-            background-color: var(--bg-light);
+            background-color: var(--bg-subtle);
+            color: var(--text-dark);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-title:after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--primary-color);
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
         }
         
         .notification-card {
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 500px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
             overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .notification-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-5px);
         }
         
         .card-header {
             background-color: var(--primary-color);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: var(--text-light);
-            padding: 20px;
+            padding: 25px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0.6;
         }
         
         .card-header h1 {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 600;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
         }
         
         .card-body {
-            padding: 30px;
+            padding: 35px;
         }
         
         .form-group {
             margin-bottom: 25px;
         }
         
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+        
         textarea.form-control {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             min-height: 120px;
             resize: vertical;
             transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
         
         textarea.form-control:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.15);
         }
         
         .send-btn {
             background-color: var(--primary-color);
+            background-image: linear-gradient(to right, var(--primary-color), var(--primary-dark));
             color: var(--text-light);
             border: none;
-            border-radius: 8px;
-            padding: 14px 20px;
+            border-radius: 10px;
+            padding: 16px 24px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             width: 100%;
             cursor: pointer;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(108, 99, 255, 0.25);
         }
         
         .send-btn:hover {
-            background-color: var(--primary-dark);
+            background-image: linear-gradient(to right, var(--primary-dark), var(--primary-color));
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.2);
+            box-shadow: 0 6px 15px rgba(108, 99, 255, 0.35);
         }
         
         .send-btn:active {
             transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(108, 99, 255, 0.2);
         }
         
         .notification-icon {
@@ -104,49 +182,145 @@
             vertical-align: middle;
             margin-right: 8px;
         }
+        
+        .notifications-container {
+            margin-top: 40px;
+            border-top: 1px solid #eaeaea;
+            padding-top: 30px;
+        }
+        
+        .notifications-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .notification-item {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            border-left: 4px solid var(--primary-color);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .notification-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+        }
+        
+        .notification-content {
+            font-size: 16px;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        .notification-time {
+            font-size: 14px;
+            color: var(--text-muted);
+            background-color: var(--bg-light);
+            padding: 6px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #d1d9e6;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 25px 20px;
+            }
+            
+            .notification-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .notification-time {
+                justify-self: start;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="notification-card">
-        <div class="card-header">
-            <h1>
-                <span class="notification-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                </span>
-                Send Notification
-            </h1>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Notification Center</h1>
         </div>
-        <div class="card-body">
-            <form id="notificationForm">
-                <div class="form-group">
-                    <textarea id="message" class="form-control" placeholder="Type your notification message here..." required></textarea>
-                </div>
-                
-                <button type="submit" class="send-btn">
+        
+        <div class="notification-card">
+            <div class="card-header">
+                <h1>
+                    <span class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                    </span>
                     Send Notification
-                </button>
-            </form>
+                </h1>
+            </div>
+            <div class="card-body">
+                <form id="notificationForm" method="POST">
+                    <div class="form-group">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea id="message" class="form-control" placeholder="Type your notification message here..." required name="subject"></textarea>
+                    </div>
+                    
+                    <button type="submit" name="send" class="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Notification
+                    </button>
+                </form>
+                
+                <div class="notifications-container">
+                    <h2 class="notifications-heading">
+                        <i class="fas fa-list-alt"></i>
+                        Recent Notifications
+                    </h2>
+                    
+                    {% if data.view %}
+                        {% for notification in data.view %}
+                            <div class="notification-item">
+                                <div class="notification-content">
+                                    {{ notification['notification'] }}
+                                </div>
+                                <div class="notification-time">
+                                    <i class="far fa-clock"></i> {{ notification['date_time'] }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="far fa-bell-slash"></i>
+                            <p>No notifications available</p>
+                            <p>Notifications you send will appear here</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
-
-    <script>
-        // Form submission handler
-        document.getElementById('notificationForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            // Get the message
-            const message = document.getElementById('message').value;
-            
-            // Here you would normally send the data to your server
-            // For demonstration, we'll just show an alert
-            if (message.trim() !== '') {
-                alert('Notification sent successfully!');
-                document.getElementById('message').value = '';
-            }
-        });
-    </script>
 </body>
 </html>

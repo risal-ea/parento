@@ -7,6 +7,45 @@ public=Blueprint('public',__name__)
 def index():
     return render_template("index.html")
 
+
+@public.route("/scanner")
+def scanner():
+    return render_template("scanner.html")
+
+@public.route("/process-qr", methods=["POST"])
+def process_qr():
+    qr_data = request.json.get("qr_data")
+    
+    if not qr_data:
+        return jsonify({"status": "error", "message": "No QR data provided"}), 400
+
+    print(f"QR Code Scanned - ID: {qr_data}")
+
+    # Check if already checked in and out today
+    cc = "select * from checking_history where admission_id='%s' and check_in_date=curdate() and check_out_date=curdate()"%(qr_data)
+    vv = select(cc)
+
+    if not vv:
+        # Check if there's a pending check-out
+        c = "select * from checking_history where admission_id='%s' and check_out_date='pending'"%(qr_data)
+        ed = select(c)
+
+        if not ed:
+            # Insert new check-in record
+            z = "insert into checking_history values(null,'%s',curdate(),curtime(),'pending','pending')"%(qr_data)
+            insert(z)
+            print("Added Check in data")
+            return jsonify({"status": "success", "message": "Successfully checked in"})
+        else:
+            # Update check-out data
+            z = "update checking_history set check_out_date=curdate(),check_out_time=curtime()"
+            update(z)
+            print("Updated Check out data")
+            return jsonify({"status": "success", "message": "Successfully checked out"})
+    else:
+        print("Already marked check-in and check-out date")
+        return jsonify({"status": "success", "message": "Already checked in and out today"})
+
 @public.route("/login",methods=['post','get'])
 def log():
     if 'login' in request.form:

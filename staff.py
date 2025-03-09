@@ -90,8 +90,18 @@ def addActivity():
 @staff.route("/send_notification", methods=['GET', 'POST'])
 def notification():
     data={}
-    # if 'send' in request.form:
-    #     subject = request.form['subject']
+    id=request.args['id']
+    pi=request.args['pi']
+    if 'send' in request.form:
+        subject = request.form['subject']
 
+        z="insert into notifications values(null, '%s', '%s', curdate(), '%s')"%(pi, subject, id)
+        insert(z)
+        return """<script>alert('forwarded');window.location='/view-babies-staff'</script>"""
+
+    fetchQuery = "select * from notifications where baby_id='%s'"%(id)
+    fetchData = select(fetchQuery)
+
+    data['view']= fetchData
 
     return render_template('notification.html', data=data)

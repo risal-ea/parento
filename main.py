@@ -519,7 +519,7 @@ def notifications():
     ccc=select(cc)
     pid=ccc[0]['parent_id']
 
-    query = "select * from notification where parent_id = %s"%(pid)
+    query = "select * from notifications where parent_id = %s"%(pid)
     result = select(query)  # ✅ Secure query
     print(result,"////")
     if result:

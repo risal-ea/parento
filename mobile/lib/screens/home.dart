@@ -8,6 +8,7 @@ import 'package:mobile/components/bottom_nav_bar.dart';
 import 'package:mobile/screens/activities.dart';
 import 'package:mobile/screens/baby_details.dart';
 import 'package:mobile/screens/notifications.dart';
+import 'package:mobile/screens/scanner.dart';
 import 'package:mobile/screens/view_daycare.dart';
 import 'package:mobile/screens/complaint.dart';
 import 'package:mobile/screens/view_meetings.dart';
@@ -639,6 +640,25 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
                 ),
               ),
               const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Scanner()));
+                },
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF6C63FF).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.qr_code_scanner,
+                    color: Color(0xFF6C63FF),
+                    size: 24,
+                  ),
+                ),
+              ),
+              SizedBox(width: 15,),
               GestureDetector(
                 onTap: () {
                   if (selectedBabyId.isNotEmpty) {
