@@ -621,13 +621,15 @@ def daycare_staff():
 def notifications():
     data={}
     loginId = request.form.get('lid')
-    print(loginId,"////")
+    babyId= request.form.get('baby_id')
+    print("loginId:", loginId)
+    print("babyId:", babyId)
 
     cc="select * from parent where login_id='%s'"%(loginId)
     ccc=select(cc)
     pid=ccc[0]['parent_id']
 
-    query = "select * from notifications where parent_id = %s"%(pid)
+    query = "select * from notifications where parent_id = '%s' and baby_id='%s'"%(pid, babyId)
     result = select(query)  # ✅ Secure query
     print(result,"////")
     if result:

@@ -50,10 +50,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     {'title': 'View Meetings', 'icon': Icons.calendar_today, 'destination': ViewMeetings(), 'color': const Color(0xFF6C63FF)},
   ];
 
+  // Updated navItems to use identifiers instead of widget instances
   final List<Map<String, dynamic>> navItems = [
-    {'index': 0, 'screen': null},
-    {'index': 1, 'screen': Notifications()},
-    {'index': 2, 'screen': ParentProfile()},
+    {'index': 0, 'screen': 'Home'},
+    {'index': 1, 'screen': 'Notifications'},
+    {'index': 2, 'screen': 'ParentProfile'},
   ];
 
   @override
@@ -94,13 +95,26 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
 
     final selectedNav = navItems.firstWhere((item) => item['index'] == index);
 
-    if (selectedNav['screen'] != null) {
+    Widget? destination;
+    switch (selectedNav['screen']) {
+      case 'Home':
+        destination = const Home();
+        break;
+      case 'Notifications':
+        destination = Notifications(babyId: selectedBabyId); // Pass selectedBabyId to Notifications
+        break;
+      case 'ParentProfile':
+        destination = ParentProfile();
+        break;
+    }
+
+    if (destination != null) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => selectedNav['screen']),
+        MaterialPageRoute(builder: (context) => destination!),
       ).then((_) {
         setState(() {
-          _selectedIndex = 0;
+          _selectedIndex = 0; // Reset to Home after returning
         });
         fetchData();
         fetchNotificationsAndShow();
@@ -138,7 +152,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
     Overlay.of(context).insert(_notificationOverlay!);
     _animationController.forward(from: 0.0);
 
-    // Automatically remove the notification after 4 seconds
     Future.delayed(const Duration(seconds: 4), () {
       _animationController.reverse().then((_) {
         _notificationOverlay?.remove();

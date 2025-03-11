@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class Notifications extends StatefulWidget {
-  const Notifications({super.key});
+  final String babyId;
+  const Notifications({super.key, required this.babyId});
 
   @override
   State<Notifications> createState() => _NotificationsState();
@@ -33,8 +34,10 @@ class _NotificationsState extends State<Notifications> {
       String ip = sh.getString('url') ?? '';
       String url = '$ip/notifications';
 
+      print("Request Body: {'lid': '$login_id', 'babyId': '${widget.babyId}'}");
       var data = await http.post(Uri.parse(url), body: {
         'lid': login_id,
+        'baby_id': widget.babyId,
       });
 
       print("Response Status: ${data.statusCode}");

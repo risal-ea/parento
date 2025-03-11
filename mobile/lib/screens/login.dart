@@ -89,7 +89,7 @@ class _loginState extends State<login> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    "KidsCare",
+                    "Parento",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
