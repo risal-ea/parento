@@ -105,3 +105,26 @@ def notification():
     data['view']= fetchData
 
     return render_template('notification.html', data=data)
+
+@staff.route("/set_meeting", methods=["GET", "POST"])
+def set_meeting():
+    data = {}
+    parentId = request.args.get('id')
+    
+    if request.method == "POST" and 'send' in request.form:
+        meeting_link = request.form['meeting_link']
+        description = request.form['description']
+        
+        # Insert query with all required fields
+        query = "INSERT INTO meeting VALUES(NULL, '%s', '%s', '%s')"%(meeting_link, description, parentId)
+        
+        insert(query)
+        
+        return """<script>alert('Meeting scheduled successfully!');window.location='/view-babies-staff'</script>"""
+
+    fetchQuery = "select * from meeting where parent_id='%s'"%(parentId)
+    fetchData = select(fetchQuery)
+
+    data['view']= fetchData
+    
+    return render_template('set_meeting.html', data=data)

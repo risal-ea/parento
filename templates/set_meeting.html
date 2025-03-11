@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Meeting</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --primary-light: #8A84FF;
+            --primary-dark: #5046e5;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+            --text-muted: #6c757d;
+            --bg-light: #f8f9fa;
+            --bg-subtle: #f0f2f5;
+            --card-shadow: 0 10px 25px rgba(108, 99, 255, 0.12);
+            --hover-shadow: 0 15px 30px rgba(108, 99, 255, 0.2);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-subtle);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-title:after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--primary-color);
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        
+        .meeting-card {
+            background-color: #ffffff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .meeting-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--text-light);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0.6;
+        }
+        
+        .card-header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-body {
+            padding: 35px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.15);
+        }
+        
+        .send-btn {
+            background-color: var(--primary-color);
+            background-image: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+            color: var(--text-light);
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(108, 99, 255, 0.25);
+        }
+        
+        .send-btn:hover {
+            background-image: linear-gradient(to right, var(--primary-dark), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 99, 255, 0.35);
+        }
+        
+        .send-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(108, 99, 255, 0.2);
+        }
+        
+        .meeting-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        .meetings-container {
+            margin-top: 40px;
+            border-top: 1px solid #eaeaea;
+            padding-top: 30px;
+        }
+        
+        .meetings-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        /* Enhanced meeting item styles */
+        .meeting-item {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: var(--transition);
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meeting-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        /* Enhanced meeting link styles */
+        .meeting-link-container {
+            background-color: var(--bg-subtle);
+            border-radius: 8px;
+            padding: 14px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+        
+        .meeting-link-container:hover {
+            background-color: #e9ecef;
+        }
+        
+        .meeting-link-icon {
+            color: var(--primary-color);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .meeting-link {
+            font-size: 16px;
+            color: var(--primary-color);
+            word-break: break-all;
+            text-decoration: none;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+        
+        .meeting-link:hover {
+            text-decoration: underline;
+        }
+        
+        .copy-link-btn {
+            background-color: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        
+        .copy-link-btn:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+        
+        .join-meeting-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            align-self: flex-start;
+            margin-top: 10px;
+        }
+        
+        .join-meeting-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(80, 70, 229, 0.3);
+        }
+        
+        .meeting-description {
+            font-size: 16px;
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin-top: 15px;
+            border-top: 1px solid #eaeaea;
+            padding-top: 15px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #d1d9e6;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Set Meetings</h1>
+        </div>
+        
+        <div class="meeting-card">
+            <div class="card-header">
+                <h1>
+                    <span class="meeting-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </span>
+                    Create Meeting
+                </h1>
+            </div>
+            <div class="card-body">
+                <form id="meetingForm" method="POST">
+                    <div class="form-group">
+                        <label for="meeting_link" class="form-label">Meeting Link</label>
+                        <input type="url" id="meeting_link" name="meeting_link" class="form-control" placeholder="https://meet.google.com/xxx-xxxx-xxx" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" name="description" class="form-control" placeholder="Add meeting details, agenda, date/time, or any additional information..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" name="send" class="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Schedule Meeting
+                    </button>
+                </form>
+                
+                <div class="meetings-container">
+                    <h2 class="meetings-heading">
+                        <i class="fas fa-list-alt"></i>
+                        Recent Meetings
+                    </h2>
+                    
+                    {% if data.view %}
+                        {% for meeting in data.view %}
+                            <div class="meeting-item">
+                                <div class="meeting-link-container">
+                                    <i class="fas fa-video meeting-link-icon"></i>
+                                    <a href="{{ meeting.link }}" target="_blank" class="meeting-link">
+                                        {{ meeting.link }}
+                                    </a>
+                                </div>
+                                
+                                <a href="{{ meeting.link }}" target="_blank" class="join-meeting-btn">
+                                    <i class="fas fa-sign-in-alt"></i> Join Meeting
+                                </a>
+                                
+                                <div class="meeting-description">
+                                    {{ meeting.description }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="far fa-calendar-times"></i>
+                            <p>No meetings scheduled yet</p>
+                            <p>Meetings you create will appear here</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

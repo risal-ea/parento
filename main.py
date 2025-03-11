@@ -640,6 +640,55 @@ def notifications():
         data['message'] = 'No notification found'
     return jsonify(data)
 
+@app.route("/view_meeting", methods=['POST'])
+def view_meeting():
+    data={}
+    loginId = request.form.get('lid')
+
+    cc="select * from parent where login_id='%s'"%(loginId)
+    ccc=select(cc)
+    pid=ccc[0]['parent_id']
+
+    fetchData = "select * from meeting where parent_id = '%s'"%(pid)
+    meetingData = select(fetchData)
+
+    if meetingData:
+        data['status'] = 'success'
+        data['data'] = meetingData
+    else:
+        data['status'] = 'failed'
+        data['message'] = 'No notification found'
+    return jsonify(data)
+
+@app.route("/checkInOut", methods=['POST', 'GET'])
+def checkInOut():
+    data={}
+    babyId = request.form.get('baby_id')
+
+    print("babyId:", babyId)
+
+    fetchAdminNo = "select * from admission_request where baby_id='%s'"%(babyId)
+    table = select(fetchAdminNo)
+    adminNo= table[0]['adminssion_id']
+
+    print("adminNo:", adminNo)
+
+    fetchCheckInOut = "select * from checking_history where admission_id='%s'"%(adminNo)
+    checkInOut = select(fetchCheckInOut)
+
+    if checkInOut:
+        data['status'] = 'success'
+        data['data'] = checkInOut
+    else:
+        data['status'] = 'failed'
+        data['message'] = 'No data found'
+
+    print(data)
+    return jsonify(data)
+
+
+    
+
 
 
 
