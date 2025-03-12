@@ -1,88 +1,349 @@
-{% include 'public/header.html' %}
-<body style="background-color: #4F6C7D;">
-    <div class="data-container">
-    {% if data['up'] %}
-        <div class="form__container">
-            <form method="POST" class="form-container margin">
-                <h2 align="center">Update Facility Information</h2>
-                <br>
-                <div class="form-group">
-                    <label for="facility_name">Facility Name:</label><br>
-                    <input type="text" id="facility_name" name="facility_name" class="form-input" 
-                           value="{{data['up'][0]['facility_name']}}" pattern="[a-zA-Z ]+" 
-                           title="Alphabets are only allowed" required><br><br>
-                </div>
-                
-                <div class="form-group">
-                    <label for="facility_type">Facility Type:</label><br>
-                    <input type="text" id="facility_type" name="facility_type" class="form-input" 
-                           value="{{data['up'][0]['facility_type']}}" required><br><br>
-                </div>
-                
-                <div class="form-group">
-                    <label for="facility_des">Facility Description:</label><br>
-                    <input type="text" id="facility_des" name="facility_des" class="form-input" 
-                           value="{{data['up'][0]['facility_des']}}" required><br><br>
-                </div>
-                
-                <div class="form-group">
-                    <label for="facility_capacity">Facility Capacity:</label><br>
-                    <input type="text" id="facility_capacity" name="facility_capacity" class="form-input" 
-                           value="{{data['up'][0]['facility_capacity']}}" required><br><br>
-                </div>
-                
-                <div class="form-group">
-                    <label for="facility_image">Facility Image:</label><br>
-                    <input type="text" id="facility_image" name="facility_image" class="form-input" 
-                           value="{{data['up'][0]['facility_image']}}" required><br><br>
-                </div>
-                
-                <div class="form-group">
-                    <label for="operating_hrs">Operating Hours:</label><br>
-                    <input type="text" id="operating_hrs" name="operating_hrs" class="form-input" 
-                           value="{{data['up'][0]['operating_hrs']}}" required><br><br>
-                </div>
-                
-                <div class="form-group">
-                    <label for="safety_measures">Safety Measures:</label><br>
-                    <input type="text" id="safety_measures" name="safety_measures" class="form-input" 
-                           value="{{data['up'][0]['safety_measures']}}" required><br><br>
-                </div>
-                
-                <input type="submit" value="Update Facility" name="update_facility" class="form-button">
+{% include 'public/daycareHeader.html' %}
+<body>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      padding-top: 4.5rem;
+    }
+    
+    .page-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .content-wrapper {
+      flex: 1;
+      padding: 2rem 0;
+    }
+    
+    .data-container {
+      max-width: 1200px;
+      width: 90%;
+      margin: 2rem auto 4rem;
+      background-color: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .data-container h1 {
+      color: #4A3AFF;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .data-container h1:after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background-color: #4A3AFF;
+      border-radius: 2px;
+    }
+    
+    .data-table-wrapper {
+      overflow-x: auto;
+      margin-top: 1.5rem;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .data-table th {
+      background-color: rgba(74, 58, 255, 0.08);
+      color: #222;
+      font-weight: 700;
+      text-align: left;
+      padding: 1.25rem 1rem;
+      border-bottom: 2px solid #eaeaea;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .data-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #eaeaea;
+      color: #555;
+      transition: background-color 0.2s ease;
+    }
+    
+    .data-table tr:hover td {
+      background-color: rgba(74, 58, 255, 0.03);
+    }
+    
+    .accept-btn {
+      display: inline-block;
+      background-color: #4A3AFF;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(74, 58, 255, 0.15);
+    }
+    
+    .accept-btn:hover {
+      background-color: #3929E0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(74, 58, 255, 0.25);
+    }
+
+    .reject-btn {
+      display: inline-block;
+      background-color: #ff4444;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(255, 68, 68, 0.15);
+    }
+    
+    .reject-btn:hover {
+      background-color: #e03333;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 68, 68, 0.25);
+    }
+
+    .form-container {
+      margin: 0 auto;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #eaeaea;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #4A3AFF;
+    }
+
+    .form-button {
+      background-color: #4A3AFF;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(74, 58, 255, 0.15);
+    }
+
+    .form-button:hover {
+      background-color: #3929E0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(74, 58, 255, 0.25);
+    }
+
+    .button-container {
+      margin-bottom: 1.5rem;
+    }
+    
+    @media screen and (max-width: 768px) {
+      .data-container {
+        padding: 1.5rem;
+        margin: 1rem auto 3rem;
+      }
+      
+      .data-table th,
+      .data-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+      }
+      
+      .accept-btn,
+      .reject-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+      }
+      
+      .form-input {
+        font-size: 0.9rem;
+      }
+      
+      .form-button {
+        padding: 0.6rem 1.2rem;
+      }
+    }
+    
+    /* Dark mode */
+    body.dark-theme {
+      background-color: #1a1a1a;
+      color: #f8f9fa;
+    }
+    
+    body.dark-theme .data-container {
+      background-color: #222;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    body.dark-theme .data-table th {
+      background-color: rgba(74, 58, 255, 0.15);
+      color: #f8f9fa;
+      border-bottom: 2px solid #333;
+    }
+    
+    body.dark-theme .data-table td {
+      color: #ddd;
+      border-bottom: 1px solid #333;
+    }
+    
+    body.dark-theme .data-table tr:hover td {
+      background-color: rgba(74, 58, 255, 0.08);
+    }
+    
+    body.dark-theme .accept-btn {
+      background-color: #4A3AFF;
+    }
+    
+    body.dark-theme .accept-btn:hover {
+      background-color: #3929E0;
+    }
+
+    body.dark-theme .reject-btn {
+      background-color: #ff4444;
+    }
+    
+    body.dark-theme .reject-btn:hover {
+      background-color: #e03333;
+    }
+
+    body.dark-theme .form-input {
+      background-color: #333;
+      border-color: #444;
+      color: #f8f9fa;
+    }
+  </style>
+
+  <div class="page-container">
+    <div class="content-wrapper">
+      <div class="data-container">
+        {% if data['up'] %}
+          <h1>Update Facility</h1>
+          <div class="form-container">
+            <form method="POST">
+              <div class="form-group">
+                <label for="facility_name">Facility Name:</label>
+                <input type="text" id="facility_name" name="facility_name" class="form-input" 
+                       value="{{data['up'][0]['facility_name']}}" pattern="[a-zA-Z ]+" 
+                       title="Alphabets are only allowed" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="facility_type">Facility Type:</label>
+                <input type="text" id="facility_type" name="facility_type" class="form-input" 
+                       value="{{data['up'][0]['facility_type']}}" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="facility_des">Facility Description:</label>
+                <input type="text" id="facility_des" name="facility_des" class="form-input" 
+                       value="{{data['up'][0]['facility_des']}}" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="facility_capacity">Facility Capacity:</label>
+                <input type="text" id="facility_capacity" name="facility_capacity" class="form-input" 
+                       value="{{data['up'][0]['facility_capacity']}}" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="facility_image">Facility Image:</label>
+                <input type="text" id="facility_image" name="facility_image" class="form-input" 
+                       value="{{data['up'][0]['facility_image']}}" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="operating_hrs">Operating Hours:</label>
+                <input type="text" id="operating_hrs" name="operating_hrs" class="form-input" 
+                       value="{{data['up'][0]['operating_hrs']}}" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="safety_measures">Safety Measures:</label>
+                <input type="text" id="safety_measures" name="safety_measures" class="form-input" 
+                       value="{{data['up'][0]['safety_measures']}}" required>
+              </div>
+              
+              <input type="submit" value="Update Facility" name="update_facility" class="form-button">
             </form>
-        </div>
-    {% else %}
-        <h1>Manage Facilities</h1>
-        <a href="/addFacility">Add Facility</a>
-        <br><br>
-        <table class="data-table">
-            <tr>
-                <th>Facility Name</th>
-                <th>Facility Type</th>
-                <th>Facility Description</th>
-                <th>Facility Capacity</th>
-                <th>Facility Image</th>
-                <th>Operating Hours</th>
-                <th>Safety Measures</th>
-                <th>Update</th>
-                <th>Delete</th>
-            </tr>
-            {% for facility in data['view'] %}
-            <tr>
-                <td>{{facility['facility_name']}}</td>
-                <td>{{facility['facility_type']}}</td>
-                <td>{{facility['facility_des']}}</td>
-                <td>{{facility['facility_capacity']}}</td>
-                <td>{{facility['facility_image']}}</td>
-                <td>{{facility['operating_hrs']}}</td>
-                <td>{{facility['safety_measures']}}</td>
-                <td><a href="?action=update&id={{facility['facility_id']}}" class="accept-btn">Update</a></td>
-                <td><a href="?action=delete&id={{facility['facility_id']}}" class="reject-btn">Delete</a></td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
+          </div>
+        {% else %}
+          <h1>Manage Facilities</h1>
+          <div class="button-container">
+            <a href="/addFacility" class="accept-btn">Add Facility</a>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Facility Name</th>
+                  <th>Facility Type</th>
+                  <th>Facility Description</th>
+                  <th>Facility Capacity</th>
+                  <th>Facility Image</th>
+                  <th>Operating Hours</th>
+                  <th>Safety Measures</th>
+                  <th>Update</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for facility in data['view'] %}
+                <tr>
+                  <td>{{facility['facility_name']}}</td>
+                  <td>{{facility['facility_type']}}</td>
+                  <td>{{facility['facility_des']}}</td>
+                  <td>{{facility['facility_capacity']}}</td>
+                  <td>{{facility['facility_image']}}</td>
+                  <td>{{facility['operating_hrs']}}</td>
+                  <td>{{facility['safety_measures']}}</td>
+                  <td><a href="?action=update&id={{facility['facility_id']}}" class="accept-btn">Update</a></td>
+                  <td><a href="?action=delete&id={{facility['facility_id']}}" class="reject-btn">Delete</a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </body>
 {% include 'public/footer.html' %}

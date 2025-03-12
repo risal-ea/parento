@@ -1,28 +1,151 @@
-{% include 'public/header.html' %}
-<body style="background-color: #4F6C7D;">
-    <div class="admin_table">
-        <h1>DayCare</h1>
-        <br>
-        <table class="admin-links-table">
-            <tr>
-                <td><a href="/manageStaff">manage staff</a></td>
-            </tr>
-            <tr>
-                <td><a href="/manageFacilities">manage facilities</a></td>
-            </tr>
-            <tr>
-                <td><a href="/view-babies-daycare">view babies</a></td>
-            </tr>
-            <tr>
-                <td><a href="/view-feedback-daycare">view feedback</a></td>
-            </tr>
-            <tr>
-                <td><a href="/view-complaint-daycare">view complaint</a></td>
-            </tr>
-            <tr>
-                <td><a href="/view-admission-requests">request admission</a></td>
-            </tr>
-        </table>
+{% include 'public/daycareHeader.html' %}
+<title>Daycare Admin Dashboard</title>
+<style>
+:root {
+  --primary: #6C63FF;
+  --primary-hover: #5046E5;
+  --bg-light: #f9fafb;
+  --text-dark: #1f2937;
+  --text-light: #6b7280;
+  --border: #e5e7eb;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+body {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.5;
+  padding: 20px;
+}
+.container {
+  max-width: 1200px;
+  margin: auto auto;
+}
+header {
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+}
+h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 15px;
+}
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 25px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: var(--primary);
+}
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.card-description {
+  color: var(--text-light);
+  font-size: 0.875rem;
+  margin-bottom: 20px;
+}
+.btn {
+  display: inline-block;
+  background-color: var(--primary);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+.btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.title{
+    margin-top: 6rem;
+}
+@media (max-width: 768px) {
+  .card-container {
+    grid-template-columns: 1fr;
+  }
+  h1 {
+    font-size: 1.75rem;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div>
+    <h1 class="title">DayCare Administration</h1>
+    <p>Welcome to your daycare administration portal. Access all management tools below.</p>
+  </div>
+  <div class="card-container">
+    <div class="card">
+      <div class="card-icon">👥</div>
+      <h2 class="card-title">Manage Staff</h2>
+      <p class="card-description">View and manage staff profiles, scheduling, and certifications.</p>
+      <a href="/manageStaff" class="btn">Manage Staff</a>
     </div>
+    
+    <div class="card">
+      <div class="card-icon">🏢</div>
+      <h2 class="card-title">Facilities</h2>
+      <p class="card-description">Manage daycare facilities, rooms, and maintenance requests.</p>
+      <a href="/manageFacilities" class="btn">Manage Facilities</a>
+    </div>
+    
+    <div class="card">
+      <div class="card-icon">👶</div>
+      <h2 class="card-title">Babies</h2>
+      <p class="card-description">View and manage baby profiles, daily reports, and activities.</p>
+      <a href="/view-babies-daycare" class="btn">View Babies</a>
+    </div>
+    
+    <div class="card">
+      <div class="card-icon">📝</div>
+      <h2 class="card-title">Feedback</h2>
+      <p class="card-description">Review parent feedback and suggestions for improvement.</p>
+      <a href="/view-feedback-daycare" class="btn">View Feedback</a>
+    </div>
+    
+    <div class="card">
+      <div class="card-icon">⚠️</div>
+      <h2 class="card-title">Complaints</h2>
+      <p class="card-description">Access and respond to parent complaints and concerns.</p>
+      <a href="/view-complaint-daycare" class="btn">View Complaints</a>
+    </div>
+    
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h2 class="card-title">Admissions</h2>
+      <p class="card-description">Review and process new admission requests and applications.</p>
+      <a href="/view-admission-requests" class="btn">Request Admission</a>
+    </div>
+  </div>
+</div>
 </body>
 {% include 'public/footer.html' %}

@@ -10,7 +10,7 @@
     --hue-color: 190;
   
     /* HSL color mode */
-    --first-color: hsl(248, 100%, 63%);
+    --first-color: hsl(var(--hue-color), 64%, 22%);
     --first-color-second: hsl(var(--hue-color), 64%, 22%);
     --first-color-alt: hsl(var(--hue-color), 64%, 15%);
     --title-color: hsl(var(--hue-color), 64%, 18%);
@@ -71,7 +71,7 @@
   
   /*========== Variables Dark theme ==========*/
   body.dark-theme {
-    --first-color-second: hsl(248, 100%, 63%);;
+    --first-color-second: hsl(var(--hue-color), 54%, 12%);
     --title-color: hsl(var(--hue-color), 24%, 95%);
     --text-color: hsl(var(--hue-color), 8%, 75%);
     --input-color: hsl(var(--hue-color), 29%, 16%);
@@ -1159,7 +1159,7 @@ h1 {
       padding: 0;
     }
     .subscribe__container {
-      background-color: hsl(248, 100%, 63%);;
+      background-color: var(--first-color-second);
       padding: 3.5rem 0;
     }
     .subscribe__input {

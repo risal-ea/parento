@@ -1,101 +1,367 @@
-{% include 'public/header.html' %}
-<body style="background-color: #4F6C7D;">
-    <div class="data-container">
-        
-    {% if data['up'] %}
-        <div class="form__container">
-            <form method="POST" class="form-container margin">
-                <h2 align="center">Update Staff Information</h2>
-                <br>
-                <div class="form-group">
-                    <label for="staff_name">Staff Name:</label><br>
-                    <input type="text" id="staff_name" name="staff_name" class="form-input" 
-                           value="{{data['up'][0]['staff_name']}}" pattern="[a-zA-Z ]+" 
-                           title="Alphabets are only allowed" required><br><br>
-                </div>
+{% include 'public/daycareHeader.html' %}
+<body>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      padding-top: 4.5rem;
+    }
+    
+    .page-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .content-wrapper {
+      flex: 1;
+      padding: 2rem 0;
+    }
+    
+    .data-container {
+      max-width: 1200px;
+      width: 90%;
+      margin: 2rem auto 4rem;
+      background-color: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .data-container h1 {
+      color: #4A3AFF;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .data-container h1:after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background-color: #4A3AFF;
+      border-radius: 2px;
+    }
+    
+    .data-table-wrapper {
+      overflow-x: auto;
+      margin-top: 1.5rem;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .data-table th {
+      background-color: rgba(74, 58, 255, 0.08);
+      color: #222;
+      font-weight: 700;
+      text-align: left;
+      padding: 1.25rem 1rem;
+      border-bottom: 2px solid #eaeaea;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .data-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #eaeaea;
+      color: #555;
+      transition: background-color 0.2s ease;
+    }
+    
+    .data-table tr:hover td {
+      background-color: rgba(74, 58, 255, 0.03);
+    }
+    
+    .accept-btn {
+      display: inline-block;
+      background-color: #4A3AFF;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(74, 58, 255, 0.15);
+    }
+    
+    .accept-btn:hover {
+      background-color: #3929E0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(74, 58, 255, 0.25);
+    }
 
-                <div class="form-group">
-                    <label for="staff_email">Staff Email:</label><br>
-                    <input type="email" id="staff_email" name="staff_email" class="form-input" 
-                           value="{{data['up'][0]['staff_email']}}" required><br><br>
-                </div>
+    .reject-btn {
+      display: inline-block;
+      background-color: #ff4444;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(255, 68, 68, 0.15);
+    }
+    
+    .reject-btn:hover {
+      background-color: #e03333;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 68, 68, 0.25);
+    }
 
-                <div class="form-group">
-                    <label for="staff_phone">Staff Phone:</label><br>
-                    <input type="tel" id="staff_phone" name="staff_phone" class="form-input"
-                           value="{{data['up'][0]['staff_phone']}}" pattern="[0-9]{10}" 
-                           title="Only 10 digits are allowed" required><br><br>
-                </div>
+    .form-container {
+      margin: 0 auto;
+      width: 100%;
+      max-width: 600px;
+    }
 
-                <div class="form-group">
-                    <label for="staff_dob">Staff Date of Birth:</label><br>
-                    <input type="date" id="staff_dob" name="staff_dob" class="form-input" required><br><br>
-                </div>
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
 
-                <div class="form-group">
-                    <label>Gender</label>
-                    <div class="gender-options">
-                        <input type="radio" value="Male" name="gender" id="male" class="form-radio" required> 
-                        <label for="male">Male</label>
-                        <input type="radio" value="Female" name="gender" id="female" class="form-radio" required>
-                        <label for="female">Female</label>
-                    </div>
-                </div>
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #eaeaea;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      transition: border-color 0.2s ease;
+    }
 
-                <div class="form-group">
-                    <label for="staff_adress">Staff Address:</label><br>
-                    <input type="text" id="staff_adress" name="staff_adress" class="form-input" 
-                           value="{{data['up'][0]['staff_adress']}}" required><br><br>
-                </div>
+    .form-input:focus {
+      outline: none;
+      border-color: #4A3AFF;
+    }
 
-                <div class="form-group">
-                    <label for="position">Position:</label><br>
-                    <input type="text" id="position" name="position" class="form-input" 
-                           value="{{data['up'][0]['position']}}" required><br><br>
-                </div>
+    .form-radio {
+      margin-right: 0.5rem;
+    }
 
-                <div class="form-group">
-                    <label for="qualification">Qualification:</label><br>
-                    <input type="text" id="qualification" name="qualification" class="form-input" 
-                           value="{{data['up'][0]['qualification']}}" required><br><br>
-                </div>
+    .gender-options {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 1.5rem;
+    }
 
-                <input type="submit" value="Update Staff" name="update_staff" class="form-button">
+    .form-button {
+      background-color: #4A3AFF;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(74, 58, 255, 0.15);
+    }
+
+    .form-button:hover {
+      background-color: #3929E0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(74, 58, 255, 0.25);
+    }
+
+    .button-container {
+      margin-bottom: 1.5rem;
+    }
+    
+    @media screen and (max-width: 768px) {
+      .data-container {
+        padding: 1.5rem;
+        margin: 1rem auto 3rem;
+      }
+      
+      .data-table th,
+      .data-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+      }
+      
+      .accept-btn,
+      .reject-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+      }
+    }
+    
+    /* Dark mode */
+    body.dark-theme {
+      background-color: #1a1a1a;
+      color: #f8f9fa;
+    }
+    
+    body.dark-theme .data-container {
+      background-color: #222;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    body.dark-theme .data-table th {
+      background-color: rgba(74, 58, 255, 0.15);
+      color: #f8f9fa;
+      border-bottom: 2px solid #333;
+    }
+    
+    body.dark-theme .data-table td {
+      color: #ddd;
+      border-bottom: 1px solid #333;
+    }
+    
+    body.dark-theme .data-table tr:hover td {
+      background-color: rgba(74, 58, 255, 0.08);
+    }
+    
+    body.dark-theme .accept-btn {
+      background-color: #4A3AFF;
+    }
+    
+    body.dark-theme .accept-btn:hover {
+      background-color: #3929E0;
+    }
+
+    body.dark-theme .reject-btn {
+      background-color: #ff4444;
+    }
+    
+    body.dark-theme .reject-btn:hover {
+      background-color: #e03333;
+    }
+
+    body.dark-theme .form-input {
+      background-color: #333;
+      border-color: #444;
+      color: #f8f9fa;
+    }
+  </style>
+
+  <div class="page-container">
+    <div class="content-wrapper">
+      <div class="data-container">
+        {% if data['up'] %}
+          <h1>Update Staff</h1>
+          <div class="form-container">
+            <form method="POST">
+              <div class="form-group">
+                <label for="staff_name">Staff Name:</label>
+                <input type="text" id="staff_name" name="staff_name" class="form-input" 
+                       value="{{data['up'][0]['staff_name']}}" pattern="[a-zA-Z ]+" 
+                       title="Alphabets are only allowed" required>
+              </div>
+
+              <div class="form-group">
+                <label for="staff_email">Staff Email:</label>
+                <input type="email" id="staff_email" name="staff_email" class="form-input" 
+                       value="{{data['up'][0]['staff_email']}}" required>
+              </div>
+
+              <div class="form-group">
+                <label for="staff_phone">Staff Phone:</label>
+                <input type="tel" id="staff_phone" name="staff_phone" class="form-input"
+                       value="{{data['up'][0]['staff_phone']}}" pattern="[0-9]{10}" 
+                       title="Only 10 digits are allowed" required>
+              </div>
+
+              <div class="form-group">
+                <label for="staff_dob">Staff Date of Birth:</label>
+                <input type="date" id="staff_dob" name="staff_dob" class="form-input" required>
+              </div>
+
+              <div class="form-group">
+                <label>Gender</label>
+                <div class="gender-options">
+                  <div>
+                    <input type="radio" value="Male" name="gender" id="male" class="form-radio" required>
+                    <label for="male">Male</label>
+                  </div>
+                  <div>
+                    <input type="radio" value="Female" name="gender" id="female" class="form-radio" required>
+                    <label for="female">Female</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="staff_adress">Staff Address:</label>
+                <input type="text" id="staff_adress" name="staff_adress" class="form-input" 
+                       value="{{data['up'][0]['staff_adress']}}" required>
+              </div>
+
+              <div class="form-group">
+                <label for="position">Position:</label>
+                <input type="text" id="position" name="position" class="form-input" 
+                       value="{{data['up'][0]['position']}}" required>
+              </div>
+
+              <div class="form-group">
+                <label for="qualification">Qualification:</label>
+                <input type="text" id="qualification" name="qualification" class="form-input" 
+                       value="{{data['up'][0]['qualification']}}" required>
+              </div>
+
+              <input type="submit" value="Update Staff" name="update_staff" class="form-button">
             </form>
-        </div>
-    {% else %}
-        <h1>Manage Staff</h1>
-        <a href="/addStaff">Add Staff</a>
-        <br><br>
-        <table class="data-table">
-            <tr>
-                <th>Staff name</th>
-                <th>Staff email</th>
-                <th>Staff phone</th>
-                <th>Staff dob</th>
-                <th>Gender</th>
-                <th>Staff address</th>
-                <th>Position</th>
-                <th>Qualification</th>
-                <th>Update</th>
-                <th>Delete</th>
-            </tr>
-            {% for staff in data['view'] %}
-            <tr>
-                <td>{{staff['staff_name']}}</td>
-                <td>{{staff['staff_email']}}</td>
-                <td>{{staff['staff_phone']}}</td>
-                <td>{{staff['staff_dob']}}</td>
-                <td>{{staff['gender']}}</td>
-                <td>{{staff['staff_adress']}}</td>
-                <td>{{staff['position']}}</td>
-                <td>{{staff['qualification']}}</td>
-                <td><a href="?action=update&id={{staff['login_id']}}" class="accept-btn">Update</a></td>
-                <td><a href="?action=delete&id={{staff['login_id']}}" class="reject-btn">Delete</a></td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
+          </div>
+        {% else %}
+          <h1>Manage Staff</h1>
+          <div class="button-container">
+            <a href="/addStaff" class="accept-btn">Add Staff</a>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Staff Name</th>
+                  <th>Staff Email</th>
+                  <th>Staff Phone</th>
+                  <th>Staff DOB</th>
+                  <th>Gender</th>
+                  <th>Staff Address</th>
+                  <th>Position</th>
+                  <th>Qualification</th>
+                  <th>Update</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for staff in data['view'] %}
+                <tr>
+                  <td>{{staff['staff_name']}}</td>
+                  <td>{{staff['staff_email']}}</td>
+                  <td>{{staff['staff_phone']}}</td>
+                  <td>{{staff['staff_dob']}}</td>
+                  <td>{{staff['gender']}}</td>
+                  <td>{{staff['staff_adress']}}</td>
+                  <td>{{staff['position']}}</td>
+                  <td>{{staff['qualification']}}</td>
+                  <td><a href="?action=update&id={{staff['login_id']}}" class="accept-btn">Update</a></td>
+                  <td><a href="?action=delete&id={{staff['login_id']}}" class="reject-btn">Delete</a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </body>
 {% include 'public/footer.html' %}
