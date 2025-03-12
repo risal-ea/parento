@@ -46,6 +46,17 @@ def viewProfile():
 
     return render_template('viewProfile_staff.html', data=data)
 
+@staff.route('/view-parent-staff')
+def viewParent():
+    data={}
+    id=request.args['id']
+    a = "SELECT * FROM babies INNER JOIN parent USING(parent_id) where parent_id = '%s'"%(id)
+    b=select(a)
+    if b:
+        data['view']=b
+
+    return render_template('viewParent_staff.html', data=data)
+
 @staff.route("/view-babies-staff")
 def viewBabies():
     data={}

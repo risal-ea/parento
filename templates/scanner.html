@@ -1,0 +1,134 @@
+
+<div class="container mt-4">
+    <h1>QR Code Scanner</h1>
+    
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Camera Feed</div>
+                <div class="card-body">
+                    <video id="video" width="100%" height="300" style="border: 1px solid gray;"></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <div class="mt-3">
+                        <button id="start-button" class="btn btn-primary">Start Camera</button>
+                        <button id="stop-button" class="btn btn-danger" style="display: none;">Stop Camera</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Results</div>
+                <div class="card-body">
+                    <div id="status" class="alert alert-info">Click "Start Camera" to begin</div>
+                    <div id="result" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jsQR Library -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const startButton = document.getElementById('start-button');
+    const stopButton = document.getElementById('stop-button');
+    const statusDiv = document.getElementById('status');
+    const resultDiv = document.getElementById('result');
+
+    let stream = null;
+    let scanning = false;
+
+    const updateStatus = (message, type = 'info') => {
+        statusDiv.className = `alert alert-${type}`;
+        statusDiv.textContent = message;
+        console.log(`Status: ${message}`);
+    };
+
+    const showResult = (text) => {
+        resultDiv.innerHTML = `<div class="alert alert-success">QR Code: ${text}</div>`;
+    };
+
+    const startCamera = async () => {
+        try {
+            console.log('--- Environment Check ---');
+            console.log('Browser:', navigator.userAgent);
+            console.log('Location:', window.location.href);
+            console.log('Secure context:', window.isSecureContext);
+            console.log('navigator.mediaDevices:', navigator.mediaDevices);
+
+            if (!window.isSecureContext) {
+                throw new Error('Camera requires a secure context (http://localhost or HTTPS)');
+            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('MediaDevices API not available');
+            }
+
+            console.log('Requesting camera...');
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' },
+                audio: false
+            });
+
+            video.srcObject = stream;
+            video.setAttribute('playsinline', true);
+            await video.play();
+
+            updateStatus('Camera started', 'success');
+            startButton.style.display = 'none';
+            stopButton.style.display = 'inline-block';
+
+            scanning = true;
+            scanQRCode();
+        } catch (error) {
+            console.error('Error:', error);
+            updateStatus(`Error: ${error.message}`, 'danger');
+        }
+    };
+
+    const stopCamera = () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+            stream = null;
+        }
+        scanning = false;
+        updateStatus('Camera stopped', 'info');
+        startButton.style.display = 'inline-block';
+        stopButton.style.display = 'none';
+        resultDiv.innerHTML = '';
+    };
+
+    const scanQRCode = () => {
+        if (!scanning || !stream) return;
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            if (code) {
+                showResult(code.data);
+                fetch('/process-qr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ qr_data: code.data })
+                })
+                .then(response => response.json())
+                .then(data => console.log('Server response:', data))
+                .catch(error => console.error('Fetch error:', error));
+                stopCamera();
+            }
+        }
+        requestAnimationFrame(scanQRCode);
+    };
+
+    startButton.addEventListener('click', startCamera);
+    stopButton.addEventListener('click', stopCamera);
+    window.addEventListener('beforeunload', stopCamera);
+});
+</script>

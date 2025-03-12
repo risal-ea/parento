@@ -83,15 +83,6 @@
       color: #555;
       transition: background-color 0.2s ease;
     }
-
-    /* Style for complaint and reply content */
-    .data-table td:nth-child(2),
-    .data-table td:nth-child(3) {
-      max-width: 300px;
-      white-space: normal;
-      word-wrap: break-word;
-      line-height: 1.5;
-    }
     
     .data-table tr:hover td {
       background-color: rgba(74, 58, 255, 0.03);
@@ -116,6 +107,17 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(74, 58, 255, 0.25);
     }
+
+    .baby-photo {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .button-container {
+      margin-bottom: 1.5rem;
+    }
     
     @media screen and (max-width: 768px) {
       .data-container {
@@ -129,14 +131,14 @@
         font-size: 0.9rem;
       }
       
-      .data-table td:nth-child(2),
-      .data-table td:nth-child(3) {
-        max-width: 200px;
-      }
-      
       .accept-btn {
         padding: 0.4rem 0.75rem;
         font-size: 0.8rem;
+      }
+      
+      .baby-photo {
+        width: 40px;
+        height: 40px;
       }
     }
     
@@ -178,30 +180,47 @@
   <div class="page-container">
     <div class="content-wrapper">
       <div class="data-container">
-        <h1>Complaints</h1>
+        <h1>Parent</h1>
+        <div class="button-container">
+          {% for i in data['view'] %}
+          {% if loop.first %}
+            <a href="/set_meeting?id={{i['parent_id']}}" class="accept-btn">Set Meeting</a>
+          {% endif %}
+          {% endfor %}
+        </div>
         <div class="data-table-wrapper">
           <table class="data-table">
             <thead>
               <tr>
                 <th>Parent Name</th>
-                <th>Complaint</th>
-                <th>Reply</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Send Reply</th>
-                <th>Forward Message</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Date of Birth</th>
+                <th>Gender</th>
+                <th>Baby Name</th>
+                <th>Baby Date of Birth</th>
+                <th>Baby Gender</th>
+                <th>Baby Photo</th>
+                <th>Allergies/Dietary Restrictions</th>
+                <th>Medical Condition</th>
               </tr>
             </thead>
             <tbody>
               {% for i in data['view'] %}
               <tr>
                 <td>{{ i['parent_name'] }}</td>
-                <td>{{ i['complaint'] }}</td>
-                <td>{{ i['reply'] }}</td>
-                <td>{{ i['date_time'] }}</td>
-                <td>{{ i['status'] }}</td>
-                <td><a href="/send-reply?id={{i['complaint_id']}}" class="accept-btn">Reply</a></td>
-                <td><a href="?action=update&id={{i['complaint_id']}}" class="accept-btn">Forward</a></td>
+                <td>{{ i['parent_email'] }}</td>
+                <td>{{ i['parent_phone'] }}</td>
+                <td>{{ i['parent_adress'] }}</td>
+                <td>{{ i['parent_dob'] }}</td>
+                <td>{{ i['parent_gender'] }}</td>
+                <td>{{ i['baby_name'] }}</td>
+                <td>{{ i['baby_dob'] }}</td>
+                <td>{{ i['baby_gender'] }}</td>
+                <td><img src="{{ i['baby_photo'] }}" alt="{{ i['baby_name'] }}" class="baby-photo" /></td>
+                <td>{{ i['allergies_or_dietry_restriction'] }}</td>
+                <td>{{ i['medical_condition'] }}</td>
               </tr>
               {% endfor %}
             </tbody>

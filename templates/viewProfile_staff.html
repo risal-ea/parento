@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% include 'public/staffHeader.html' %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,46 +8,50 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4F6C7D;
-            --secondary-color: #2D3E4B;
-            --accent-color: #6EA5C8;
+            --primary-color: #f8f9fa;    /* Light gray background from example */
+            --secondary-color: #4A3AFF;  /* Purple from example */
+            --accent-color: rgba(74, 58, 255, 0.15);  /* Light purple from example */
             --text-light: #ffffff;
-            --text-dark: #333333;
-            --background-light: #f5f7f9;
-            --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            --text-dark: #333;          /* Text color from example */
+            --background-light: #ffffff; /* White card background from example */
+            --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.06); /* Shadow from example */
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
         
         body {
             background-color: var(--primary-color);
-            background-image: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             min-height: 100vh;
             padding: 30px 20px;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: var(--text-dark);
+            padding-top: 4.5rem;
+        }
+
+        h2{
+            color: white;
         }
         
         .data-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 15px;
         }
         
         h1 {
-            color: var(--text-light);
+            color: var(--secondary-color);
             text-align: center;
             margin-bottom: 30px;
-            font-size: 2.5rem;
-            font-weight: 300;
-            letter-spacing: 1px;
+            font-size: 2rem;
+            font-weight: 800;
             position: relative;
             padding-bottom: 15px;
         }
@@ -54,17 +59,18 @@
         h1:after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
             width: 60px;
-            height: 3px;
-            background-color: var(--accent-color);
+            height: 4px;
+            background-color: var(--secondary-color);
+            border-radius: 2px;
         }
         
         section {
             background-color: var(--background-light);
-            border-radius: 12px;
+            border-radius: 24px;
             overflow: hidden;
             box-shadow: var(--card-shadow);
             display: flex;
@@ -83,7 +89,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px;
+            padding: 2.5rem;
         }
         
         @media (min-width: 768px) {
@@ -104,7 +110,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #ddd;
+            background-color: #eaeaea;
             border-radius: 50%;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
@@ -113,7 +119,6 @@
             font-size: 120px;
             color: #888;
         }
-
         
         @media (min-width: 768px) {
             .profile-image {
@@ -127,7 +132,7 @@
             height: 200px;
             border-radius: 50%;
             object-fit: cover;
-            border: 5px solid white;
+            border: 5px solid var(--background-light);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
@@ -135,8 +140,8 @@
             position: absolute;
             bottom: 10px;
             right: 10px;
-            background-color: var(--accent-color);
-            color: white;
+            background-color: var(--secondary-color);
+            color: var(--text-light);
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.85rem;
@@ -149,10 +154,10 @@
         }
         
         .profile-name {
-            color: var(--secondary-color);
+            color: #222;
             font-size: 2rem;
             margin-bottom: 15px;
-            border-bottom: 2px solid #eee;
+            border-bottom: 2px solid #eaeaea;
             padding-bottom: 10px;
         }
         
@@ -177,13 +182,13 @@
         .info-icon {
             width: 40px;
             height: 40px;
-            background-color: rgba(110, 165, 200, 0.1);
+            background-color: var(--accent-color);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 15px;
-            color: var(--accent-color);
+            color: var(--secondary-color);
         }
         
         .info-icon i {
@@ -202,7 +207,7 @@
         
         .info-value {
             font-weight: 500;
-            color: var(--text-dark);
+            color: #555;
         }
         
         .empty-state {
@@ -238,8 +243,8 @@
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: var(--accent-color);
-            color: white;
+            background-color: var(--secondary-color);
+            color: var(--text-light);
             border-radius: 5px;
             text-decoration: none;
             font-weight: 500;
@@ -247,8 +252,32 @@
         }
         
         .empty-state .action-btn:hover {
-            background-color: #5a8aa6;
+            background-color: #3b2ecc;
             transform: translateY(-2px);
+        }
+
+        /* Dark mode */
+        body.dark-theme {
+            background-color: #1a1a1a;
+            color: #f8f9fa;
+        }
+        
+        body.dark-theme section {
+            background-color: #222;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.dark-theme .profile-name {
+            color: #f8f9fa;
+            border-bottom: 2px solid #333;
+        }
+        
+        body.dark-theme .info-value {
+            color: #ddd;
+        }
+        
+        body.dark-theme .info-label {
+            color: #aaa;
         }
     </style>
 </head>
@@ -359,4 +388,5 @@
         {% endif %}
     </div>
 </body>
+<br> 
 </html>

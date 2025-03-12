@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Dashboard</title>
+{% include 'public/staffHeader.html' %}
   <style>
     :root {
       --primary: #4f46e5;
@@ -100,6 +95,10 @@
     .btn:hover {
       background-color: var(--primary-hover);
     }
+
+    .title{
+      margin-top: 10rem;
+    }
     
     @media (max-width: 768px) {
       .card-container {
@@ -114,10 +113,10 @@
 </head>
 <body>
   <div class="container">
-    <header>
+    <div class="title">
       <h1>Staff Dashboard</h1>
       <p>Welcome to your staff portal. Access all your management tools below.</p>
-    </header>
+    </div>
     
     <div class="card-container">
       <div class="card">
@@ -143,4 +142,4 @@
     </div>
   </div>
 </body>
-</html>
+{% include 'public/footer.html' %}

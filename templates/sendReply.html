@@ -1,18 +1,173 @@
-{% include 'public/header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Reply</title>
+    <style>
+        :root {
+            --primary-color: #4a6ee0;
+            --primary-hover: #3a5ecc;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            margin: 0;
+            color: var(--text-color);
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .reply-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            width: 100%;
+        }
+        
+        .reply-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        
+        .reply-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 110, 224, 0.2);
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn .icon {
+            margin-left: 8px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .container {
+                margin: 20px auto;
+            }
+            
+            .card-header, .card-body {
+                padding: 15px;
+            }
+            
+            .reply-textarea {
+                min-height: 120px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
 <body>
-    <div class="data-container">
-        <form action="" method="POST">
-            <table class="data-table">
-                <tr>
-                    <td>
-                        <textarea name="reply" id=""></textarea>
-                    </td>
-                    <td>
-                        <button type="submit" name="submit" class="accept-btn">reply</button>
-                    </td>
-                </tr>
-            </table>
-        </form>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Compose Your Reply</h1>
+            </div>
+            <div class="card-body">
+                <form action="" method="POST" class="reply-form">
+                    <div class="form-group">
+                        <textarea 
+                            name="reply" 
+                            class="reply-textarea" 
+                            placeholder="Type your message here..."
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="btn-container">
+                        <button type="submit" name="submit" class="btn btn-primary">
+                            Send Reply
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </body>
-{% include 'public/footer.html' %}
+</html>
