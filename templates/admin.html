@@ -1,22 +1,221 @@
-{% include 'public/header.html' %}
-<body style="background-color: #4F6C7D;">
-    <div class="admin_table">
-        <h1>Welcome Admin</h1>
-        <br>
-        <table class="admin-links-table">
-            <tr>
-                <td><a href="/view-dayCare">View Day Care</a></td>
-            </tr>
-            <tr>
-                <td><a href="/view-staff">View Staff</a></td>
-            </tr>
-            <tr>
-                <td><a href="/view-parent">View Parent</a></td>
-            </tr>
-            <tr>
-                <td><a href="/view-feedback">View Feedback</a></td>
-            </tr>
-        </table>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    :root {
+      --primary-color: #6C63FF; /* Purple color */
+      --primary-light: #8F88FF;
+      --primary-dark: #5A52E5;
+      --text-color: #2D3748;
+      --text-light: #718096;
+      --bg-color: #F7FAFC;
+      --card-bg: #FFFFFF;
+      --border-radius: 8px;
+      --transition: all 0.3s ease;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem;
+      flex: 1;
+    }
+    
+    .admin-header {
+      margin-bottom: 3rem;
+      margin-top: 6rem;
+      text-align: center;
+    }
+    
+    .admin-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+    }
+    
+    .admin-title span {
+      color: var(--primary-color);
+    }
+    
+    .admin-subtitle {
+      color: var(--text-light);
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+    
+    .admin-menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .menu-card {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .menu-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .menu-card:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--primary-color);
+      transition: var(--transition);
+      z-index: 2;
+    }
+    
+    .menu-card:hover:before {
+      height: 6px;
+    }
+    
+    .menu-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1.5rem;
+      text-decoration: none;
+      color: var(--text-color);
+      height: 100%;
+      position: relative;
+      z-index: 3;
+    }
+    
+    .menu-icon {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(108, 99, 255, 0.1);
+      color: var(--primary-color);
+      border-radius: 50%;
+      margin-bottom: 1.25rem;
+      font-size: 1.5rem;
+      transition: var(--transition);
+    }
+    
+    .menu-card:hover .menu-icon {
+      background-color: var(--primary-color);
+      color: white;
+      transform: scale(1.1);
+    }
+    
+    .menu-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      text-align: center;
+    }
+    
+    .menu-description {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      .admin-title {
+        font-size: 1.8rem;
+      }
+      
+      .admin-menu {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+{% include 'public/adminHeader.html' %}
+<body>
+  <div class="container">
+    <header class="admin-header">
+      <h1 class="admin-title">Welcome, <span>Admin</span></h1>
+      <p class="admin-subtitle">Manage your daycare operations with ease</p>
+    </header>
+    
+    <div class="admin-menu">
+      <div class="menu-card">
+        <a href="/view-dayCare" class="menu-link">
+          <div class="menu-icon">
+            <i>🏠</i>
+          </div>
+          <h2 class="menu-title">Day Care</h2>
+          <p class="menu-description">View and manage daycare centers, facilities, and operations</p>
+        </a>
+      </div>
+      
+      <div class="menu-card">
+        <a href="/view-staff" class="menu-link">
+          <div class="menu-icon">
+            <i>👤</i>
+          </div>
+          <h2 class="menu-title">Staff</h2>
+          <p class="menu-description">Manage staff profiles, schedules, and performance records</p>
+        </a>
+      </div>
+      
+      <div class="menu-card">
+        <a href="/view-parent" class="menu-link">
+          <div class="menu-icon">
+            <i>👪</i>
+          </div>
+          <h2 class="menu-title">Parents</h2>
+          <p class="menu-description">Access parent information, children details, and billing</p>
+        </a>
+      </div>
+      
+      <div class="menu-card">
+        <a href="/view-feedback" class="menu-link">
+          <div class="menu-icon">
+            <i>📝</i>
+          </div>
+          <h2 class="menu-title">Feedback</h2>
+          <p class="menu-description">Review and respond to parent reviews and suggestions</p>
+        </a>
+      </div>
     </div>
+  </div>
+  
+  {% include 'public/footer.html' %}
 </body>
-{% include 'public/footer.html' %}
+</html>

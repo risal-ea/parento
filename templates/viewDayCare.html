@@ -1,54 +1,194 @@
-{% include 'public/header.html' %}
-<body style="background-color: #4F6C7D;">
-    <div class="data-container">
-        <h1>DAY CARE DETAILS</h1>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Day Care Name</th>
-                    <th>Owner Name</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>License No</th>
-                    <th>Capacity</th>
-                    <th>Operating Time</th>
-                    <th>Day Care Description</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in data['view'] %}
-                <tr>
-                    <td>{{i['day_care_name']}}</td>
-                    <td>{{i['owner_name']}}</td>
-                    <td>{{i['phone']}}</td>
-                    <td>{{i['adress']}}</td>
-                    <td>{{i['license_number']}}</td>
-                    <td>{{i['capacity']}}</td>
-                    <td>{{i['operating_time']}}</td>
-                    <td>{{i['daycare_discription']}}</td>
-                    {% if i['usertype'] == 'pending' %}
-                    <td>Pending</td>
-                    <td class="data-actions">
-                        <a href="?action=accept&id={{i['login_id']}}" class="accept-btn">Accept</a> | 
-                        <a href="?action=reject&id={{i['login_id']}}" class="reject-btn">Reject</a>
-                    </td>
-                    {% elif i['usertype'] == 'dayCare' %}
-                    <td>Accepted</td>
-                    <td>
-                        <a href="?action=reject&id={{i['login_id']}}" class="reject-btn">Reject</a>
-                    </td>
-                    {% else %}
-                    <td>Rejected</td>
-                    <td>
-                        <a href="?action=accept&id={{i['login_id']}}" class="accept-btn">Accept</a>
-                    </td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+{% include 'public/adminHeader.html' %}
+<style>
+  :root {
+    --primary: #6C63FF;
+    --primary-light: #8683FF;
+    --primary-dark: #5046E5;
+    --white: #FFFFFF;
+    --light-gray: #F5F5F5;
+    --gray: #E0E0E0;
+    --dark-gray: #333333;
+    --pending: #FFC107;
+    --accepted: #4CAF50;
+    --rejected: #F44336;
+  }
+
+  body {
+    background-color: var(--light-gray);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: var(--dark-gray);
+  }
+
+  .data-container {
+    max-width: 1200px;
+    margin: 6rem auto 2rem auto;
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .data-table thead {
+    background-color: var(--primary);
+    color: var(--white);
+  }
+
+  .data-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .data-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--gray);
+  }
+
+  .data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .data-table tr:nth-child(even) {
+    background-color: rgba(108, 99, 255, 0.05);
+  }
+
+  .data-table tr:hover {
+    background-color: rgba(108, 99, 255, 0.1);
+  }
+
+  .data-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .accept-btn, .reject-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-block;
+  }
+
+  .accept-btn {
+    background-color: var(--primary);
+    color: var(--white);
+  }
+
+  .accept-btn:hover {
+    background-color: var(--primary-dark);
+    box-shadow: 0 2px 4px rgba(108, 99, 255, 0.3);
+  }
+
+  .reject-btn {
+    background-color: var(--rejected);
+    color: var(--white);
+  }
+
+  .reject-btn:hover {
+    background-color: #D32F2F;
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+  }
+
+  td:nth-child(9) {
+    font-weight: 500;
+  }
+
+  td:nth-child(9):contains("Pending") {
+    color: var(--pending);
+  }
+
+  td:nth-child(9):contains("Accepted") {
+    color: var(--accepted);
+  }
+
+  td:nth-child(9):contains("Rejected") {
+    color: var(--rejected);
+  }
+
+  /* Responsive design */
+  @media (max-width: 1024px) {
+    .data-container {
+      margin: 1rem;
+      padding: 1rem;
+    }
+    
+    .data-table {
+      display: block;
+      overflow-x: auto;
+    }
+  }
+</style>
+
+<body>
+<div class="data-container">
+  <h1>DAY CARE DETAILS</h1>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Day Care Name</th>
+        <th>Owner Name</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>License No</th>
+        <th>Capacity</th>
+        <th>Operating Time</th>
+        <th>Day Care Description</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in data['view'] %}
+      <tr>
+        <td>{{i['day_care_name']}}</td>
+        <td>{{i['owner_name']}}</td>
+        <td>{{i['phone']}}</td>
+        <td>{{i['adress']}}</td>
+        <td>{{i['license_number']}}</td>
+        <td>{{i['capacity']}}</td>
+        <td>{{i['operating_time']}}</td>
+        <td>{{i['daycare_discription']}}</td>
+        {% if i['usertype'] == 'pending' %}
+        <td style="color: var(--pending);">Pending</td>
+        <td class="data-actions">
+          <a href="?action=accept&id={{i['login_id']}}" class="accept-btn">Accept</a> |
+          <a href="?action=reject&id={{i['login_id']}}" class="reject-btn">Reject</a>
+        </td>
+        {% elif i['usertype'] == 'dayCare' %}
+        <td style="color: var(--accepted);">Accepted</td>
+        <td>
+          <a href="?action=reject&id={{i['login_id']}}" class="reject-btn">Reject</a>
+        </td>
+        {% else %}
+        <td style="color: var(--rejected);">Rejected</td>
+        <td>
+          <a href="?action=accept&id={{i['login_id']}}" class="accept-btn">Accept</a>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 </body>
 {% include 'public/footer.html' %}

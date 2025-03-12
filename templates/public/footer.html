@@ -1,93 +1,290 @@
 <!--==================== FOOTER ====================-->
 <footer class="footer section">
+    <style>
+      .footer {
+        background-color: #f8f9fa;
+        padding: 6rem 0 4rem;
+        position: relative;
+      }
+      
+      .footer__container {
+        background-color: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+        padding: 4rem 6rem;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .footer__content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        row-gap: 3rem;
+        column-gap: 2rem;
+      }
+      
+      .footer__title {
+        font-size: 1.75rem;
+        color: #4A3AFF;
+        font-weight: 800;
+        margin-bottom: 1.25rem;
+        letter-spacing: 0.5px;
+      }
+      
+      .footer__description {
+        font-size: 1rem;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+        color: #666;
+      }
+      
+      .footer__social {
+        font-size: 1.35rem;
+        color: #4A3AFF;
+        margin-right: 1.25rem;
+        transition: 0.4s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background-color: rgba(74, 58, 255, 0.08);
+      }
+      
+      .footer__social:hover {
+        color: white;
+        background-color: #4A3AFF;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(74, 58, 255, 0.2);
+      }
+      
+      .footer__subtitle {
+        font-size: 1.2rem;
+        color: #222;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+      
+      .footer__item {
+        margin-bottom: 1rem;
+        list-style: none;
+        position: relative;
+      }
+      
+      .footer__link {
+        color: #666;
+        text-decoration: none;
+        transition: 0.3s ease;
+        font-size: 1rem;
+        display: inline-block;
+        position: relative;
+      }
+      
+      .footer__link:hover {
+        color: #4A3AFF;
+        padding-left: 8px;
+      }
+      
+      .footer__link:after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #4A3AFF;
+        transition: width 0.3s ease;
+      }
+      
+      .footer__link:hover:after {
+        width: 100%;
+      }
+      
+      .footer__rights {
+        display: flex;
+        flex-direction: column;
+        row-gap: 2rem;
+        border-top: 1px solid #eaeaea;
+        margin-top: 4rem;
+        padding-top: 2rem;
+        text-align: center;
+      }
+      
+      .footer__copy {
+        font-size: 0.875rem;
+        color: #777;
+      }
+      
+      .footer__terms {
+        display: flex;
+        column-gap: 2rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .footer__terms-link {
+        font-size: 0.875rem;
+        color: #777;
+        text-decoration: none;
+        transition: 0.3s;
+        position: relative;
+      }
+      
+      .footer__terms-link:hover {
+        color: #4A3AFF;
+      }
+      
+      .footer__terms-link:after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background-color: #4A3AFF;
+        transition: width 0.3s ease;
+      }
+      
+      .footer__terms-link:hover:after {
+        width: 100%;
+      }
+      
+      .scrollup {
+        position: fixed;
+        right: 1.5rem;
+        bottom: 5.5rem;
+        background-color: #4A3AFF;
+        padding: 0.85rem;
+        border-radius: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        transition: 0.4s ease;
+        box-shadow: 0 6px 16px rgba(74, 58, 255, 0.25);
+      }
+      
+      .scrollup:hover {
+        background-color: #3929E0;
+        transform: translateY(-6px);
+        box-shadow: 0 8px 20px rgba(74, 58, 255, 0.35);
+      }
+      
+      .scrollup__icon {
+        font-size: 1.35rem;
+        color: #fff;
+      }
+      
+      /* Media Queries */
+      @media screen and (min-width: 768px) {
+        .footer__container {
+          padding: 5rem 4rem;
+        }
+        
+        .footer__rights {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
+      
+      @media screen and (max-width: 767px) {
+        .footer__container {
+          padding: 3rem 2rem;
+        }
+        
+        .footer__content {
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+        
+        .footer__terms {
+          margin-top: 0.5rem;
+        }
+      }
+    </style>
+  
     <div class="footer__container container grid">
-        <div class="footer__content grid">
-            <div class="footer__data">
-                <h3 class="footer__title">PARENTO</h3>
-                <p class="footer__description">Enhancing communication <br> between parents and caretakers, <br> every step of the way.</p>
-                <div>
-                    <a href="https://www.facebook.com/" target="_blank" class="footer__social">
-                        <i class="ri-facebook-box-fill"></i>
-                    </a>
-                    <a href="https://twitter.com/" target="_blank" class="footer__social">
-                        <i class="ri-twitter-fill"></i>
-                    </a>
-                    <a href="https://www.instagram.com/" target="_blank" class="footer__social">
-                        <i class="ri-instagram-fill"></i>
-                    </a>
-                    <a href="https://www.youtube.com/" target="_blank" class="footer__social">
-                        <i class="ri-youtube-fill"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="footer__data">
-                <h3 class="footer__subtitle">About PARENTO</h3>
-                <ul>
-                    <li class="footer__item">
-                        <a href="#about" class="footer__link">About Us</a>
-                    </li>
-                    <li class="footer__item">
-                        <a href="#features" class="footer__link">Features</a>
-                    </li>
-                    <li class="footer__item">
-                        <a href="#" class="footer__link">News & Blog</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="footer__data">
-                <h3 class="footer__subtitle">Company</h3>
-                <ul>
-                    <li class="footer__item">
-                        <a href="#" class="footer__link">Our Team</a>
-                    </li>
-                    <li class="footer__item">
-                        <a href="#" class="footer__link">Pricing Plans</a>
-                    </li>
-                    <li class="footer__item">
-                        <a href="#" class="footer__link">Join Us</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="footer__data">
-                <h3 class="footer__subtitle">Support</h3>
-                <ul>
-                    <li class="footer__item">
-                        <a href="#" class="footer__link">FAQs</a>
-                    </li>
-                    <li class="footer__item">
-                        <a href="#" class="footer__link">Support Center</a>
-                    </li>
-                    <li class="footer__item">
-                        <a href="#" class="footer__link">Contact Us</a>
-                    </li>
-                </ul>
-            </div>
+      <div class="footer__content grid">
+        <div class="footer__data">
+          <h3 class="footer__title">PARENTO</h3>
+          <p class="footer__description">Enhancing communication <br> between parents and caretakers, <br> every step of the way.</p>
+          <div>
+            <a href="https://www.facebook.com/" target="_blank" class="footer__social">
+              <i class="ri-facebook-box-fill"></i>
+            </a>
+            <a href="https://twitter.com/" target="_blank" class="footer__social">
+              <i class="ri-twitter-fill"></i>
+            </a>
+            <a href="https://www.instagram.com/" target="_blank" class="footer__social">
+              <i class="ri-instagram-fill"></i>
+            </a>
+            <a href="https://www.youtube.com/" target="_blank" class="footer__social">
+              <i class="ri-youtube-fill"></i>
+            </a>
+          </div>
         </div>
-
-        <div class="footer__rights">
-            <p class="footer__copy">&#169; 2024 PARENTO. All rights reserved.</p>
-            <div class="footer__terms">
-                <a href="#" class="footer__terms-link">Terms & Agreements</a>
-                <a href="#" class="footer__terms-link">Privacy Policy</a>
-            </div>
+        <div class="footer__data">
+          <h3 class="footer__subtitle">About PARENTO</h3>
+          <ul>
+            <li class="footer__item">
+              <a href="#about" class="footer__link">About Us</a>
+            </li>
+            <li class="footer__item">
+              <a href="#features" class="footer__link">Features</a>
+            </li>
+            <li class="footer__item">
+              <a href="#" class="footer__link">News & Blog</a>
+            </li>
+          </ul>
         </div>
+        <div class="footer__data">
+          <h3 class="footer__subtitle">Company</h3>
+          <ul>
+            <li class="footer__item">
+              <a href="#" class="footer__link">Our Team</a>
+            </li>
+            <li class="footer__item">
+              <a href="#" class="footer__link">Pricing Plans</a>
+            </li>
+            <li class="footer__item">
+              <a href="#" class="footer__link">Join Us</a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer__data">
+          <h3 class="footer__subtitle">Support</h3>
+          <ul>
+            <li class="footer__item">
+              <a href="#" class="footer__link">FAQs</a>
+            </li>
+            <li class="footer__item">
+              <a href="#" class="footer__link">Support Center</a>
+            </li>
+            <li class="footer__item">
+              <a href="#" class="footer__link">Contact Us</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__rights">
+        <p class="footer__copy">&#169; 2025 PARENTO. All rights reserved.</p>
+        <div class="footer__terms">
+          <a href="#" class="footer__terms-link">Terms & Agreements</a>
+          <a href="#" class="footer__terms-link">Privacy Policy</a>
+        </div>
+      </div>
     </div>
-</footer>
-
-<!--========== SCROLL UP ==========-->
-<a href="#" class="scrollup" id="scroll-up">
+  </footer>
+  
+  <!--========== SCROLL UP ==========-->
+  <a href="#" class="scrollup" id="scroll-up">
     <i class="ri-arrow-up-line scrollup__icon"></i>
-</a>
-
-<!--=============== SCROLL REVEAL===============-->
-<script src="/static/js/scrollreveal.min.js"></script>
-
-<!--=============== SWIPER JS ===============-->
-<script src="/static/js/swiper-bundle.min.js"></script>
-
-<!--=============== MAIN JS ===============-->
-<script src="/static/js/main.js"></script>
-</html>
+  </a>
+  
+  <!--=============== SCROLL REVEAL===============-->
+  <script src="/static/js/scrollreveal.min.js"></script>
+  <!--=============== SWIPER JS ===============-->
+  <script src="/static/js/swiper-bundle.min.js"></script>
+  <!--=============== MAIN JS ===============-->
+  <script src="/static/js/main.js"></script>
