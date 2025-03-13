@@ -71,9 +71,10 @@ class _ViewFacilitiesState extends State<ViewFacilities> with SingleTickerProvid
               'type': facility['facility_type'].toString(),
               'description': facility['facility_des'].toString(),
               'capacity': facility['facility_capacity'].toString(),
-              'image': facility['facility_image'].toString(),
+              // 'image': facility['facility_image'].toString(),
               'op_hrs': facility['operating_hrs'].toString(),
               'safety': facility['safety_measures'].toString(),
+              'facility_image': facility['facility_image'].toString(),
             };
           }).toList();
           isLoading = false;
@@ -322,6 +323,92 @@ class FacilityCard extends StatelessWidget {
                 title: "Safety Measures",
                 value: facility['safety'] ?? 'N/A',
               ),
+              // Facility Image - added after safety measures with corrected path
+              if (facility['facility_image'] != null &&
+                  facility['facility_image']!.isNotEmpty &&
+                  facility['facility_image'] != 'N/A')
+                FutureBuilder<SharedPreferences>(
+                  future: SharedPreferences.getInstance(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final String ip = snapshot.data!.getString('url') ?? '';
+                      final String imageUrl = '$ip/static/facility_images/${facility['facility_image']}';
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF6C63FF).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.image_outlined,
+                                  size: 16,
+                                  color: Color(0xFF6C63FF),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Text(
+                                "Facility Image",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 12),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              imageUrl,
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                print("Error loading image: $error");
+                                print("Image URL: $imageUrl");
+                                return Container(
+                                  height: 200,
+                                  color: Color(0xFFEEEDFF),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.image_not_supported_outlined,
+                                          color: Color(0xFF6C63FF),
+                                          size: 32,
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          "Image not available",
+                                          style: TextStyle(
+                                            color: Color(0xFF6C63FF),
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return SizedBox.shrink();
+                    }
+                  },
+                ),
             ],
           ),
         ),
