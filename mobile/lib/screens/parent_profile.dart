@@ -98,14 +98,14 @@ class _ParentProfileState extends State<ParentProfile> {
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                // Edit profile functionality
-              },
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.edit),
+          //     onPressed: () {
+          //       // Edit profile functionality
+          //     },
+          //   ),
+          // ],
         ),
         body: isLoading
             ? Center(

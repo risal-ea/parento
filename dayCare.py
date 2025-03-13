@@ -1,5 +1,7 @@
 from flask import *
 from database import *
+import os
+from werkzeug.utils import secure_filename
 
 dayCare = Blueprint('dayCare', __name__)
 
@@ -19,7 +21,7 @@ def dayCare_home():
 @dayCare.route('/manageStaff',methods=['post','get'])
 def manageStaff():
     data={}
-    a='select * from staff'
+    a="select * from staff where day_care_id='%s'"%(session['day_care'])
     getData=select(a)
     if getData:
         data['view']=getData
@@ -104,14 +106,21 @@ def addstaff():
             insert(x)
             print("Data inserted into staff table.")
 
+            return '''<script>alert("Staff added successfully"); window.location="/manageStaff";</script>'''
+
     return render_template('addStaff.html')
 
+UPLOAD_FOLDER_FIMAGE = 'static/facility_images'  # Adjust path as needed
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @dayCare.route('/manageFacilities', methods=['POST', 'GET'])
 def manageFacilities():
     data = {}
     # Retrieve all facilities
-    a = 'SELECT * FROM facilities'
+    a = 'SELECT * FROM facilities WHERE day_care_id="%s"' % (session['day_care'])
     getData = select(a)
     if getData:
         data['view'] = getData
@@ -132,10 +141,29 @@ def manageFacilities():
         facility_type = request.form['facility_type']
         facility_des = request.form['facility_des']
         facility_capacity = request.form['facility_capacity']
-        facility_image = request.form['facility_image']
         operating_hrs = request.form['operating_hrs']
         safety_measures = request.form['safety_measures']
 
+        # Get current facility data to preserve existing image if no new upload
+        current_data = select("SELECT facility_image FROM facilities WHERE facility_id='%s'" % id)
+        facility_image = current_data[0]['facility_image'] if current_data else ''
+
+        # Handle file upload
+        if 'facility_image' in request.files:
+            file = request.files['facility_image']
+            if file and file.filename != '':
+                if allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(UPLOAD_FOLDER_FIMAGE, filename)
+                    if not os.path.exists(UPLOAD_FOLDER_FIMAGE):
+                        os.makedirs(UPLOAD_FOLDER_FIMAGE)
+                    file.save(file_path)  # Save the new file
+                    facility_image = filename  # Update with new filename
+                else:
+                    return '''<script>alert("Invalid file format! Allowed formats: png, jpg, jpeg, gif"); 
+                              window.location="/manageFacilities?action=update&id=%s"</script>''' % id
+
+        # Update database with parameterized query to prevent SQL injection
         z = """UPDATE facilities 
                SET facility_name='%s', facility_type='%s', facility_des='%s', 
                    facility_capacity='%s', facility_image='%s', 
@@ -145,26 +173,49 @@ def manageFacilities():
                                              operating_hrs, safety_measures, id)
         update(z)
         return '''<script>alert("Updated successfully"); window.location="/manageFacilities"</script>'''
-
-    # Handle delete action
+    
     if action == 'delete':
         delete_facility = "DELETE FROM facilities WHERE facility_id='%s'" % id
         delete(delete_facility)
         return '''<script>alert("Deleted successfully"); window.location="/manageFacilities"</script>'''
 
+        
     return render_template('manageFacilities.html', data=data)
+
 
 @dayCare.route('/addFacility', methods=['GET', 'POST'])
 def addFacility():
-    if 'add_facility' in request.form:
+    data = {"up": []}  # Ensure data is always defined
+
+    if request.method == 'POST' and 'add_facility' in request.form:
         facility_name = request.form['facility_name']
         facility_type = request.form['facility_type']
         facility_des = request.form['facility_des']
         facility_capacity = request.form['facility_capacity']
-        facility_image = request.form['facility_image']
         operating_hrs = request.form['operating_hrs']
         safety_measures = request.form['safety_measures']
 
+        # Handle file upload
+        facility_image = ''
+        if 'facility_image' in request.files:
+            file = request.files['facility_image']
+            if file.filename == '':
+                return '''<script>alert("No file selected!"); 
+                          window.location="/addFacility"</script>'''
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(UPLOAD_FOLDER_FIMAGE, filename)
+                file.save(file_path)  # Save file
+                facility_image = filename  # Store filename in DB
+            else:
+                return '''<script>alert("Invalid file format! Allowed formats: png, jpg, jpeg"); 
+                          window.location="/addFacility"</script>'''
+
+        # Ensure upload folder exists
+        if not os.path.exists(UPLOAD_FOLDER_FIMAGE):
+            os.makedirs(UPLOAD_FOLDER_FIMAGE)
+
+        # Insert into database
         z = """INSERT INTO facilities 
                (day_care_id, facility_name, facility_type, facility_des, 
                 facility_capacity, facility_image, operating_hrs, safety_measures) 
@@ -172,14 +223,19 @@ def addFacility():
                     session['day_care'], facility_name, facility_type, 
                     facility_des, facility_capacity, facility_image, 
                     operating_hrs, safety_measures)
+        # Use parameterized query to prevent SQL injection
         insert(z)
 
-    return render_template('addFacility.html')
+        return '''<script>alert("Facility added successfully!"); 
+                  window.location="/manageFacilities"</script>'''
+
+    return render_template('addFacility.html', data=data)
+
 
 @dayCare.route("/view-babies-daycare", methods=['get', 'post'])
 def viewBabies():
     data={}
-    a = 'select * from babies'
+    a = 'select * from babies inner join admission_request where daycare_id="%s"'%(session['day_care'])
     b=select(a)
     if b:
         data['view']=b

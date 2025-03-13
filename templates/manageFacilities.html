@@ -257,7 +257,7 @@
         {% if data['up'] %}
           <h1>Update Facility</h1>
           <div class="form-container">
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
               <div class="form-group">
                 <label for="facility_name">Facility Name:</label>
                 <input type="text" id="facility_name" name="facility_name" class="form-input" 
@@ -285,8 +285,9 @@
               
               <div class="form-group">
                 <label for="facility_image">Facility Image:</label>
-                <input type="text" id="facility_image" name="facility_image" class="form-input" 
-                       value="{{data['up'][0]['facility_image']}}" required>
+                <input type="file" id="facility_image" name="facility_image" class="form-input" 
+                       accept="image/png, image/jpeg, image/gif">
+                <small>Current image: {{data['up'][0]['facility_image']}}</small>
               </div>
               
               <div class="form-group">
@@ -331,7 +332,7 @@
                   <td>{{facility['facility_type']}}</td>
                   <td>{{facility['facility_des']}}</td>
                   <td>{{facility['facility_capacity']}}</td>
-                  <td>{{facility['facility_image']}}</td>
+                  <td><img src="static/facility_images/{{facility['facility_image']}}" alt=""></td>
                   <td>{{facility['operating_hrs']}}</td>
                   <td>{{facility['safety_measures']}}</td>
                   <td><a href="?action=update&id={{facility['facility_id']}}" class="accept-btn">Update</a></td>

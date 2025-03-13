@@ -95,6 +95,8 @@ def dayCareReg():
         x="insert into day_care values(null,'%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(id, name, owner_name,phone_no,adress,license_number,capacity,opTime,dcDescription)
         insert(x)
 
+        return '''<script>alert("Registration successfull, Please Login"); window.location="/login";</script>'''
+
 
     return render_template("dayCareRegistration.html")
 
@@ -115,6 +117,8 @@ def parentReg():
 
         x="insert into parent values(null,'%s','%s','%s','%s','%s','%s','%s')"%(id, name, email,phone_no,adress,dob,gender)
         insert(x)
+        return '''<script>alert("Registration successfull, Please Login"); window.location="/login";</script>'''
+
 
     return render_template("parentRegistration.html")
 
