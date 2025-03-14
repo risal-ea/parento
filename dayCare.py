@@ -381,11 +381,9 @@ def chat():
         message = request.form.get('message')
         if message:
             # Insert new message into chat table
-            query_insert = """
-                INSERT INTO chat (sender_id, sender_type, receiver_id, receiver_type, message, date_time)
-                VALUES ('%s', 'daycare', '%s', 'parent', '%s', NOW())
-            """ % (daycare_login_id, parent_login_id, message)
-            select(query_insert)  # Replace with your insert function if select doesn't work for INSERT
+            query_insert = "insert into chat values(null, '%s', 'daycare', '%s', 'parent', '%s', NOW())"%(daycare_login_id, parent_login_id, message)
+
+            insert(query_insert)  # Replace with your insert function if select doesn't work for INSERT
 
             # Redirect to the same chat page with GET to prevent resubmission
             return redirect(url_for('dayCare.chat', id=admission_id))

@@ -82,6 +82,7 @@
       border-bottom: 1px solid #eaeaea;
       color: #555;
       transition: background-color 0.2s ease;
+      vertical-align: middle; /* Align content vertically */
     }
     
     .data-table tr:hover td {
@@ -129,10 +130,13 @@
     }
 
     .qr-code-img {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
+      max-width: 100px; /* Reduced size and made responsive */
+      max-height: 100px;
+      width: auto;
+      height: auto;
+      object-fit: contain; /* Changed to contain to maintain aspect ratio */
       border-radius: 4px;
+      display: block; /* Ensure it behaves well in table cell */
     }
 
     .action-buttons {
@@ -159,8 +163,8 @@
       }
       
       .qr-code-img {
-        width: 100px;
-        height: 100px;
+        max-width: 80px; /* Smaller size for mobile */
+        max-height: 80px;
       }
       
       .action-buttons {

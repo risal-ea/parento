@@ -152,7 +152,7 @@ class _RegisterState extends State<Register> {
                     Icon(Icons.child_care, color: primaryColor, size: 32),
                     SizedBox(width: 10),
                     Text(
-                      "KidsCare",
+                      "Parento",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

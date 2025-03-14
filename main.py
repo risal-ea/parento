@@ -48,17 +48,6 @@ def update_payment_status():
 
         # Check if update was successful (assuming update returns rows affected or True)
         if update_result:
-            # Uncomment and fix this if you want to insert into admission_payment
-            # insert_query = "INSERT INTO admission_payment VALUES (NULL, %s, %s, NOW(), 'paid')"
-            # insert_result = insert(insert_query, (admission, select_result[0].get('payment', '')))
-            # if insert_result:
-            #     data['status'] = 'success'
-            #     data['message'] = 'Payment status updated and recorded successfully'
-            # else:
-            #     data['status'] = 'failed'
-            #     data['message'] = 'Failed to record payment'
-            # return jsonify(data), 200 if insert_result else 500
-
             data['status'] = 'success'
             data['message'] = 'Payment status updated successfully'
         else:
@@ -196,31 +185,6 @@ def manage_babies():
 
     return jsonify({"status": "success", "message": "Baby details saved successfully"})
 
-
-
-# @app.route('/and_manage_babie',methods=['POST'])
-# def manage_babies():
-#     data={}
-#     lid=request.form['lid']
-
-#     z="select * from parent where login_id='%s'"%(lid)
-#     xx=select(z)
-#     pid=xx[0]['parent_id']
-#     print(pid)
-#     baby_name = request.form['baby_name']
-#     dob = request.form['baby_dob']
-#     gender = request.form['baby_gender']
-#     health = request.form['health_issues']
-#     medical_condition = request.form['medical_condition']
-
-#     print(lid,"/////")
-
-
-#     x="insert into babies values(null,'%s','%s','%s','%s','null','%s','%s')"%(pid, baby_name, dob, gender, health, medical_condition)
-#     b=insert(x)
-
-#     print(data)
-#     return data
 
 @app.route('/and_send_complaint', methods=['POST'])
 def sendComplaint():
@@ -397,50 +361,6 @@ def baby_details():
     except Exception as e:
         print(f"Error in baby_details: {str(e)}")
         return jsonify({"status": "error", "message": "Internal server error"}), 500
-    
-
-# @app.route("/baby_details", methods=['POST','GET'])
-# def baby_details():
-#     try:
-#         baby_id = request.form.get('baby_id', '')  # Safely get baby_id
-        
-#         if not baby_id:
-#             return jsonify({"status": "error", "message": "Baby ID is required"}), 400
-
-#         print(f"Baby ID received: {baby_id}")  # Improved logging
-
-#         # Fetch baby details from database
-#         query = "SELECT baby_name, baby_dob, baby_photo, allergies_or_dietry_restriction, medical_condition FROM babies WHERE baby_id=%s"
-#         result = select(query, (baby_id,))
-
-#         # Fetch QR code separately
-#         qr_query = "SELECT * FROM admission_request WHERE baby_id = %s"
-#         qr_result = select(qr_query, (baby_id,))
-
-#         if result and len(result) > 0:  # If baby data is found
-#             baby_data = {
-#                 "status": "success",
-#                 "data": [{
-#                     "baby_name": result[0]["baby_name"],
-#                     "payment": qr_result[0]["payment"],
-#                     "payment_status": qr_result[0]["payment_status"],
-#                     "admision": qr_result[0]["adminssion_id"],
-#                     "baby_dob": str(result[0]["baby_dob"]),  # Convert date to string
-#                     "baby_photo": result[0]["baby_photo"] or "",  # Handle null values
-#                     "allergies_or_dietry_restriction": result[0]["allergies_or_dietry_restriction"] or "",
-#                     "medical_condition": result[0]["medical_condition"] or "",
-#                     "qr_code": qr_result[0]["qr_code"] if qr_result and len(qr_result) > 0 else ""
-#                 }]
-#             }
-#             print(f"Returning baby data: {baby_data}")  # Log the response
-#             return jsonify(baby_data), 200
-#         else:
-#             print(f"No baby found for ID: {baby_id}")
-#             return jsonify({"status": "error", "message": "Baby not found"}), 404
-
-#     except Exception as e:
-#         print(f"Error in baby_details: {str(e)}")
-#         return jsonify({"status": "error", "message": "Internal server error"}), 500
 
 
 
@@ -685,11 +605,6 @@ def checkInOut():
 
     print(data)
     return jsonify(data)
-
-
-    
-
-
 
 
 #/////////////////////////
