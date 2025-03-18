@@ -74,7 +74,7 @@ class _RegisterState extends State<Register> {
           "name": parentName.text.trim(),
           "phone_number": parentPhone.text.trim(),
           "email": parentEmail.text.trim(),
-          "address": parentAddress.text.trim(),
+          "addres": parentAddress.text.trim(),
           "dob": parentDob.text.trim(),
           "gender": selectedGender,
           "username": username.text.trim(),

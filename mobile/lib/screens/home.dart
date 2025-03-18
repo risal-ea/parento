@@ -546,7 +546,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin, Widget
                     childAspectRatio: 0.85,
                     children: [
                       buildActivityCard("Sleep", Icons.bedtime, Colors.blue, calculateDuration('Sleeping')),
-                      buildActivityCard("Eat", Icons.restaurant, Colors.orange, calculateDuration('Playing')),
+                      buildActivityCard("Eat", Icons.restaurant, Colors.orange, calculateDuration('Eating')),
                       buildActivityCard("Study", Icons.menu_book, Colors.green, calculateDuration('Studying')),
                     ],
                   ),

@@ -46,32 +46,36 @@ def process_qr():
         print("Already marked check-in and check-out date")
         return jsonify({"status": "success", "message": "Already checked in and out today"})
 
-@public.route("/login",methods=['post','get'])
+@public.route("/login", methods=['POST', 'GET'])
 def log():
-    if 'login' in request.form:
-        uname=request.form['username']
-        password=request.form['psw']
+    if request.method == 'POST' and 'login' in request.form:
+        uname = request.form['username']
+        password = request.form['psw']
 
-        getData="SELECT * FROM login WHERE username='%s' AND PASSWORD='%s'"%(uname,password)
+        getData = "SELECT * FROM login WHERE username='%s' AND PASSWORD='%s'" % (uname, password)
         res = select(getData)
-        session['log']= res[0]['login_id']
-        print(session['log'])
-
-        if res:
-            if res[0]['usertype']=='admin':
-                return redirect(url_for('admin.adm'))
-            elif res[0]['usertype']=='dayCare':
-                qry="select * from day_care where login_id='%s'"%(session['log'])
-                res1=select(qry)
-                session['day_care']=res1[0]['day_care_id']
-                return redirect(url_for('dayCare.dayCare_home'))
-            elif res[0]['usertype']=='staff':
-                qry="select * from staff where login_id='%s'"%(session['log'])
-                res1=select(qry)
-                session['staff']=res1[0]['staff_id']
-                return redirect(url_for('staff.staffHome'))
-
         
+        if res:
+            session['log'] = res[0]['login_id']
+            print(session['log'])
+            
+            if res[0]['usertype'] == 'admin':
+                return redirect(url_for('admin.adm'))
+            elif res[0]['usertype'] == 'dayCare':
+                qry = "select * from day_care where login_id='%s'" % (session['log'])
+                res1 = select(qry)
+                session['day_care'] = res1[0]['day_care_id']
+                return redirect(url_for('dayCare.dayCare_home'))
+            elif res[0]['usertype'] == 'staff':
+                qry = "select * from staff where login_id='%s'" % (session['log'])
+                res1 = select(qry)
+                session['staff'] = res1[0]['staff_id']
+                return redirect(url_for('staff.staffHome'))
+        else:
+            # Flash a message when login fails
+            flash('Incorrect username or password', 'error')
+            return redirect(url_for('public.log'))
+    
     return render_template("login.html")
 
 

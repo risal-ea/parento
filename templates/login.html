@@ -1,76 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <link rel="shortcut icon" href="assets/img/favicon.png" type="image/png">
-
-        <!--=============== REMIXICONS ===============-->
-        <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-        
-        <!--=============== SWIPER CSS ===============-->
-        <link rel="stylesheet" href="/static/css/swiper-bundle.min.css">
-
-        <!--=============== CSS ===============-->
-        <link rel="stylesheet" href="/static/css/style.css">
-
-        <title>parento</title>
-    </head>
-    <header class="header" id="header">
-            <nav class="nav container">
-                <a href="/" class="nav__logo">PARENTO</a>
-
-                <div class="nav__menu" id="nav-menu">
-                    <ul class="nav__list">
-                        <li class="nav__item">
-                            <a href="/parentReg" class="nav__link">Parent Registration</a>
-                        </li>
-                        <li class="nav__item">
-                            <a href="/dayCareReg" class="nav__link">Daycare Registration</a>
-                        </li>
-                        <li class="nav__item">
-                            <a href="/login" class="nav__link">Login</a>
-                        </li>
-                    </ul>
-
-                    <div class="nav__dark">
-                        <!-- Theme change button -->
-                        <span class="change-theme-name">Dark mode</span>
-                        <i class="ri-moon-line change-theme" id="theme-button"></i>
-                    </div>
-
-                    <i class="ri-close-line nav__close" id="nav-close"></i>
-                </div>
-
-                <div class="nav__toggle" id="nav-toggle">
-                    <i class="ri-function-line"></i>
-                </div>
-            </nav>
-    </header>      
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/swiper-bundle.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>parento</title>
+    <style>
+        .flash-error {
+            color: red;
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-        <!--==================== HOME ====================-->
-        <section>
-            <img src="/static/img/home1.jpg" alt="" class="home__img">
-
-            <div class="form__container">
-                <form action="" method="post" class="form-container">
-                    <h2 align="center">Login</h2>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" name="username" id="username" class="form-input" placeholder="Enter Username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" name="psw" id="password" class="form-input" placeholder="Enter Password" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" name="login" value="Login" class="form-button">
-                    </div>
-                </form>
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="/" class="nav__logo">PARENTO</a>
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="/parentReg" class="nav__link">Parent Registration</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="/dayCareReg" class="nav__link">Daycare Registration</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="/login" class="nav__link">Login</a>
+                    </li>
+                </ul>
+                <div class="nav__dark">
+                    <span class="change-theme-name">Dark mode</span>
+                    <i class="ri-moon-line change-theme" id="theme-button"></i>
+                </div>
+                <i class="ri-close-line nav__close" id="nav-close"></i>
             </div>
-        </section>
+            <div class="nav__toggle" id="nav-toggle">
+                <i class="ri-function-line"></i>
+            </div>
+        </nav>
+    </header>      
+
+    <section>
+        <img src="/static/img/home1.jpg" alt="" class="home__img">
+        <div class="form__container">
+            <form action="" method="post" class="form-container">
+                <h2 align="center">Login</h2>
+                
+                <!-- Add flash message display -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" name="username" id="username" class="form-input" placeholder="Enter Username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="psw" id="password" class="form-input" placeholder="Enter Password" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" name="login" value="Login" class="form-button">
+                </div>
+            </form>
+        </div>
+    </section>
     {% include 'public/footer.html' %}
 </body>
+</html>
