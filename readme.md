@@ -12,9 +12,9 @@ PARENTO is a application designed to streamline communication between caretakers
 
 ## Screenshots
 <p float="left">
-  <img src="screenshots/s1.png" alt="Screenshot 1" width="300" />
-  <img src="screenshots/s2.png" alt="Screenshot 2" width="300" />
-  <img src="screenshots/s3.png" alt="Screenshot 2" width="300" />
+  <img src="screenshots/s1.png" alt="Screenshot 1" width="200" />
+  <img src="screenshots/s2.png" alt="Screenshot 2" width="200" />
+  <img src="screenshots/s3.png" alt="Screenshot 2" width="200" />
 </p>
 
 <p float="left">
