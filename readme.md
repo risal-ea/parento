@@ -2,34 +2,58 @@
 
 PARENTO is a application designed to streamline communication between caretakers and parents. The app provides a user-friendly interface for real-time updates on children's activities, health tracking, photo sharing, feedback, and more. With PARENTO, parents can stay connected with their children's daycare activities, monitor progress, and interact with caretakers easily.
 
-## Features
+## Technology 
 
-- **Activity Updates:** Daily activity timelines for children, providing parents with real-time updates.
-- **Customizable Categories:** Allows caretakers to create categories for different types of activities.
-- **Photo Sharing:** Caretakers can upload photos of children's activities for parents to view.
+- Flutter, Dart
+- Flask, Python
+- HTML, CSS, JAVASCRIPT
+- Mysql
+- API (Razorpay)
 
-- **Health Tracking:** Monitor children’s health metrics like temperature, weight, and vaccinations.
-- **Mood Reports:** Caretakers can share mood reports of children based on observations.
-- **Milestone Tracking:** Track milestones such as learning achievements and physical development.
-- **Feedback System:** Parents can provide feedback on their child's progress and daycare experience.
-- **Secure Data Storage:** All user data, including personal and medical details, are securely stored.
-- **Emergency Alerts:** Immediate alerts sent to parents in case of emergencies.
-- **Calendar Integration:** Activity schedules are synchronized with a built-in calendar.
-- **User Roles:** Multiple user roles (admin, parent, caretaker) with different permissions.
-- **Push Notifications:** Real-time notifications for activity updates, feedback, and alerts.
-- **In-App Purchases:** Parents can make purchases for daycare-related products or services.
-- **QR Scanning for Check-In/Check-Out:** Parents can scan QR codes to check their children in and out of daycare.
+## Screenshots
+<p float="left">
+  <img src="screenshots/s1.png" alt="Screenshot 1" width="200" />
+  <img src="screenshots/s2.png" alt="Screenshot 2" width="200" />
+  <img src="screenshots/s3.png" alt="Screenshot 2" width="200" />
+</p>
 
-## Tech Stack
+<p float="left">
+  <img src="screenshots/s4.png" alt="Screenshot 1" width="200" />
+  <img src="screenshots/s5.png" alt="Screenshot 2" width="200" />
+  <img src="screenshots/s6.png" alt="Screenshot 2" width="200" />
+</p>
 
-- **Frontend:** Flutter, HTML, CSS, JavaScript.
-- **Backend:** Python (Flask),Dart
-- **Database:** MySQL
-- **Notifications:** Firebase Cloud Messaging (FCM) for push notifications
-- **Calendar Integration:** Google Calendar API
+<p float="left">
+  <img src="screenshots/s7.png" alt="Screenshot 1" width="200" />
+  <img src="screenshots/s8.png" alt="Screenshot 2" width="200" />
+  <img src="screenshots/s9.png" alt="Screenshot 2" width="200" />
+</p>
 
-### Clone the Repository
+<p float="left">
+  <img src="screenshots/s10.png" alt="Screenshot 1" width="200" />
+  <img src="screenshots/s11.png" alt="Screenshot 2" width="200" />
+  <img src="screenshots/s12.png" alt="Screenshot 2" width="200" />
+</p>
 
-```bash
-git clone https://github.com/risal-ea/parento.git
-cd parento
+<p float="left">
+  <img src="screenshots/s13.png" alt="Screenshot 1" width="200" />
+  <img src="screenshots/s14.png" alt="Screenshot 2" width="200" />
+  <img src="screenshots/s15.png" alt="Screenshot 2" width="200" />
+</p>
+
+<p float="left">
+  <img src="screenshots/s16.png" alt="Screenshot 1" width="200" />
+  <img src="screenshots/s17.png" alt="Screenshot 2" width="200" />
+  <img src="screenshots/s18.png" alt="Screenshot 2" width="200" />
+</p>
+
+<p float="left">
+  <img src="screenshots/s19.png" alt="Screenshot 1" width="200" />
+  <img src="screenshots/s20.png" alt="Screenshot 2" width="200" />
+  <img src="screenshots/s21.png" alt="Screenshot 2" width="200" />
+</p>
+
+<p float="left">
+  <img src="screenshots/s22.png" alt="Screenshot 1" width="200" />
+</p>
+
